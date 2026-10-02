@@ -10,32 +10,39 @@
 </script>
 <style>
   :root{
-    --ink:#1c2b2a;
-    --paper:#f6f5f1;
+    /* Digit palette */
+    --navy:#132335;        /* brand navy — header band, feature tiles */
+    --navy-2:#192b3e;
+    --brand:#30b0cb;       /* brand cyan — buttons, active states, accents */
+    --brand-ink:#132335;   /* text on brand cyan */
+    --ink:#132335;
+    --paper:#f4f6f8;
     --panel:#ffffff;
-    --line:#dcd8cd;
-    --teal:#0f4c46;
-    --teal-dim:#e4ece9;
-    --amber:#b8863b;
-    --amber-dim:#f5ead9;
-    --red:#9c3b34;
-    --red-dim:#f6e6e4;
-    --green:#3f6b3a;
-    --green-dim:#e9f0e6;
+    --line:#dde3e9;
+    --teal:#167690;        /* cyan text/lines on light surfaces (AA contrast) */
+    --teal-dim:#e3f3f7;
+    --amber:#a8742a;
+    --amber-dim:#fbf0dc;
+    --red:#b23b3b;
+    --red-dim:#fbe9e9;
+    --green:#2f7d4f;
+    --green-dim:#e5f4ec;
     --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
     --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --ink:#e9ece9; --paper:#141a19; --panel:#1b2220; --line:#2c3532;
-      --teal:#5fb3a3; --teal-dim:#1c2e2a; --amber:#d9a860; --amber-dim:#2e2718;
-      --red:#e08479; --red-dim:#3a201d; --green:#8fc17f; --green-dim:#1f2c1c;
+      --navy:#192b3e; --navy-2:#1f344a; --brand:#30b0cb; --brand-ink:#0f1b29;
+      --ink:#e6edf3; --paper:#0f1b29; --panel:#132335; --line:#26394d;
+      --teal:#30b0cb; --teal-dim:#173a4d; --amber:#e0b066; --amber-dim:#33291a;
+      --red:#f08a80; --red-dim:#3d2224; --green:#7fcf9a; --green-dim:#173326;
     }
   }
   :root[data-theme="dark"]{
-    --ink:#e9ece9; --paper:#141a19; --panel:#1b2220; --line:#2c3532;
-    --teal:#5fb3a3; --teal-dim:#1c2e2a; --amber:#d9a860; --amber-dim:#2e2718;
-    --red:#e08479; --red-dim:#3a201d; --green:#8fc17f; --green-dim:#1f2c1c;
+    --navy:#192b3e; --navy-2:#1f344a; --brand:#30b0cb; --brand-ink:#0f1b29;
+    --ink:#e6edf3; --paper:#0f1b29; --panel:#132335; --line:#26394d;
+    --teal:#30b0cb; --teal-dim:#173a4d; --amber:#e0b066; --amber-dim:#33291a;
+    --red:#f08a80; --red-dim:#3d2224; --green:#7fcf9a; --green-dim:#173326;
   }
   *{box-sizing:border-box;}
   body{
@@ -46,23 +53,24 @@
   header.top{
     display:flex; justify-content:space-between; align-items:flex-end;
     gap:16px; margin-bottom:22px; flex-wrap:wrap;
-    border-bottom:2px solid var(--ink); padding-bottom:14px;
+    background:var(--navy); color:#fff; border-radius:8px; padding:22px 24px;
+    border-top:3px solid var(--brand);
   }
   header.top h1{
     font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; font-weight:700;
   }
-  header.top p{margin:0; color:var(--ink); opacity:0.65; font-size:13px;}
+  header.top p{margin:0; color:#fff; opacity:0.7; font-size:13px;}
   .fy-badge{
-    font-family:var(--mono); font-size:12px; background:var(--teal-dim); color:var(--teal);
+    font-family:var(--mono); font-size:12px; background:rgba(48,176,203,0.16); color:var(--brand);
     padding:5px 10px; border-radius:3px; white-space:nowrap;
   }
   .top-right{display:flex; gap:8px; align-items:center; align-self:flex-start; flex-wrap:wrap;}
   .theme-toggle{
-    font-family:var(--sans); font-size:12px; font-weight:600; color:var(--ink);
-    background:var(--panel); border:1px solid var(--line); border-radius:3px;
+    font-family:var(--sans); font-size:12px; font-weight:600; color:#fff;
+    background:transparent; border:1px solid rgba(255,255,255,0.3); border-radius:3px;
     padding:4px 10px; cursor:pointer; white-space:nowrap;
   }
-  .theme-toggle:hover{border-color:var(--teal); color:var(--teal);}
+  .theme-toggle:hover{border-color:var(--brand); color:var(--brand);}
 
   nav.tabs{
     display:flex; gap:2px; margin-bottom:20px; border-bottom:1px solid var(--line);
@@ -73,7 +81,7 @@
     background:none; border:none; padding:10px 16px; cursor:pointer;
     border-bottom:2px solid transparent; white-space:nowrap;
   }
-  nav.tabs button.active{opacity:1; color:var(--teal); border-bottom-color:var(--teal);}
+  nav.tabs button.active{opacity:1; color:var(--teal); border-bottom-color:var(--brand);}
   nav.tabs button:hover{opacity:0.9;}
 
   .panel{display:none;}
@@ -98,7 +106,7 @@
     width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:4px;
     background:var(--paper); color:var(--ink); font-family:var(--mono); font-size:14px;
   }
-  input:focus, select:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  input:focus, select:focus{outline:2px solid var(--brand); outline-offset:1px;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
 
@@ -109,7 +117,7 @@
     border-right:1px solid var(--line);
   }
   .seg button:last-child{border-right:none;}
-  .seg button.active{background:var(--teal); color:#fff; opacity:1;}
+  .seg button.active{background:var(--brand); color:var(--brand-ink); opacity:1;}
 
   .result-line{
     display:flex; justify-content:space-between; align-items:baseline;
@@ -157,11 +165,79 @@
   .ledger-row select{padding:8px 4px; font-size:12px;}
   .ledger-row button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:34px;}
   .btn{
-    background:var(--teal); color:#fff; border:none; border-radius:4px; padding:8px 14px;
+    background:var(--brand); color:var(--brand-ink); border:none; border-radius:4px; padding:8px 14px;
     font-size:13px; font-weight:600; cursor:pointer; font-family:var(--sans);
   }
   .btn.ghost{background:none; border:1px solid var(--line); color:var(--ink);}
   .btn.small{padding:6px 10px; font-size:12px;}
+
+  .tm-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+  .tm-tile{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:12px 14px;}
+  .tm-tile .lbl{font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; opacity:0.6; font-weight:600;}
+  .tm-tile .amt{font-family:var(--mono); font-size:20px; font-weight:700; margin-top:4px;}
+  .tm-tile.net{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .tm-tile.net .lbl{opacity:0.7;}
+  .tm-tile.net .amt{color:#fff;}
+  .tm-block{border:1px solid var(--line); border-radius:6px; padding:14px 16px 6px; margin-bottom:14px;}
+  .tm-block-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:6px;}
+  .tm-block-head .t{font-size:13px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:0.04em;}
+  .tm-block-head .s{font-size:12px; opacity:0.6; text-align:right;}
+  .tm-block .result-line .k small{display:block; font-size:11.5px; opacity:0.75;}
+  .tm-block .result-line.deduct .v{color:var(--red);}
+  .tm-block .result-line.net{border-top:1px solid var(--ink); border-bottom:none; font-weight:700;}
+  .tm-block .result-line.super{opacity:0.75; border-bottom:none;}
+  .tm-block .empty{font-size:12.5px; opacity:0.55; padding:4px 0 10px;}
+
+  .date-wrap{position:relative;}
+  .date-wrap input.date-au{padding-right:38px;}
+  .date-wrap input.date-au.invalid{border-color:var(--red); outline-color:var(--red);}
+  .date-wrap .date-btn{
+    position:absolute; right:4px; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer; font-size:15px; padding:4px 6px; opacity:0.7;
+  }
+  .date-wrap .date-btn:hover{opacity:1;}
+  .date-wrap .date-picker{position:absolute; right:0; bottom:0; width:1px; height:1px; opacity:0; pointer-events:none; border:0; padding:0;}
+  .mcb-table input{padding:5px 8px; font-size:13px; text-align:right; min-width:110px;}
+  .mcb-table td{vertical-align:middle;}
+  .mcb-table td:nth-child(2){white-space:nowrap;}
+  .mcb-table input.edited{border-color:var(--amber); background:var(--amber-dim);}
+  .mcb-table tr.partial td{background:var(--amber-dim);}
+  .mcb-table tr.capped td{background:var(--red-dim);}
+  .mcb-table tr.capped td.val{color:var(--red);}
+  .mcb-table tr.tot td{border-top:2px solid var(--ink); border-bottom:none; font-weight:700;}
+  /* Super column — the figure that matters each pay run */
+  .mcb-table th.sup{text-align:right; color:var(--teal); border-bottom:2px solid var(--teal);}
+  .mcb-table td.sup{
+    background:color-mix(in srgb, var(--teal-dim) 55%, transparent);
+    color:var(--teal); font-size:14px; font-weight:700; min-width:130px;
+  }
+  .mcb-table td.sup small{display:block; font-size:11px; font-weight:600; opacity:0.75;}
+  .mcb-table tr.partial td.sup{background:var(--amber-dim); color:var(--amber);}
+  .mcb-table tr.capped td.sup{background:var(--red-dim); color:var(--red);}
+  .mcb-table tr.tot td.sup{background:var(--teal-dim); font-size:15px;}
+
+  .lead{font-size:13px; opacity:0.7; max-width:620px;}
+  .type-cards{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin:16px 0 4px;}
+  @media (max-width:860px){ .type-cards{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .type-cards{grid-template-columns:1fr;} }
+  .type-card{
+    text-align:left; background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; cursor:pointer; font-family:var(--sans); display:flex; flex-direction:column; gap:4px;
+  }
+  .type-card strong{font-size:13.5px;}
+  .type-card span{font-size:12px; opacity:0.7; line-height:1.4;}
+  .type-card:hover{border-color:var(--brand);}
+  .type-card.active{border:2px solid var(--brand); padding:13px 15px; background:var(--teal-dim);}
+  .followup{margin-top:14px; padding:14px 16px 2px; background:var(--paper); border:1px solid var(--line); border-radius:8px;}
+  .followup > .hint{font-size:11.5px; opacity:0.6; margin:-4px 0 12px;}
+  .stp-row{margin:-2px 0 6px;}
+  .stp-tag{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; color:var(--teal); background:var(--teal-dim); padding:2px 8px; border-radius:10px;}
+  details.rules{margin-top:20px;}
+  details.rules summary{cursor:pointer; font-weight:700; font-size:14px;}
+  details.rules dl{display:grid; grid-template-columns:220px 1fr; gap:8px 16px; margin:14px 0 0; font-size:13px;}
+  details.rules dt{font-weight:600;}
+  details.rules dd{margin:0; opacity:0.85;}
+  @media (max-width:640px){ details.rules dl{grid-template-columns:1fr;} details.rules dd{margin-bottom:8px;} }
 
   footer.foot{margin-top:36px; font-size:11.5px; opacity:0.5; border-top:1px solid var(--line); padding-top:14px;}
 </style>
@@ -184,6 +260,8 @@
     <button class="tab-btn active" data-tab="base">Base Pay</button>
     <button class="tab-btn" data-tab="payg">PAYG — Method B(ii)</button>
     <button class="tab-btn" data-tab="variance">Variances &amp; Adjustments</button>
+    <button class="tab-btn" data-tab="term">Termination</button>
+    <button class="tab-btn" data-tab="mcb">Super — Max Contribution Base</button>
   </nav>
 
   <!-- ============ BASE PAY ============ -->
@@ -223,10 +301,6 @@
             <input type="number" id="bp-annualSalary" value="85000" step="0.01">
             <div class="hint">The salary this role would pay at full standard hours.</div>
           </div>
-          <div class="field">
-            <label>Standard full-time hours / week</label>
-            <input type="number" id="bp-ftHours" value="38" step="0.25">
-          </div>
         </div>
 
         <div id="bp-hourly-fields" style="display:none;">
@@ -234,6 +308,11 @@
             <label>Hourly rate ($)</label>
             <input type="number" id="bp-hourlyRate" value="42.50" step="0.01">
           </div>
+        </div>
+
+        <div class="field">
+          <label>Standard full-time hours / week</label>
+          <input type="number" id="bp-ftHours" value="38" step="0.25">
         </div>
 
         <div class="field" id="bp-pt-hours-field">
@@ -365,10 +444,10 @@
           <div>
             <h3>By calendar days (salaried, no timesheet split)</h3>
             <div class="row2">
-              <div class="field"><label>Period start date</label><input type="date" id="mp-periodStart"></div>
-              <div class="field"><label>Period end date</label><input type="date" id="mp-periodEnd"></div>
+              <div class="field"><label>Period start date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-periodStart"></div>
+              <div class="field"><label>Period end date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-periodEnd"></div>
             </div>
-            <div class="field"><label>Rate change effective date (first day at new rate)</label><input type="date" id="mp-changeDate"></div>
+            <div class="field"><label>Rate change effective date (first day at new rate)</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-changeDate"></div>
             <div class="row2">
               <div class="field"><label>Old rate — pay for a full period at this rate ($)</label><input type="number" id="mp-periodPayOld" value="2923.08" step="0.01"></div>
               <div class="field"><label>New rate — pay for a full period at this rate ($)</label><input type="number" id="mp-periodPayNew" value="3115.38" step="0.01"></div>
@@ -410,6 +489,333 @@
     </div>
   </div>
 
+  <!-- ============ TERMINATION ============ -->
+  <div class="panel" id="panel-term">
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+        <div>
+          <h2 style="margin-bottom:4px;">Termination</h2>
+          <div class="lead">Pick what happened, then answer the follow-up that appears. This sets the tax treatment for every payment below.</div>
+        </div>
+        <button class="btn ghost small" id="tm-loadSample" type="button">Load sample</button>
+      </div>
+      <div class="type-cards" id="tm-type">
+        <button type="button" class="type-card" data-val="redundancy"><strong>Redundancy</strong><span>The role is being abolished, whether or not it qualifies as genuine for tax</span></button>
+        <button type="button" class="type-card active" data-val="normal"><strong>Resignation / dismissal / retirement</strong><span>Any ordinary termination, including performance dismissals and retirement</span></button>
+        <button type="button" class="type-card" data-val="invalidity"><strong>Invalidity</strong><span>Permanent incapacity, certified by two legally qualified medical practitioners</span></button>
+        <button type="button" class="type-card" data-val="death"><strong>Death of the employee</strong><span>Final amounts paid to a beneficiary or the estate</span></button>
+      </div>
+
+      <div class="followup" data-for="normal">
+        <div class="row2">
+          <div class="field">
+            <label>What happened?</label>
+            <select id="tm-reason">
+              <option value="resign" selected>Employee resigned</option>
+              <option value="retire">Employee retired</option>
+              <option value="employer">Dismissed by employer</option>
+              <option value="misconduct">Dismissed for serious misconduct</option>
+              <option value="fixedterm">Fixed-term contract ended</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="followup" data-for="redundancy" style="display:none;">
+        <div class="row3">
+          <div class="field">
+            <label>Genuine redundancy for tax?</label>
+            <select id="tm-genuine">
+              <option value="yes" selected>Yes — meets the ATO conditions</option>
+              <option value="no">No — not genuine</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Employer size</label>
+            <select id="tm-smallBiz">
+              <option value="no" selected>15 or more employees</option>
+              <option value="yes">Small business (under 15)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Redundancy pay (weeks)</label>
+            <input type="number" id="tm-redWks" value="" step="0.2" placeholder="NES scale">
+          </div>
+        </div>
+        <div class="hint">Genuine if the position (not the person) is abolished, the employee is under age pension age (67), the dismissal is at arm's length, and there's no arrangement to re-employ. Redundancy pay blank = NES scale (s119) at the base rate of pay.</div>
+      </div>
+      <div class="followup" data-for="invalidity" style="display:none;">
+        <div class="row2">
+          <div class="field">
+            <label>Certified by two legally qualified medical practitioners?</label>
+            <select id="tm-certified">
+              <option value="yes" selected>Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Last retirement day</label>
+            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-retireDate">
+            <div class="hint">Blank = 67th birthday. Used for the tax-free invalidity segment.</div>
+          </div>
+        </div>
+      </div>
+      <div class="followup" data-for="death" style="display:none;">
+        <div class="row2">
+          <div class="field">
+            <label>Who receives the death benefit?</label>
+            <select id="tm-deathTo">
+              <option value="dependant" selected>A dependant</option>
+              <option value="nondependant">A non-dependant</option>
+              <option value="trustee">The estate (trustee)</option>
+            </select>
+          </div>
+        </div>
+        <div class="hint">Wages and unused leave owed at death are paid to the estate without withholding. The recipient only changes the tax on the ETP.</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Employee</h2>
+          <div class="field"><label>Name</label><input type="text" id="tm-name" placeholder="optional"></div>
+          <div class="row3">
+            <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob" value="01/01/1990"></div>
+            <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired" value="15/03/2021"></div>
+            <div class="field"><label>Last day</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-last" value="02/10/2026"></div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Casual employee?</label>
+              <select id="tm-casual">
+                <option value="no" selected>No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Date notice given</label>
+              <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-noticeDate">
+              <div class="hint">NES age &amp; service are tested on this day. Blank = last day.</div>
+            </div>
+          </div>
+
+          <h3>Pay details</h3>
+          <div class="row2">
+            <div class="field">
+              <label>Pay frequency</label>
+              <select id="tm-freq">
+                <option value="weekly">Weekly (52/yr)</option>
+                <option value="fortnightly" selected>Fortnightly (26/yr)</option>
+                <option value="monthly">Monthly (12/yr)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tax-free threshold claimed?</label>
+              <select id="tm-scale">
+                <option value="2" selected>Yes — Scale 2</option>
+                <option value="1">No — Scale 1</option>
+              </select>
+            </div>
+          </div>
+          <div class="row3">
+            <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" value="38" step="0.25"></div>
+            <div class="field"><label>Annual salary ($)</label><input type="number" id="tm-salary" value="85000" step="0.01"></div>
+            <div class="field"><label>Hourly rate ($)</label><input type="number" id="tm-rate" value="" step="0.0001" placeholder="from salary"></div>
+          </div>
+          <div class="field"><label>Super Guarantee rate (%)</label><input type="number" id="tm-sgRate" value="12" step="0.1"></div>
+        </div>
+
+        <div class="card">
+          <h2>Final pay period</h2>
+          <div class="row2">
+            <div class="field"><label>Ordinary hours worked</label><input type="number" id="tm-ordHrs" value="76" step="0.25"></div>
+            <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" value="0" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
+          </div>
+
+          <h3>Earlier this financial year</h3>
+          <div class="row2">
+            <div class="field">
+              <label>Taxable payments before this pay ($)</label>
+              <input type="number" id="tm-ytdTaxable" value="0" step="0.01">
+              <div class="hint">Reduces the whole-of-income cap.</div>
+            </div>
+            <div class="field">
+              <label>OTE paid before this pay ($)</label>
+              <input type="number" id="tm-ytdOte" value="0" step="0.01">
+              <div class="hint">For the super maximum contribution base.</div>
+            </div>
+          </div>
+
+          <h3>Leave</h3>
+          <div class="row2">
+            <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" value="64" step="0.01"></div>
+            <div class="field">
+              <label>Add AL accrued on final period?</label>
+              <select id="tm-alAccrue">
+                <option value="no" selected>No — balance already includes it</option>
+                <option value="yes">Yes — ordinary hours ÷ 13</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" value="0" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
+
+          <h3>Employment termination payment (ETP)</h3>
+          <div class="row2">
+            <div class="field">
+              <label>Notice in lieu (weeks)</label>
+              <input type="number" id="tm-noticeWks" value="" step="0.2" placeholder="NES minimum">
+              <div class="hint">Blank = NES minimum. Enter the award/contract period if it's longer.</div>
+            </div>
+            <div class="field"><label>Ex-gratia ($)</label><input type="number" id="tm-exGratia" value="0" step="0.01"></div>
+          </div>
+          <div class="field">
+            <label>Other weekly amounts in full rate of pay ($/week)</label>
+            <input type="number" id="tm-noticeExtra" value="0" step="0.01">
+            <div class="hint">Allowances, loadings, incentive payments, overtime/penalties the employee would normally have earned. Added to notice in lieu; super is applied to the base portion only.</div>
+          </div>
+          <div class="field">
+            <label>ETP rate up to the cap</label>
+            <select id="tm-etpRate">
+              <option value="auto" selected>Auto — preservation age (60) by 30 June 2027?</option>
+              <option value="0.17">17% — at or over preservation age</option>
+              <option value="0.32">32% — under preservation age</option>
+            </select>
+            <div class="hint">Anything above the cap is withheld at 47%. Death benefits use their own rates.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 id="tm-heading">Termination calculation</h2>
+          <div id="tm-summary"></div>
+        </div>
+        <div class="card">
+          <h2>Fair Work entitlements (NES)</h2>
+          <div id="tm-nes"></div>
+        </div>
+        <div class="card">
+          <h2>Withholding &amp; STP reporting</h2>
+          <div id="tm-pay"></div>
+        </div>
+        <div class="card">
+          <h2 id="tm-s7title">Schedule 7 — tax on unused leave (marginal rates)</h2>
+          <div id="tm-s7inputs">
+            <div class="field">
+              <label>Normal gross earnings for a regular pay period</label>
+              <div class="seg" id="tm-s7mode">
+                <button class="active" data-val="std">Standard hours</button>
+                <button data-val="hours">Hours</button>
+                <button data-val="avg">Average of pay runs</button>
+                <button data-val="manual">Amount</button>
+              </div>
+            </div>
+            <div class="field tm-s7-field" data-mode="hours" style="display:none;">
+              <label>Hours in a regular pay period</label>
+              <input type="number" id="tm-s7Hours" value="" step="0.25" placeholder="e.g. 64.5">
+              <div class="hint">Multiplied by the hourly rate.</div>
+            </div>
+            <div class="field tm-s7-field" data-mode="avg" style="display:none;">
+              <label>Gross earnings of recent pay runs ($)</label>
+              <div id="tm-s7Runs"></div>
+              <button class="btn ghost small" id="tm-s7AddRun" type="button">+ Add pay run</button>
+              <div class="hint">Normal earnings only — leave out bonuses, back pay and other one-off payments.</div>
+            </div>
+            <div class="field tm-s7-field" data-mode="manual" style="display:none;">
+              <label>Normal gross earnings ($)</label>
+              <input type="number" id="tm-normalGross" value="" step="0.01">
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label>Override step 1 withholding ($)</label>
+                <input type="number" id="tm-s7Tax1" value="" step="1" placeholder="calculated">
+              </div>
+              <div class="field">
+                <label>Override step 5 withholding ($)</label>
+                <input type="number" id="tm-s7Tax2" value="" step="1" placeholder="calculated">
+              </div>
+            </div>
+          </div>
+          <div id="tm-s7note"></div>
+          <table class="steps" id="tm-sched7"></table>
+        </div>
+      </div>
+    </div>
+
+    <details class="card rules">
+      <summary>The rates and rules behind this calculator</summary>
+      <dl>
+        <dt>Financial year</dt><dd>The rates are for 2026–27, so the last day of employment needs to fall between 1 July 2026 and 30 June 2027.</dd>
+        <dt>Genuine redundancy tax-free amount</dt><dd>The first $13,598 of a genuine redundancy payment is tax-free, plus another $6,801 for every completed year of service (ATO key rates, FY 2026–27).</dd>
+        <dt>ETP caps</dt><dd>The employment termination payment cap is $270,000. The whole-of-income cap is $180,000 and isn't indexed (ATO Schedule 11, from 1 July 2026).</dd>
+        <dt>ETP tax rates</dt><dd>32% for an employee under preservation age, 17% once they have reached preservation age (60) by 30 June of the year the payment is made, and 47% on anything above the caps.</dd>
+        <dt>Unused leave</dt><dd>Withheld at a flat 32%, or with the marginal method where ATO Schedule 7 (from 1 July 2026) calls for it, including the special rule for payments under $300.</dd>
+        <dt>Final wages</dt><dd>Ordinary earnings are taxed with the ATO's Schedule 1 formulas for scales 1 and 2 (from 1 July 2026), the same table a normal pay run uses.</dd>
+        <dt>Super guarantee</dt><dd>12%, with an annual maximum contribution base of $270,830 under Payday Super (FY 2026–27).</dd>
+        <dt>What we take as given</dt><dd>The employee has provided a TFN and no withholding variation is in place. If an ETP has already been paid for the same termination, the caps and codes change, and this tool doesn't model that.</dd>
+      </dl>
+    </details>
+  </div>
+
+  <!-- ============ SUPER — MAXIMUM CONTRIBUTION BASE ============ -->
+  <div class="panel" id="panel-mcb">
+    <div class="note">
+      Super Guarantee is paid on each pay run's ordinary time earnings (OTE) until the employee's OTE for the financial year reaches the <strong>maximum contribution base</strong>. In the pay run that crosses it, super is only due on the remaining amount; after that, no SG is required for the rest of the year. Only OTE counts — leave out overtime and other non-OTE payments.
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">Remuneration</h2>
+          <button class="btn ghost small" id="mcb-loadSample" type="button">Load sample</button>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Total fixed remuneration ($)</label><input type="number" id="mcb-amount" value="325300" step="0.01"><div class="hint">Including super.</div></div>
+          <div class="field"><label>Standard hours / week</label><input type="number" id="mcb-hours" value="38" step="0.25"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>SG rate (%)</label><input type="number" id="mcb-sgRate" value="12" step="0.1"></div>
+          <div class="field">
+            <label>Maximum contribution base ($)</label>
+            <input type="number" id="mcb-max" value="270830" step="1">
+            <div class="hint">FY2026–27 annual limit.</div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Pay frequency</label>
+            <select id="mcb-freq">
+              <option value="weekly">Weekly</option>
+              <option value="fortnightly">Fortnightly</option>
+              <option value="monthly" selected>Monthly</option>
+            </select>
+          </div>
+          <div class="field" id="mcb-firstPayField" style="display:none;">
+            <label>First pay date in the FY</label>
+            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mcb-firstPay" value="02/07/2026">
+          </div>
+        </div>
+        <div class="hint" id="mcb-firstPayHint" style="display:none; font-size:11.5px; opacity:0.55; margin:-6px 0 12px;">Pay dates run from the first pay date to 30 June 2027 — some years have 27 fortnightly or 53 weekly pays.</div>
+
+        <h3>Base salary (excl. super)</h3>
+        <div id="mcb-breakdown"></div>
+      </div>
+
+      <div class="card">
+        <h2>Summary</h2>
+        <div id="mcb-summary"></div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:12px; flex-wrap:wrap;">
+          <h2 style="margin:0;">Super by pay run</h2>
+          <button class="btn ghost small" id="mcb-reset" type="button">Clear overrides</button>
+        </div>
+        <div class="hint" style="font-size:12px; opacity:0.6; margin-bottom:10px;">Regular OTE fills in automatically from the annual base salary ÷ pay periods. Type over a row for a pay rise, unpaid leave or a part period (edited rows turn amber; clear them to go back to auto). Use additional OTE for bonuses or commissions that count as OTE.</div>
+        <div style="overflow-x:auto;"><table class="steps mcb-table" id="mcb-table"></table></div>
+      </div>
+    </div>
+  </div>
+
   <footer class="foot">
     Built for internal validation use. PAYG figures follow the ATO's Schedule 1 (NAT 1004) formula method and Schedule 5 Method B(ii) as published for payments from 1 July 2026, Scale 1 &amp; 2 (resident, standard Medicare levy) only. Always spot-check against the ATO's tax withheld calculator and Xero's own calculation before relying on this for a live pay run — this is a working tool, not a lodgment-ready source of truth.
   </footer>
@@ -417,6 +823,55 @@
 </div>
 
 <script>
+/* ---------------- dates (dd/mm/yyyy) ---------------- */
+const pad2 = n => String(n).padStart(2, "0");
+function fmtDateAU(d){ return pad2(d.getDate()) + "/" + pad2(d.getMonth()+1) + "/" + d.getFullYear(); }
+// "7/4/2003", "07-04-2003", "07042003" → "2003-04-07"; "" if blank or not a real date
+function auToISO(text){
+  const t = (text || "").trim();
+  let m = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/) || t.match(/^(\d{2})(\d{2})(\d{4})$/);
+  if(!m) return "";
+  const d = +m[1], mo = +m[2], y = +m[3];
+  const dt = new Date(y, mo-1, d);
+  if(dt.getFullYear() !== y || dt.getMonth() !== mo-1 || dt.getDate() !== d) return "";
+  return y + "-" + pad2(mo) + "-" + pad2(d);
+}
+function dateISO(id){ return auToISO(document.getElementById(id).value); }
+
+document.querySelectorAll("input.date-au").forEach(input=>{
+  const wrap = document.createElement("div");
+  wrap.className = "date-wrap";
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const picker = document.createElement("input");
+  picker.type = "date"; picker.tabIndex = -1; picker.className = "date-picker";
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "date-btn"; btn.title = "Pick a date"; btn.textContent = "📅";
+  wrap.append(picker, btn);
+
+  btn.addEventListener("click", ()=>{
+    picker.value = auToISO(input.value);
+    try{ picker.showPicker(); }catch(e){ picker.focus(); picker.click(); }
+  });
+  picker.addEventListener("change", ()=>{
+    if(!picker.value) return;
+    const [y,m,d] = picker.value.split("-");
+    input.value = d + "/" + m + "/" + y;
+    input.classList.remove("invalid");
+    input.dispatchEvent(new Event("input"));
+    input.dispatchEvent(new Event("change"));
+  });
+  // Auto-insert slashes while typing digits
+  input.addEventListener("input", e=>{
+    if(e.inputType === "insertText" && /^\d{2}$|^\d{2}\/\d{2}$/.test(input.value)) input.value += "/";
+  });
+  input.addEventListener("blur", ()=>{
+    const iso = auToISO(input.value);
+    if(iso){ const [y,m,d] = iso.split("-"); input.value = d + "/" + m + "/" + y; }
+    input.classList.toggle("invalid", input.value.trim() !== "" && !iso);
+  });
+});
+
 /* ---------------- helpers ---------------- */
 function fmt(v){
   const n = Number(v)||0;
@@ -485,6 +940,7 @@ function periodWithholding(periodEarnings, scale, frequency){
 }
 
 const PERIODS_PER_YEAR = {weekly:52, fortnightly:26, monthly:12};
+const WEEKS_PER_YEAR = 52;
 
 /* ---------------- theme toggle ---------------- */
 const themeBtn = document.getElementById("theme-toggle");
@@ -557,14 +1013,14 @@ function calcBase(){
   let hourlyRate;
   if(basis === "annual"){
     const annualSalary = num("bp-annualSalary");
-    // FTE hourly rate derived from full-time hours (52.1786 weeks/yr average)
-    hourlyRate = annualSalary / (ftHours * 52.1786);
+    // FTE hourly rate derived from full-time hours
+    hourlyRate = annualSalary / (ftHours * WEEKS_PER_YEAR);
   } else {
     hourlyRate = num("bp-hourlyRate");
   }
 
   const periodsPerYear = PERIODS_PER_YEAR[freq];
-  const weeksPerPeriod = 52.1786 / periodsPerYear;
+  const weeksPerPeriod = WEEKS_PER_YEAR / periodsPerYear;
   const standardHoursThisPeriod = contractedHours * weeksPerPeriod;
 
   let hoursWorkedRaw = document.getElementById("bp-hoursWorked").value;
@@ -583,8 +1039,10 @@ function calcBase(){
     superAmt = totalPackage - grossExSuper;
   }
 
-  const annualGross = grossExSuper * (periodsPerYear / (hoursThisPeriod>0 ? (hoursThisPeriod/standardHoursThisPeriod || 1) : 1));
-  const annualisedFromRate = hourlyRate * contractedHours * 52.1786;
+  // Annual salary = hourly rate × contracted hours/week × 52 weeks
+  // (e.g. $60/hr × 42 hrs × 52 = $131,040). Super-inclusive rates are converted to ex-super first.
+  const hourlyExSuper = superMode === "incl" ? hourlyRate / (1 + sgRate) : hourlyRate;
+  const annualisedFromRate = hourlyExSuper * contractedHours * WEEKS_PER_YEAR;
 
   const html = `
     <div class="result-line"><span class="k">Effective hourly rate</span><span class="v">${fmt(hourlyRate)}</span></div>
@@ -700,9 +1158,9 @@ calcMidPeriodHours();
   document.getElementById(id).addEventListener("change", calcMidPeriodDays);
 });
 function calcMidPeriodDays(){
-  const start = document.getElementById("mp-periodStart").value;
-  const end = document.getElementById("mp-periodEnd").value;
-  const change = document.getElementById("mp-changeDate").value;
+  const start = dateISO("mp-periodStart");
+  const end = dateISO("mp-periodEnd");
+  const change = dateISO("mp-changeDate");
   if(!start || !end || !change){
     document.getElementById("mp-daySplit").textContent = "–";
     document.getElementById("mp-dayPayOld").textContent = fmt(0);
@@ -799,6 +1257,677 @@ function calcOtherPayments(){
   document.getElementById("op-total").textContent = fmt(taxable+nontaxable);
 }
 calcOtherPayments();
+
+/* ================= TERMINATION ================= */
+// FY2026–27 rates — see "The rates and rules behind this calculator" on the Termination tab
+const TERM = {
+  fyLabel: "2026–27",
+  fyStart: {y:2026, m:7, d:1},
+  fyEnd:   {y:2027, m:6, d:30},
+  grBase: 13598,          // genuine redundancy tax-free base amount
+  grPerYear: 6801,        // + per completed year of service
+  etpCap: 270000,         // ETP cap
+  wioCap: 180000,         // whole-of-income cap (not indexed)
+  preservationAge: 60,
+  pensionAge: 67,
+  lumpSumARate: 0.32,
+  topRate: 0.47,
+  smallLeave: 300,        // Schedule 7: unused leave under $300 is added to the final pay
+  mcb: 270830,            // super maximum contribution base (annual, Payday Super)
+  pre1993: {y:1993, m:8, d:16},
+};
+
+function parseDate(id){
+  const v = dateISO(id);
+  if(!v) return null;
+  const [y,m,d] = v.split("-").map(Number);
+  return {y, m, d};
+}
+function isLastDayOfFeb(dt){
+  return dt.m === 2 && dt.d === new Date(dt.y, 2, 0).getDate();
+}
+// Excel YEARFRAC with default basis 0 (US 30/360)
+function yearFrac(a, b){
+  if(!a || !b) return 0;
+  if(a.y > b.y || (a.y === b.y && (a.m > b.m || (a.m === b.m && a.d > b.d)))) [a, b] = [b, a];
+  let d1 = a.d, d2 = b.d;
+  if(isLastDayOfFeb(a) && isLastDayOfFeb(b)) d2 = 30;
+  if(isLastDayOfFeb(a)) d1 = 30;
+  if(d2 === 31 && d1 >= 30) d2 = 30;
+  if(d1 === 31) d1 = 30;
+  return ((b.y - a.y)*360 + (b.m - a.m)*30 + (d2 - d1)) / 360;
+}
+function round2(v){ return Math.round(v*100)/100; }
+function addYears(dt, n){
+  // 29 Feb anniversaries fall on 28 Feb in non-leap years
+  const lastDay = new Date(dt.y + n, dt.m, 0).getDate();
+  return {y: dt.y + n, m: dt.m, d: Math.min(dt.d, lastDay)};
+}
+function cmpDate(a, b){ return (a.y - b.y) || (a.m - b.m) || (a.d - b.d); }
+// Whole years from `from` to `to` (anniversary on `to` counts)
+function completedYears(from, to){
+  if(!from || !to || cmpDate(to, from) < 0) return 0;
+  let n = to.y - from.y;
+  if(cmpDate(addYears(from, n), to) > 0) n--;
+  return Math.max(0, n);
+}
+function daysBetween(a, b){ return Math.round((Date.UTC(b.y, b.m-1, b.d) - Date.UTC(a.y, a.m-1, a.d)) / 86400000); }
+function fmtDt(dt){ return dt ? pad2(dt.d) + "/" + pad2(dt.m) + "/" + dt.y : "–"; }
+const pct = r => Math.round(r*100) + "%";
+
+const TERM_TYPE_LABEL = {
+  redundancy: "Redundancy",
+  normal: "Resignation / dismissal / retirement",
+  invalidity: "Invalidity",
+  death: "Death of the employee",
+};
+const NES_REASON_LABEL = {
+  resign: "Employee resigned",
+  retire: "Employee retired",
+  employer: "Dismissed by employer",
+  misconduct: "Dismissed for serious misconduct",
+  fixedterm: "Fixed-term contract ended",
+};
+
+// NES minimum notice — Fair Work Act 2009 s117(3)
+function nesNotice(type, reason, casual, dob, hired, noticeDate){
+  const na = why => ({applies:false, weeks:0, base:0, extra:0, why});
+  if(casual) return na("Casual employees are excluded from NES notice — s123(1)(c).");
+  if(type === "death") return na("No notice applies when employment ends because the employee has died.");
+  if(type === "invalidity") return na("If the employer ended the employment, NES notice applies — enter the weeks in Notice in lieu.");
+  if(type === "normal" && reason !== "employer"){
+    return na({
+      resign: "The NES notice table only applies when the employer terminates. For resignations, the employee's notice period comes from their award, agreement or contract.",
+      retire: "The NES notice table only applies when the employer terminates. On retirement, notice comes from the award, agreement or contract.",
+      misconduct: "No notice (or payment in lieu) is required for termination due to serious misconduct — s123(1)(b).",
+      fixedterm: "Not required where a fixed-term contract ends at its specified date — s123(1)(a).",
+    }[reason]);
+  }
+  if(!hired || !noticeDate) return {applies:true, weeks:0, base:0, extra:0, why:"Enter the hired date and notice date."};
+  // Service bands: not more than 1 yr → 1 wk; >1–3 yrs → 2; >3–5 yrs → 3; >5 yrs → 4
+  const over = n => cmpDate(noticeDate, addYears(hired, n)) > 0;
+  const base = over(5) ? 4 : over(3) ? 3 : over(1) ? 2 : 1;
+  const age45 = dob ? cmpDate(noticeDate, addYears(dob, 45)) >= 0 : false;
+  const twoYrs = cmpDate(noticeDate, addYears(hired, 2)) >= 0;
+  const extra = age45 && twoYrs ? 1 : 0;
+  return {applies:true, weeks: base + extra, base, extra, age45, twoYrs};
+}
+
+// NES redundancy pay — Fair Work Act 2009 s119(2)
+const NES_REDUNDANCY = [0, 4, 6, 7, 8, 10, 11, 13, 14, 16, 12]; // index = completed years (10+ → 12)
+function nesRedundancy(hired, last, smallBiz, casual){
+  if(casual) return {weeks:0, why:"Casual employees aren't entitled to NES redundancy pay — s123(1)(c)."};
+  if(smallBiz) return {weeks:0, why:"Small business employers (fewer than 15 employees) don't have to pay NES redundancy pay — s121(1)(b)."};
+  const yrs = completedYears(hired, last);
+  if(yrs < 1) return {weeks:0, yrs, why:"Less than 1 year of continuous service — no NES redundancy pay."};
+  return {weeks: NES_REDUNDANCY[Math.min(yrs, 10)], yrs};
+}
+
+const TERM_INPUTS = ["tm-name","tm-dob","tm-hired","tm-last","tm-reason","tm-casual","tm-noticeDate","tm-noticeExtra",
+ "tm-genuine","tm-smallBiz","tm-redWks","tm-certified","tm-retireDate","tm-deathTo",
+ "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-stsl","tm-ytdTaxable","tm-ytdOte",
+ "tm-alBal","tm-alAccrue","tm-lslHrs","tm-normalGross","tm-s7Hours","tm-s7Tax1","tm-s7Tax2",
+ "tm-noticeWks","tm-exGratia","tm-etpRate"];
+TERM_INPUTS.forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener("input", calcTermination);
+  el.addEventListener("change", calcTermination);
+});
+
+function termType(){ return document.querySelector("#tm-type .type-card.active").dataset.val; }
+function setTermType(val){
+  document.querySelectorAll("#tm-type .type-card").forEach(c=>c.classList.toggle("active", c.dataset.val === val));
+  document.querySelectorAll("#panel-term .followup").forEach(f=>{ f.style.display = f.dataset.for === val ? "block" : "none"; });
+}
+document.querySelectorAll("#tm-type .type-card").forEach(c=>{
+  c.addEventListener("click", ()=>{ setTermType(c.dataset.val); calcTermination(); });
+});
+
+// Sample: weekly resignation, under a year's service, hourly rate with no salary
+const TM_SAMPLE = {
+  "tm-name": "Sample employee",
+  "tm-dob": "07/04/2003",
+  "tm-hired": "25/05/2026",
+  "tm-last": "07/10/2026",
+  "tm-reason": "resign",
+  "tm-casual": "no",
+  "tm-noticeDate": "",
+  "tm-freq": "weekly",
+  "tm-scale": "2",
+  "tm-stdHrs": "38",
+  "tm-salary": "",
+  "tm-rate": "37.955466",
+  "tm-sgRate": "12",
+  "tm-ordHrs": "38",
+  "tm-stsl": "0",
+  "tm-ytdTaxable": "0",
+  "tm-ytdOte": "0",
+  "tm-alBal": "60.3073",
+  "tm-alAccrue": "no",
+  "tm-lslHrs": "0",
+  "tm-noticeWks": "",
+  "tm-exGratia": "0",
+  "tm-noticeExtra": "0",
+  "tm-etpRate": "auto",
+};
+document.getElementById("tm-loadSample").addEventListener("click", ()=>{
+  setTermType("normal");
+  Object.entries(TM_SAMPLE).forEach(([id, v])=>{ document.getElementById(id).value = v; });
+  calcTermination();
+});
+
+wireSeg("tm-s7mode", calcTermination);
+function addS7Run(amount){
+  const div = document.createElement("div");
+  div.className = "row2";
+  div.style.gridTemplateColumns = "1fr 34px";
+  div.style.marginBottom = "6px";
+  div.innerHTML = `
+    <input type="number" class="tm-s7-run" step="0.01" placeholder="Gross for pay run" value="${amount!==undefined?amount:''}">
+    <button type="button" class="btn ghost small" title="Remove">×</button>
+  `;
+  document.getElementById("tm-s7Runs").appendChild(div);
+  div.querySelector("input").addEventListener("input", calcTermination);
+  div.querySelector("button").addEventListener("click", ()=>{ div.remove(); calcTermination(); });
+}
+document.getElementById("tm-s7AddRun").addEventListener("click", ()=>{ addS7Run(); calcTermination(); });
+addS7Run(); addS7Run(); addS7Run();
+
+function calcTermination(){
+  const type = termType();
+  const reason = document.getElementById("tm-reason").value;
+  const casual = document.getElementById("tm-casual").value === "yes";
+  const freq = document.getElementById("tm-freq").value;
+  const scale = parseInt(document.getElementById("tm-scale").value, 10);
+  const periodsPerYear = PERIODS_PER_YEAR[freq];
+  const stdHrs = num("tm-stdHrs");
+  const sgRate = num("tm-sgRate")/100;
+  const rateRaw = document.getElementById("tm-rate").value;
+  const hourlyRate = rateRaw !== "" ? num("tm-rate")
+    : (stdHrs > 0 ? num("tm-salary") / (stdHrs * WEEKS_PER_YEAR) : 0);
+  const weeklyBase = hourlyRate * stdHrs;
+
+  // Ages & service. Template: Age = INT(YEARFRAC(BirthDate,TermDate)); Service = ROUNDDOWN(YEARFRAC(HiredDate,TermDate),2)
+  const dob = parseDate("tm-dob"), hired = parseDate("tm-hired"), last = parseDate("tm-last");
+  const age = Math.floor(yearFrac(dob, last));
+  const ageAtFyEnd = completedYears(dob, TERM.fyEnd);
+  const serviceYrs = Math.floor(yearFrac(hired, last)*100 + 1e-9)/100;
+  const fullYears = completedYears(hired, last);
+  const warnings = [];
+  if(last && (cmpDate(last, TERM.fyStart) < 0 || cmpDate(last, TERM.fyEnd) > 0)){
+    warnings.push(`The last day (${fmtDt(last)}) is outside FY${TERM.fyLabel} — these rates only apply to a last day between 01/07/2026 and 30/06/2027.`);
+  }
+  if(hired && cmpDate(hired, TERM.pre1993) < 0){
+    warnings.push("Hired before 16 August 1993 — any pre-1993 long service leave has its own Lump Sum A/B treatment, which this tool doesn't model.");
+  }
+
+  // Tax treatment by termination type
+  let genuine = false, invalid = false;
+  if(type === "redundancy" && document.getElementById("tm-genuine").value === "yes"){
+    if(age >= TERM.pensionAge){
+      warnings.push(`At ${age}, the employee has reached age pension age (${TERM.pensionAge}), so the payment can't be a genuine redundancy payment for tax — treated as not genuine.`);
+    } else genuine = true;
+  }
+  if(type === "invalidity"){
+    if(document.getElementById("tm-certified").value === "yes") invalid = true;
+    else warnings.push("Without certification by two legally qualified medical practitioners the payment isn't an invalidity payment — taxed as an ordinary termination.");
+  }
+  const isDeath = type === "death";
+  const leaveMode = isDeath ? "estate" : (genuine || invalid) ? "lumpA" : "marginal";
+
+  const nes = nesNotice(type, reason, casual, dob, hired, parseDate("tm-noticeDate") || last);
+  const red = type === "redundancy" ? nesRedundancy(hired, last, document.getElementById("tm-smallBiz").value === "yes", casual) : null;
+
+  // ---- Final wages
+  const ordHrs = num("tm-ordHrs");
+  const ordGross = round2(ordHrs * hourlyRate);
+  const ordPayg = isDeath ? 0 : periodWithholding(ordGross, scale, freq);
+  const stsl = isDeath ? 0 : num("tm-stsl");
+  const ordNet = ordGross - ordPayg - stsl;
+
+  // ---- Unused leave (AL accrual helper: ordinary hours ÷ 13 = 4 weeks per 52)
+  const alAccrual = document.getElementById("tm-alAccrue").value === "yes" ? ordHrs / 13 : 0;
+  const alHrs = num("tm-alBal") + alAccrual;
+  const alGross = round2(alHrs * hourlyRate);
+  const lslHrs = num("tm-lslHrs");
+  const lslGross = round2(lslHrs * hourlyRate);
+  const leaveGross = alGross + lslGross;
+
+  // Schedule 7 marginal-rate inputs
+  const s7Mode = segVal("tm-s7mode");
+  document.querySelectorAll(".tm-s7-field").forEach(el=>{
+    el.style.display = el.dataset.mode === s7Mode ? "block" : "none";
+  });
+  const s7Runs = [...document.querySelectorAll("#tm-s7Runs .tm-s7-run")]
+    .map(el => parseFloat(el.value)).filter(v => !isNaN(v));
+  let normalGross, normalBasis;
+  if(s7Mode === "hours"){
+    normalGross = num("tm-s7Hours") * hourlyRate;
+    normalBasis = `${num("tm-s7Hours")} hrs × ${fmt(hourlyRate)}`;
+  } else if(s7Mode === "avg"){
+    normalGross = s7Runs.length ? s7Runs.reduce((a,b)=>a+b, 0) / s7Runs.length : 0;
+    normalBasis = `average of ${s7Runs.length} pay run${s7Runs.length===1?"":"s"}`;
+  } else if(s7Mode === "manual"){
+    normalGross = num("tm-normalGross");
+    normalBasis = "entered amount";
+  } else {
+    normalGross = stdHrs * hourlyRate * WEEKS_PER_YEAR / periodsPerYear;
+    normalBasis = `${stdHrs} hrs/wk × ${fmt(hourlyRate)}`;
+  }
+  normalGross = round2(normalGross);
+  const tax1Raw = document.getElementById("tm-s7Tax1").value;
+  const tax2Raw = document.getElementById("tm-s7Tax2").value;
+  const s7Tax1 = tax1Raw !== "" ? num("tm-s7Tax1") : periodWithholding(normalGross, scale, freq);
+  const s7PerPeriod = leaveGross / periodsPerYear;
+  const s7NoCents = Math.floor(s7PerPeriod);
+  const s7Combined = s7NoCents + normalGross;
+  const s7Tax2 = tax2Raw !== "" ? num("tm-s7Tax2") : periodWithholding(s7Combined, scale, freq);
+  const s7Diff = s7Tax2 - s7Tax1;
+
+  let leaveTax = 0, leaveMethod, leaveStp;
+  const smallLeave = leaveMode === "marginal" && leaveGross > 0 && leaveGross < TERM.smallLeave;
+  if(leaveMode === "estate"){
+    leaveMethod = "Paid to the estate — no withholding";
+    leaveStp = "Paid to estate";
+  } else if(leaveMode === "lumpA"){
+    leaveTax = Math.round(leaveGross * TERM.lumpSumARate);
+    leaveMethod = `Flat ${pct(TERM.lumpSumARate)} — ${genuine ? "genuine redundancy" : "invalidity"}`;
+    leaveStp = "Lump Sum A · type R";
+  } else if(smallLeave){
+    // Under $300: add to the final pay and withhold with the tax table
+    leaveTax = Math.max(0, periodWithholding(ordGross + leaveGross, scale, freq) - ordPayg);
+    leaveMethod = `Under ${fmt(TERM.smallLeave)} — added to the final pay`;
+    leaveStp = "Paid leave · type U";
+  } else {
+    leaveTax = leaveGross > 0 ? Math.max(0, s7Diff * periodsPerYear) : 0;
+    leaveMethod = "Marginal rates — Schedule 7";
+    leaveStp = "Paid leave · type U";
+  }
+  // Split leave tax between AL and LSL pro rata for display
+  const alTax = leaveGross > 0 ? Math.round(leaveTax * alGross / leaveGross) : 0;
+  const lslTax = leaveTax - alTax;
+  const leaveNet = leaveGross - leaveTax;
+
+  // ---- Notice in lieu, redundancy pay, ex-gratia
+  const noticeRaw = document.getElementById("tm-noticeWks").value;
+  const noticeWks = noticeRaw !== "" ? num("tm-noticeWks") : nes.weeks;
+  const noticeBase = noticeWks * weeklyBase;
+  const noticeGross = round2(noticeBase + noticeWks * num("tm-noticeExtra"));
+  const exGratia = num("tm-exGratia");
+  const redRaw = document.getElementById("tm-redWks").value;
+  const redWks = red ? (redRaw !== "" ? num("tm-redWks") : red.weeks) : 0;
+  const redPay = round2(redWks * weeklyBase);
+
+  // Genuine redundancy: redundancy pay, notice in lieu and ex-gratia are tax-free up to the limit (Lump Sum D)
+  const grLimit = TERM.grBase + TERM.grPerYear * fullYears;
+  const grPool = genuine ? redPay + noticeGross + exGratia : 0;
+  const taxFree = genuine ? Math.min(grPool, grLimit) : 0;
+  const etpGross = round2(genuine ? grPool - taxFree : redPay + noticeGross + exGratia);
+
+  // Invalidity segment: ETP × days to retirement ÷ (employment days + days to retirement)
+  let invSeg = 0, invDetail = "";
+  if(invalid && etpGross > 0 && hired && last){
+    const retire = parseDate("tm-retireDate") || (dob ? addYears(dob, TERM.pensionAge) : null);
+    if(retire && cmpDate(retire, last) > 0){
+      const toRet = daysBetween(last, retire);
+      const empDays = daysBetween(hired, last) + 1;
+      invSeg = round2(etpGross * toRet / (empDays + toRet));
+      invDetail = `${fmt(etpGross)} × ${toRet.toLocaleString("en-AU")} days to ${fmtDt(retire)} ÷ (${empDays.toLocaleString("en-AU")} employment days + ${toRet.toLocaleString("en-AU")})`;
+    } else {
+      invDetail = "Last retirement day isn't after the last day — no invalidity segment.";
+    }
+  }
+  const etpTaxable = round2(etpGross - invSeg);
+
+  // ETP code, cap and rates
+  const deathTo = document.getElementById("tm-deathTo").value;
+  let etpCode, excluded, cap, capNote, rateUnder, rateNote;
+  if(isDeath){
+    etpCode = {dependant:"D", nondependant:"N", trustee:"T"}[deathTo];
+    cap = TERM.etpCap; capNote = `ETP cap ${fmt(TERM.etpCap)}`;
+    rateUnder = {dependant:0, nondependant:0.32, trustee:0}[deathTo];
+    rateNote = {dependant:"Death benefit to a dependant — tax-free up to the cap",
+                nondependant:"Death benefit to a non-dependant",
+                trustee:"Paid to the trustee of the estate — no withholding"}[deathTo];
+  } else {
+    excluded = genuine || invalid;
+    etpCode = excluded ? "R" : "O";
+    const etpSel = document.getElementById("tm-etpRate").value;
+    rateUnder = etpSel === "auto" ? (ageAtFyEnd >= TERM.preservationAge ? 0.17 : 0.32) : parseFloat(etpSel);
+    rateNote = etpSel === "auto"
+      ? `Age ${ageAtFyEnd} at 30/06/2027 — ${ageAtFyEnd >= TERM.preservationAge ? "at or over" : "under"} preservation age (${TERM.preservationAge})`
+      : "Rate chosen manually";
+    if(excluded){
+      cap = TERM.etpCap; capNote = `Excluded ETP — ETP cap ${fmt(TERM.etpCap)}`;
+    } else {
+      const otherTaxable = num("tm-ytdTaxable") + ordGross + leaveGross;
+      const wioLeft = Math.max(0, TERM.wioCap - otherTaxable);
+      cap = Math.min(TERM.etpCap, wioLeft);
+      capNote = `Smaller of the ETP cap (${fmt(TERM.etpCap)}) and the whole-of-income cap less other taxable pay this FY (${fmt(TERM.wioCap)} − ${fmt(otherTaxable)})`;
+    }
+  }
+  const underCap = Math.min(etpTaxable, cap);
+  const overCap = Math.max(0, etpTaxable - cap);
+  const overRate = isDeath && deathTo === "trustee" ? 0 : TERM.topRate;
+  const etpTax = Math.round(underCap * rateUnder + overCap * overRate);
+  const etpNet = etpGross - etpTax;
+
+  // ---- Super: OTE is final wages + base pay in notice in lieu, limited by the maximum contribution base
+  const mcbLeft = Math.max(0, TERM.mcb - num("tm-ytdOte"));
+  const ordSuper = round2(Math.min(ordGross, mcbLeft) * sgRate);
+  const noticeSuper = round2(Math.min(noticeBase, Math.max(0, mcbLeft - ordGross)) * sgRate);
+  const superCapped = ordGross + noticeBase > mcbLeft;
+
+  // ---- Totals
+  const totalGross = round2(ordGross + leaveGross + taxFree + etpGross);
+  const totalTax = ordPayg + leaveTax + etpTax;
+  const totalSuper = ordSuper + noticeSuper;
+  const totalNet = round2(totalGross - totalTax - stsl);
+
+  /* ---------- render: summary ---------- */
+  const esc = s => s.replace(/[<>&"]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+  const name = document.getElementById("tm-name").value.trim();
+  const typeDetail = type === "normal" ? NES_REASON_LABEL[reason]
+    : type === "redundancy" ? (genuine ? "Genuine redundancy" : "Not a genuine redundancy")
+    : type === "invalidity" ? (invalid ? "Certified invalidity" : "Not certified")
+    : {dependant:"Death benefit to a dependant", nondependant:"Death benefit to a non-dependant", trustee:"Paid to the estate"}[deathTo];
+  document.getElementById("tm-heading").textContent =
+    type === "normal" && reason === "resign" ? "Resignation calculation" : TERM_TYPE_LABEL[type];
+  document.getElementById("tm-summary").innerHTML = `
+    ${name ? line2("Employee", esc(name)) : ""}
+    ${line2("Termination", TERM_TYPE_LABEL[type], typeDetail)}
+    ${line2("Age at last day", age, `${ageAtFyEnd} at 30/06/2027`)}
+    ${line2("Completed years of service", fullYears, `${serviceYrs.toFixed(2)} years (YEARFRAC)`)}
+    ${line2("Hourly rate", fmt(hourlyRate))}
+    ${line2("Weekly pay (standard hours × rate)", fmt(weeklyBase))}
+    ${warnings.map(w=>`<div class="warn">${w}</div>`).join("")}
+  `;
+
+  /* ---------- render: NES ---------- */
+  const yesNo = ok => `<span class="flag ${ok ? "ok" : "under"}">${ok ? "Yes" : "No"}</span>`;
+  let nesHtml = `<h3>Minimum notice (s117)</h3>`;
+  if(!nes.applies || nes.why){
+    nesHtml += line2("NES minimum notice", nes.applies ? "–" : "Not applicable") + `<div class="note">${nes.why}</div>`;
+  } else {
+    nesHtml += `
+      ${line2("Base notice for length of service", `${nes.base} week${nes.base>1?"s":""}`)}
+      <div class="result-line sub"><span class="k">Aged 45 or over on the day notice is given</span><span class="v">${yesNo(nes.age45)}</span></div>
+      <div class="result-line sub"><span class="k">At least 2 years' continuous service</span><span class="v">${yesNo(nes.twoYrs)}</span></div>
+      ${line2("Extra week (45+ with 2+ years)", nes.extra ? "+1 week" : "–")}
+      <div class="result-line total"><span class="k">NES minimum notice / payment in lieu</span><span class="v">${nes.weeks} weeks</span></div>
+      <div class="note">Payment in lieu must be at the employee's full rate of pay — base rate plus incentive payments, bonuses, loadings, monetary allowances, overtime and penalty rates they would have received. If the award, agreement or contract gives a longer period, that applies instead.</div>`;
+    if(noticeRaw !== "" && noticeWks < nes.weeks){
+      nesHtml += `<div class="warn">Notice in lieu entered (${noticeWks} weeks) is below the NES minimum of ${nes.weeks} weeks.</div>`;
+    }
+  }
+  if(red){
+    nesHtml += `<h3>Redundancy pay (s119)</h3>`;
+    if(red.why && !red.weeks){
+      nesHtml += line2("NES redundancy pay", "None") + `<div class="note">${red.why}</div>`;
+    } else {
+      nesHtml += line2("Completed years of continuous service", red.yrs) +
+        `<div class="result-line total"><span class="k">NES redundancy pay</span><span class="v">${red.weeks} weeks</span></div>`;
+    }
+    if(redRaw !== "" && redWks < red.weeks){
+      nesHtml += `<div class="warn">Redundancy pay entered (${redWks} weeks) is below the NES scale of ${red.weeks} weeks.</div>`;
+    }
+  }
+  document.getElementById("tm-nes").innerHTML = nesHtml;
+
+  /* ---------- render: withholding & STP ---------- */
+  const line = (k, v, cls="", sub="") =>
+    `<div class="result-line${cls?" "+cls:""}"><span class="k">${k}${sub?`<small>${sub}</small>`:""}</span><span class="v">${v}</span></div>`;
+  const minus = v => v ? "−" + fmt(v) : fmt(0);
+  const stpTag = t => `<span class="stp-tag">STP: ${t}</span>`;
+  const block = (title, subtitle, body, stp) =>
+    `<div class="tm-block"><div class="tm-block-head"><span class="t">${title}</span><span class="s">${subtitle}</span></div>${stp ? `<div class="stp-row">${stpTag(stp)}</div>` : ""}${body}</div>`;
+  let n = 0;
+
+  const tiles = `
+    <div class="tm-tiles">
+      <div class="tm-tile net"><div class="lbl">Total withholding</div><div class="amt">${fmt(totalTax)}</div></div>
+      <div class="tm-tile"><div class="lbl">Total gross</div><div class="amt">${fmt(totalGross)}</div></div>
+      <div class="tm-tile"><div class="lbl">${isDeath ? "Net paid out" : "Net to employee"}</div><div class="amt">${fmt(totalNet)}</div></div>
+      <div class="tm-tile"><div class="lbl">Super (to fund)</div><div class="amt">${fmt(totalSuper)}</div></div>
+    </div>`;
+
+  const superNote = superCapped ? `Limited by the maximum contribution base (${fmt(mcbLeft)} OTE left this FY)` : "Paid to fund, not to employee";
+  const finalPay = block(`${++n}. Final wages`, isDeath ? "Paid to the estate" : "Schedule 1 tax table",
+    line("Ordinary hours", fmt(ordGross), "", `${ordHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}`) +
+    line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : "") +
+    (stsl ? line("STSL withheld", minus(stsl), "deduct") : "") +
+    line("Net", fmt(ordNet), "net") +
+    line(`Super (${(sgRate*100).toFixed(1)}%)`, fmt(ordSuper), "super", superNote),
+    isDeath ? "Paid to estate" : "Gross (salary & wages)");
+
+  const leaveBody = leaveGross > 0
+    ? line("Annual leave", fmt(alGross), "", `${alHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}${alAccrual ? ` · incl. ${alAccrual.toFixed(2)} hrs accrued` : ""}`) +
+      (lslGross ? line("Long service leave", fmt(lslGross), "", `${lslHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}`) : "") +
+      line("PAYG withheld", minus(leaveTax), "deduct", leaveMode === "marginal" && !smallLeave ? "Schedule 7 — see working below" : leaveMethod) +
+      line("Net", fmt(leaveNet), "net") +
+      line("Super", fmt(0), "super", "Unused leave paid on termination isn't OTE")
+    : `<div class="empty">No unused leave to pay out.</div>`;
+  const leave = block(`${++n}. Unused leave`, leaveMethod, leaveBody, leaveGross > 0 ? leaveStp : "");
+
+  let redBlock = "";
+  if(genuine){
+    redBlock = block(`${++n}. Genuine redundancy — tax-free part`, "Not taxed",
+      (redPay ? line("Redundancy pay", fmt(redPay), "", `${redWks} wks × ${fmt(weeklyBase)}`) : "") +
+      (noticeGross ? line("Notice in lieu", fmt(noticeGross), "", `${noticeWks} wks — part of the redundancy payment`) : "") +
+      (exGratia ? line("Ex-gratia", fmt(exGratia)) : "") +
+      line("Tax-free limit", fmt(grLimit), "", `${fmt(TERM.grBase)} + ${fmt(TERM.grPerYear)} × ${fullYears} completed year${fullYears===1?"":"s"}`) +
+      line("Tax-free amount", fmt(taxFree), "net") +
+      (grPool > grLimit ? line("Excess over the limit", fmt(grPool - grLimit), "super", "Paid as an ETP — see below") : ""),
+      grPool > 0 ? "Lump Sum D" : "");
+  }
+
+  let etpBody;
+  if(etpGross > 0){
+    etpBody =
+      (genuine ? line("Excess over the tax-free limit", fmt(etpGross)) :
+        (redPay ? line("Redundancy pay", fmt(redPay), "", `${redWks} wks × ${fmt(weeklyBase)}`) : "") +
+        (noticeGross ? line("Notice in lieu", fmt(noticeGross), "", `${noticeWks} wk${noticeWks===1?"":"s"} × ${fmt(noticeGross/noticeWks)}/wk`) : "") +
+        (exGratia ? line("Ex-gratia", fmt(exGratia)) : "")) +
+      (invSeg ? line("Invalidity segment (tax-free)", minus(invSeg), "", invDetail) : (invalid && invDetail ? line("Invalidity segment", fmt(0), "", invDetail) : "")) +
+      (invSeg ? line("Taxable component", fmt(etpTaxable)) : "") +
+      line(`Up to the cap at ${pct(rateUnder)}`, fmt(underCap), "", `${rateNote} · ${capNote}: ${fmt(cap)}`) +
+      (overCap ? line(`Above the cap at ${pct(overRate)}`, fmt(overCap)) : "") +
+      line("PAYG withheld", minus(etpTax), "deduct") +
+      line("Net", fmt(etpNet), "net") +
+      line(`Super (${(sgRate*100).toFixed(1)}%)`, fmt(noticeSuper), "super", noticeBase ? "On base pay in notice in lieu" : "Redundancy pay and ex-gratia aren't OTE");
+  } else {
+    etpBody = `<div class="empty">${genuine && grPool > 0 ? "No ETP — the whole redundancy payment is within the tax-free limit." : "No ETP payable — no redundancy pay, notice in lieu or ex-gratia."}</div>` +
+      (noticeSuper ? line(`Super on notice in lieu (${(sgRate*100).toFixed(1)}%)`, fmt(noticeSuper), "super") : "");
+  }
+  const etp = block(`${++n}. Employment termination payment`, isDeath ? "Death benefit ETP" : (excluded ? "Excluded ETP" : "Non-excluded ETP"),
+    etpBody, etpGross > 0 ? `ETP code ${etpCode}` : "");
+
+  const deathNote = isDeath ? `<div class="note">Wages and unused leave paid to a deceased employee's estate aren't withheld from. Check the ATO's guidance for how to report them; the death benefit ETP is reported with code ${etpCode}.</div>` : "";
+  document.getElementById("tm-pay").innerHTML = tiles + finalPay + leave + redBlock + etp + deathNote;
+
+  /* ---------- render: Schedule 7 ---------- */
+  const s7inputs = document.getElementById("tm-s7inputs");
+  const s7table = document.getElementById("tm-sched7");
+  const s7note = document.getElementById("tm-s7note");
+  const s7title = document.getElementById("tm-s7title");
+  s7inputs.style.display = "none"; s7table.innerHTML = ""; s7note.innerHTML = "";
+  if(leaveGross <= 0){
+    s7title.textContent = "Tax on unused leave";
+    s7note.innerHTML = `<div class="note">No unused leave to pay out.</div>`;
+  } else if(leaveMode === "estate"){
+    s7title.textContent = "Tax on unused leave";
+    s7note.innerHTML = `<div class="note">Unused leave owed at death is paid to the estate — no withholding.</div>`;
+  } else if(leaveMode === "lumpA"){
+    s7title.textContent = "Tax on unused leave — Lump Sum A";
+    s7note.innerHTML = `<div class="note">On a ${genuine ? "genuine redundancy" : "certified invalidity"}, unused annual and long service leave is withheld at a flat ${pct(TERM.lumpSumARate)}: ${fmt(leaveGross)} × ${pct(TERM.lumpSumARate)} = <strong>${fmt(leaveTax)}</strong>. The Schedule 7 marginal method isn't used.</div>`;
+  } else if(smallLeave){
+    s7title.textContent = `Schedule 7 — unused leave under ${fmt(TERM.smallLeave)}`;
+    s7table.innerHTML = `<tr><th>#</th><th>Step</th><th style="text-align:right">Result</th></tr>
+      <tr><td class="n">1</td><td>Final pay + unused leave (${fmt(ordGross)} + ${fmt(leaveGross)})</td><td class="val">${fmt(ordGross + leaveGross)}</td></tr>
+      <tr><td class="n">2</td><td>Withholding on step 1 (tax table)</td><td class="val">${fmt(ordPayg + leaveTax)}</td></tr>
+      <tr><td class="n">3</td><td>Less withholding on the final pay alone</td><td class="val">${fmt(ordPayg)}</td></tr>
+      <tr class="final"><td class="n">4</td><td>Tax on unused leave</td><td class="val">${fmt(leaveTax)}</td></tr>`;
+  } else {
+    s7title.textContent = "Schedule 7 — tax on unused leave (marginal rates)";
+    s7inputs.style.display = "block";
+    const s7 = [
+      [1, `Withholding on normal gross earnings of ${fmt(normalGross)} (${normalBasis})${tax1Raw !== "" ? " — overridden" : ""}`, s7Tax1],
+      [2, `Unused leave (${fmt(leaveGross)}) ÷ ${periodsPerYear} pay periods`, s7PerPeriod],
+      [3, "Ignore any cents", s7NoCents],
+      [4, "Step 3 + normal gross earnings", s7Combined],
+      [5, `Withholding on the amount at step 4${tax2Raw !== "" ? " — overridden" : ""}`, s7Tax2],
+      [6, "Step 5 − step 1", s7Diff],
+    ];
+    let s7html = "<tr><th>#</th><th>Step</th><th style=\"text-align:right\">Result</th></tr>";
+    s7.forEach(r=>{ s7html += `<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="val">${fmt(r[2])}</td></tr>`; });
+    s7html += `<tr class="final"><td class="n">7</td><td>Step 6 × ${periodsPerYear} — tax on unused leave</td><td class="val">${fmt(leaveTax)}</td></tr>`;
+    s7table.innerHTML = s7html;
+  }
+}
+calcTermination();
+
+/* ================= SUPER — MAXIMUM CONTRIBUTION BASE ================= */
+const FY_START = {y:2026, m:7, d:1}, FY_END = {y:2027, m:6, d:30};
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function mcbPeriods(){
+  const freq = document.getElementById("mcb-freq").value;
+  if(freq === "monthly"){
+    return Array.from({length:12}, (_, i)=>{
+      const m = (FY_START.m - 1 + i) % 12;
+      return MONTHS[m] + " " + (FY_START.y + (FY_START.m - 1 + i >= 12 ? 1 : 0));
+    });
+  }
+  const step = freq === "weekly" ? 7 : 14;
+  const first = parseDate("mcb-firstPay") || FY_START;
+  const labels = [];
+  const d = new Date(first.y, first.m - 1, first.d);
+  const end = new Date(FY_END.y, FY_END.m - 1, FY_END.d);
+  while(d <= end && labels.length < 60){
+    labels.push(fmtDateAU(d));
+    d.setDate(d.getDate() + step);
+  }
+  return labels;
+}
+
+function buildMcbRows(){
+  const freq = document.getElementById("mcb-freq").value;
+  document.getElementById("mcb-firstPayField").style.display = freq === "monthly" ? "none" : "block";
+  document.getElementById("mcb-firstPayHint").style.display = freq === "monthly" ? "none" : "block";
+  const labels = mcbPeriods();
+  let html = `<tr><th>#</th><th>Pay run</th><th style="text-align:right">Regular OTE</th><th style="text-align:right">Additional OTE</th><th style="text-align:right">Total OTE</th><th style="text-align:right">OTE year to date</th><th class="sup">Super payable</th><th>Status</th></tr>`;
+  labels.forEach((lbl, i)=>{
+    html += `<tr id="mcb-r${i}"><td class="n">${i+1}</td><td>${lbl}</td>
+      <td><input type="number" class="mcb-reg" data-i="${i}" step="0.01"></td>
+      <td><input type="number" class="mcb-add" data-i="${i}" step="0.01" placeholder="0.00"></td>
+      <td class="val" id="mcb-ote${i}"></td><td class="val" id="mcb-cum${i}"></td>
+      <td class="val sup" id="mcb-sup${i}"></td><td id="mcb-st${i}"></td></tr>`;
+  });
+  html += `<tr class="tot"><td></td><td>Total</td><td></td><td></td><td class="val" id="mcb-totOte"></td><td></td><td class="val sup" id="mcb-totSup"></td><td></td></tr>`;
+  const table = document.getElementById("mcb-table");
+  table.innerHTML = html;
+  table.querySelectorAll(".mcb-add").forEach(el=>el.addEventListener("input", calcMcb));
+  table.querySelectorAll(".mcb-reg").forEach(el=>el.addEventListener("input", ()=>{
+    // Typing over a row marks it as edited; clearing it returns it to the auto amount
+    const edited = el.value !== "";
+    el.dataset.edited = edited ? "1" : "";
+    el.classList.toggle("edited", edited);
+    el.title = edited ? "Edited — clear to go back to the auto amount" : "";
+    calcMcb();
+  }));
+  table.querySelectorAll(".mcb-reg").forEach(el=>el.addEventListener("blur", calcMcb));
+  calcMcb();
+}
+
+function calcMcb(){
+  const sgRate = num("mcb-sgRate")/100;
+  const amount = num("mcb-amount");
+  const base = round2(amount / (1 + sgRate));
+  const hours = num("mcb-hours");
+  const maxBase = num("mcb-max");
+  const freq = document.getElementById("mcb-freq").value;
+  const regDefault = round2(base / PERIODS_PER_YEAR[freq]);
+  document.getElementById("mcb-breakdown").innerHTML =
+    line2("Annual", fmt(base), `${fmt(amount)} ÷ ${(1 + sgRate).toFixed(2)}`) +
+    line2("Monthly", fmt(base / 12)) +
+    line2("Fortnightly", fmt(base / 26)) +
+    line2("Weekly", fmt(base / 52)) +
+    line2("Hourly", hours > 0 ? fmt(base / (hours * WEEKS_PER_YEAR)) : "–", `${hours} hrs × ${WEEKS_PER_YEAR} weeks`) +
+    line2(`Super in package (${(sgRate*100).toFixed(1)}%)`, fmt(amount - base));
+
+  let cum = 0, totOte = 0, totSup = 0, totUncapped = 0, capRun = null;
+  const regInputs = document.querySelectorAll("#mcb-table .mcb-reg");
+  regInputs.forEach((regEl, i)=>{
+    regEl.placeholder = regDefault.toFixed(2);
+    if(regEl.dataset.edited !== "1" && document.activeElement !== regEl) regEl.value = regDefault.toFixed(2);
+    const reg = regEl.dataset.edited === "1" ? parseFloat(regEl.value) || 0 : regDefault;
+    const add = parseFloat(document.querySelector(`#mcb-table .mcb-add[data-i="${i}"]`).value) || 0;
+    const ote = reg + add;
+    const remaining = Math.max(0, maxBase - cum);
+    const superOte = Math.min(ote, remaining);
+    const sup = round2(superOte * sgRate);
+    cum += ote; totOte += ote; totSup += sup; totUncapped += round2(ote * sgRate);
+
+    let cls = "", status = "";
+    const fullSup = round2(ote * sgRate);
+    let supNote = "";
+    if(ote > 0 && superOte <= 0){
+      cls = "capped"; status = `<span class="flag over">Cap reached</span>`;
+      supNote = `<small>was ${fmt(fullSup)}</small>`;
+    } else if(superOte < ote){
+      cls = "partial"; status = `<span class="flag under">Partial — ${fmt(superOte)} of OTE</span>`;
+      supNote = `<small>reduced from ${fmt(fullSup)}</small>`;
+      capRun = capRun || document.querySelector(`#mcb-r${i} td:nth-child(2)`).textContent;
+    }
+    document.getElementById("mcb-r"+i).className = cls;
+    document.getElementById("mcb-ote"+i).textContent = fmt(ote);
+    document.getElementById("mcb-cum"+i).textContent = fmt(cum);
+    document.getElementById("mcb-sup"+i).innerHTML = fmt(sup) + supNote;
+    document.getElementById("mcb-st"+i).innerHTML = status;
+  });
+  document.getElementById("mcb-totOte").textContent = fmt(totOte);
+  document.getElementById("mcb-totSup").textContent = fmt(totSup);
+
+  const maxSuper = round2(maxBase * sgRate);
+  const overBase = totOte - maxBase;
+  const notPaid = totUncapped - totSup;
+  document.getElementById("mcb-summary").innerHTML = `
+    <div class="tm-tiles">
+      <div class="tm-tile net"><div class="lbl">SG payable this FY</div><div class="amt">${fmt(totSup)}</div></div>
+      <div class="tm-tile"><div class="lbl">Total OTE this FY</div><div class="amt">${fmt(totOte)}</div></div>
+    </div>
+    ${line2("Maximum contribution base", fmt(maxBase))}
+    ${line2("Maximum SG for the year", fmt(maxSuper), `${fmt(maxBase)} × ${(sgRate*100).toFixed(1)}%`)}
+    ${overBase > 0
+      ? line2("OTE above the maximum contribution base", fmt(overBase)) +
+        line2("SG not required because of the cap", fmt(notPaid)) +
+        `<div class="warn">Cap reached in <strong>${capRun || "an earlier pay run"}</strong> — super is reduced in that run and is $0 for every pay run after it. On a TFR package, check the contract: the ${fmt(notPaid)} not paid as super may need to be paid as salary instead.</div>`
+      : `<div class="note">OTE stays ${fmt(-overBase)} under the maximum contribution base — full SG is payable every pay run.</div>`}
+  `;
+}
+function line2(k, v, sub){
+  return `<div class="result-line"><span class="k">${k}${sub ? `<br><span style="font-size:11.5px; opacity:0.7;">${sub}</span>` : ""}</span><span class="v">${v}</span></div>`;
+}
+
+["mcb-amount","mcb-hours","mcb-sgRate","mcb-max"].forEach(id=>document.getElementById(id).addEventListener("input", calcMcb));
+["mcb-freq","mcb-firstPay"].forEach(id=>document.getElementById(id).addEventListener("change", buildMcbRows));
+document.getElementById("mcb-reset").addEventListener("click", ()=>{
+  document.querySelectorAll("#mcb-table input").forEach(el=>{
+    el.value = ""; el.dataset.edited = ""; el.classList.remove("edited"); el.title = "";
+  });
+  calcMcb();
+});
+document.getElementById("mcb-loadSample").addEventListener("click", ()=>{
+  document.getElementById("mcb-amount").value = "325300";
+  document.getElementById("mcb-hours").value = "37.5";
+  document.getElementById("mcb-sgRate").value = "12";
+  document.getElementById("mcb-max").value = "270830";
+  document.getElementById("mcb-freq").value = "monthly";
+  buildMcbRows();
+  document.querySelector('#mcb-table .mcb-add[data-i="0"]').value = "18000";
+  calcMcb();
+});
+buildMcbRows();
 </script>
 </body>
 </html>
