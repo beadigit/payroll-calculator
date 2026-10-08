@@ -196,6 +196,8 @@
     background:none; border:none; cursor:pointer; font-size:15px; padding:4px 6px; opacity:0.7;
   }
   .date-wrap .date-btn:hover{opacity:1;}
+  .date-swap{display:none; font-size:11.5px; margin-top:4px; color:var(--amber);}
+  .date-swap button{background:none; border:none; padding:0; color:var(--teal); font:inherit; font-weight:600; text-decoration:underline; cursor:pointer;}
   .date-wrap .date-picker{position:absolute; right:0; bottom:0; width:1px; height:1px; opacity:0; pointer-events:none; border:0; padding:0;}
   .mcb-table input{padding:5px 8px; font-size:13px; text-align:right; min-width:110px;}
   .mcb-table td{vertical-align:middle;}
@@ -838,6 +840,51 @@ function auToISO(text){
 }
 function dateISO(id){ return auToISO(document.getElementById(id).value); }
 
+const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+function validYMD(y, m, d){
+  const dt = new Date(y, m-1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m-1 && dt.getDate() === d;
+}
+function fullYear(y){
+  if(y >= 100) return y;
+  // Two-digit years: 00–49 → 2000s, 50–99 → 1900s
+  return y < 50 ? 2000 + y : 1900 + y;
+}
+// Reads a date in any common format — dd/mm/yyyy, mm/dd/yyyy, yyyy-mm-dd, "7 Apr 2003", "April 7, 2003" —
+// and returns {d, m, y, alt} where alt is the other reading when day and month can't be told apart.
+function parseAnyDate(text){
+  let t = (text || "").trim().replace(/\s+/g, " ");
+  t = t.replace(/[T ]\d{1,2}:\d{2}(:\d{2})?(\.\d+)?\s*(am|pm)?.*$/i, "").trim(); // drop a time part
+  let m;
+  // yyyy-mm-dd / yyyy/mm/dd
+  if((m = t.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/))){
+    const y = +m[1], mo = +m[2], d = +m[3];
+    return validYMD(y, mo, d) ? {y, m:mo, d} : null;
+  }
+  // a/b/yyyy or a-b-yy
+  if((m = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2}|\d{4})$/)) || (m = t.match(/^(\d{2})(\d{2})(\d{4})$/))){
+    const a = +m[1], b = +m[2], y = fullYear(+m[3]);
+    const asDM = validYMD(y, b, a), asMD = validYMD(y, a, b);
+    if(asDM && asMD) return a === b ? {y, m:b, d:a} : {y, m:b, d:a, alt:{y, m:a, d:b}};
+    if(asDM) return {y, m:b, d:a};
+    if(asMD) return {y, m:a, d:b};
+    return null;
+  }
+  // 7 Apr 2003 / 7-April-2003
+  if((m = t.match(/^(\d{1,2})(?:st|nd|rd|th)?[\s\-\/.]+([a-z]+)\.?,?[\s\-\/.]+(\d{2}|\d{4})$/i))){
+    const mo = MONTH_NAMES.indexOf(m[2].slice(0,3).toLowerCase()) + 1, y = fullYear(+m[3]), d = +m[1];
+    return mo && validYMD(y, mo, d) ? {y, m:mo, d} : null;
+  }
+  // April 7, 2003 / Apr 7 2003 (optionally led by a weekday)
+  if((m = t.match(/^(?:[a-z]+,?\s+)?([a-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{2}|\d{4})$/i))){
+    const mo = MONTH_NAMES.indexOf(m[1].slice(0,3).toLowerCase()) + 1, y = fullYear(+m[3]), d = +m[2];
+    return mo && validYMD(y, mo, d) ? {y, m:mo, d} : null;
+  }
+  return null;
+}
+const dmy = p => pad2(p.d) + "/" + pad2(p.m) + "/" + p.y;
+const longDate = p => new Date(p.y, p.m-1, p.d).toLocaleDateString("en-AU", {day:"numeric", month:"long", year:"numeric"});
+
 document.querySelectorAll("input.date-au").forEach(input=>{
   const wrap = document.createElement("div");
   wrap.className = "date-wrap";
@@ -848,6 +895,26 @@ document.querySelectorAll("input.date-au").forEach(input=>{
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "date-btn"; btn.title = "Pick a date"; btn.textContent = "📅";
   wrap.append(picker, btn);
+  // Shown after pasting a date that reads both ways, e.g. 05/07/2026
+  const swap = document.createElement("div");
+  swap.className = "date-swap";
+  wrap.after(swap);
+
+  const commit = () => {
+    input.classList.remove("invalid");
+    input.dispatchEvent(new Event("input"));
+    input.dispatchEvent(new Event("change"));
+  };
+  const hideSwap = () => { swap.style.display = "none"; swap.innerHTML = ""; };
+  const showSwap = (p) => {
+    swap.innerHTML = `Read as <strong>${longDate(p)}</strong>. <button type="button">Meant ${longDate(p.alt)}?</button>`;
+    swap.style.display = "block";
+    swap.querySelector("button").addEventListener("click", ()=>{
+      input.value = dmy(p.alt);
+      hideSwap();
+      commit();
+    });
+  };
 
   btn.addEventListener("click", ()=>{
     picker.value = auToISO(input.value);
@@ -857,18 +924,32 @@ document.querySelectorAll("input.date-au").forEach(input=>{
     if(!picker.value) return;
     const [y,m,d] = picker.value.split("-");
     input.value = d + "/" + m + "/" + y;
-    input.classList.remove("invalid");
-    input.dispatchEvent(new Event("input"));
-    input.dispatchEvent(new Event("change"));
+    hideSwap();
+    commit();
+  });
+  input.addEventListener("paste", e=>{
+    const text = (e.clipboardData || window.clipboardData).getData("text");
+    const p = parseAnyDate(text);
+    if(!p) return; // let the browser paste it; blur will flag it if it isn't a date
+    e.preventDefault();
+    input.value = dmy(p);
+    if(p.alt) showSwap(p); else hideSwap();
+    commit();
   });
   // Auto-insert slashes while typing digits
   input.addEventListener("input", e=>{
     if(e.inputType === "insertText" && /^\d{2}$|^\d{2}\/\d{2}$/.test(input.value)) input.value += "/";
+    if(e.inputType && e.inputType !== "insertFromPaste") hideSwap();
   });
   input.addEventListener("blur", ()=>{
-    const iso = auToISO(input.value);
-    if(iso){ const [y,m,d] = iso.split("-"); input.value = d + "/" + m + "/" + y; }
-    input.classList.toggle("invalid", input.value.trim() !== "" && !iso);
+    // Typed dates are read as dd/mm first; an impossible dd/mm like 04/25/2026 is read as mm/dd
+    const p = parseAnyDate(input.value);
+    if(p){
+      const before = input.value;
+      input.value = dmy(p);
+      if(input.value !== before) commit();
+    }
+    input.classList.toggle("invalid", input.value.trim() !== "" && !p);
   });
 });
 
@@ -1685,9 +1766,9 @@ function calcTermination(){
 
   const tiles = `
     <div class="tm-tiles">
-      <div class="tm-tile net"><div class="lbl">Total withholding</div><div class="amt">${fmt(totalTax)}</div></div>
+      <div class="tm-tile net"><div class="lbl">${isDeath ? "Net paid out" : "Net to employee"}</div><div class="amt">${fmt(totalNet)}</div></div>
       <div class="tm-tile"><div class="lbl">Total gross</div><div class="amt">${fmt(totalGross)}</div></div>
-      <div class="tm-tile"><div class="lbl">${isDeath ? "Net paid out" : "Net to employee"}</div><div class="amt">${fmt(totalNet)}</div></div>
+      <div class="tm-tile"><div class="lbl">Total withholding</div><div class="amt">${fmt(totalTax)}</div></div>
       <div class="tm-tile"><div class="lbl">Super (to fund)</div><div class="amt">${fmt(totalSuper)}</div></div>
     </div>`;
 
