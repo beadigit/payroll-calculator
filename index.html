@@ -18,6 +18,11 @@
     --ink:#132335;
     --paper:#f4f6f8;
     --panel:#ffffff;
+    --field:#f4f6f8;       /* input backgrounds */
+    --field-line:#dde3e9;
+    --header:#132335;      /* top header band */
+    --rule:#132335;        /* heavy divider lines above totals */
+    --divider:#c3ced8;     /* column group dividers in tables */
     --line:#dde3e9;
     --teal:#167690;        /* cyan text/lines on light surfaces (AA contrast) */
     --teal-dim:#e3f3f7;
@@ -32,28 +37,32 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --navy:#192b3e; --navy-2:#1f344a; --brand:#30b0cb; --brand-ink:#0f1b29;
-      --ink:#e6edf3; --paper:#0f1b29; --panel:#132335; --line:#26394d;
-      --teal:#30b0cb; --teal-dim:#173a4d; --amber:#e0b066; --amber-dim:#33291a;
-      --red:#f08a80; --red-dim:#3d2224; --green:#7fcf9a; --green-dim:#173326;
+      --navy:#111827; --navy-2:#1f2937; --brand:#30b0cb; --brand-ink:#111827;
+      --ink:#f9fafb; --paper:#111827; --panel:#1f2937; --line:#374151;
+      --field:#374151; --field-line:#4b5563; --header:#1f2937;
+      --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
+      --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
+      --rule:#4b5563; --divider:#4b5563;
     }
   }
   :root[data-theme="dark"]{
-    --navy:#192b3e; --navy-2:#1f344a; --brand:#30b0cb; --brand-ink:#0f1b29;
-    --ink:#e6edf3; --paper:#0f1b29; --panel:#132335; --line:#26394d;
-    --teal:#30b0cb; --teal-dim:#173a4d; --amber:#e0b066; --amber-dim:#33291a;
-    --red:#f08a80; --red-dim:#3d2224; --green:#7fcf9a; --green-dim:#173326;
+    --navy:#111827; --navy-2:#1f2937; --brand:#30b0cb; --brand-ink:#111827;
+    --ink:#f9fafb; --paper:#111827; --panel:#1f2937; --line:#374151;
+    --field:#374151; --field-line:#4b5563; --header:#1f2937;
+    --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
+    --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
+    --rule:#4b5563; --divider:#4b5563;
   }
   *{box-sizing:border-box;}
   body{
     margin:0; background:var(--paper); color:var(--ink);
     font-family:var(--sans); font-size:15px; line-height:1.5;
   }
-  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px;}
+  .wrap{max-width:1360px; margin:0 auto; padding:28px 20px 80px;}
   header.top{
     display:flex; justify-content:space-between; align-items:flex-end;
     gap:16px; margin-bottom:22px; flex-wrap:wrap;
-    background:var(--navy); color:#fff; border-radius:8px; padding:22px 24px;
+    background:var(--header); color:#fff; border-radius:8px; padding:22px 24px; border:1px solid var(--line);
     border-top:3px solid var(--brand);
   }
   header.top h1{
@@ -72,17 +81,36 @@
   }
   .theme-toggle:hover{border-color:var(--brand); color:var(--brand);}
 
-  nav.tabs{
-    display:flex; gap:2px; margin-bottom:20px; border-bottom:1px solid var(--line);
-    overflow-x:auto;
+  .layout{display:grid; grid-template-columns:230px minmax(0, 1fr); gap:28px; align-items:start;}
+  .sidenav{
+    position:sticky; top:20px; background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    padding:8px 10px 12px;
   }
-  nav.tabs button{
-    font-family:var(--sans); font-size:14px; font-weight:600; color:var(--ink); opacity:0.55;
-    background:none; border:none; padding:10px 16px; cursor:pointer;
-    border-bottom:2px solid transparent; white-space:nowrap;
+  .nav-group + .nav-group{border-top:1px solid var(--line); margin-top:6px; padding-top:4px;}
+  .nav-cat{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal);
+    padding:10px 10px 4px;
   }
-  nav.tabs button.active{opacity:1; color:var(--teal); border-bottom-color:var(--brand);}
-  nav.tabs button:hover{opacity:0.9;}
+  .sidenav button{
+    display:block; width:100%; text-align:left; font-family:var(--sans); font-size:13.5px; font-weight:600;
+    color:var(--ink); opacity:0.75; background:none; border:none; border-left:3px solid transparent;
+    border-radius:0 6px 6px 0; padding:8px 10px; margin:1px 0; cursor:pointer;
+  }
+  .sidenav button:hover{opacity:1; background:var(--paper);}
+  .sidenav button.active{opacity:1; color:var(--teal); background:var(--teal-dim); border-left-color:var(--brand);}
+  .page-head{margin-bottom:18px;}
+  .page-head .eyebrow{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal);}
+  .page-head h2{font-size:22px; margin:2px 0 4px; letter-spacing:-0.01em;}
+  .page-head p{margin:0; font-size:13.5px; opacity:0.7; max-width:720px;}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr; gap:16px;}
+    .sidenav{position:static; display:flex; gap:4px; overflow-x:auto; padding:6px;}
+    .nav-group{display:flex; align-items:center; flex-shrink:0;}
+    .nav-group + .nav-group{border-top:none; margin-top:0; padding-top:0; border-left:1px solid var(--line); padding-left:4px;}
+    .nav-cat{padding:0 6px; font-size:10px;}
+    .sidenav button{white-space:nowrap; border-left:none; border-radius:6px; border-bottom:2px solid transparent;}
+    .sidenav button.active{border-bottom-color:var(--brand);}
+  }
 
   .panel{display:none;}
   .panel.active{display:block;}
@@ -103,10 +131,13 @@
   .field{margin-bottom:12px;}
   .field .hint{font-size:11.5px; opacity:0.55; margin-top:3px;}
   input[type=number], input[type=text], input[type=date], select{
-    width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:4px;
-    background:var(--paper); color:var(--ink); font-family:var(--mono); font-size:14px;
+    width:100%; padding:8px 10px; border:1px solid var(--field-line); border-radius:4px;
+    background:var(--field); color:var(--ink); font-family:var(--mono); font-size:14px;
   }
   input:focus, select:focus{outline:2px solid var(--brand); outline-offset:1px;}
+  ::placeholder{color:var(--ink); opacity:0.4;}
+  :root[data-theme="dark"]{color-scheme:dark;}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){color-scheme:dark;} }
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
 
@@ -127,7 +158,7 @@
   .result-line .k{opacity:0.75;}
   .result-line .v{font-family:var(--mono); font-weight:600; white-space:nowrap;}
   .result-line.total{
-    border-top:2px solid var(--ink); border-bottom:none; margin-top:6px; padding-top:12px;
+    border-top:2px solid var(--rule); border-bottom:none; margin-top:6px; padding-top:12px;
     font-size:16px; font-weight:700;
   }
   .result-line.total .v{font-size:17px;}
@@ -143,6 +174,18 @@
   .steps td.val{font-family:var(--mono); text-align:right; white-space:nowrap; font-weight:600;}
   .steps tr.hl td{background:var(--teal-dim);}
   .steps tr.final td{background:var(--amber-dim); font-weight:700; border-bottom:none;}
+
+  .sal-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .sal-head h2{margin:0;}
+  .sal-head .basis{font-size:12.5px; opacity:0.65;}
+  .sal-head .fte{
+    font-family:var(--mono); font-size:12px; background:var(--teal-dim); color:var(--teal);
+    padding:3px 8px; border-radius:3px; white-space:nowrap;
+  }
+  .sal-wrap{overflow-x:auto;}
+  .sal{min-width:520px; font-size:13.5px;}
+  .sal th.r{text-align:right;}
+  .sal td.val.hl{color:var(--teal); font-weight:700;}
 
   .note{
     background:var(--teal-dim); border-left:3px solid var(--teal); padding:10px 12px;
@@ -160,10 +203,6 @@
   .flag.under{background:var(--amber-dim); color:var(--amber);}
   .flag.ok{background:var(--green-dim); color:var(--green);}
 
-  .ledger-row{display:grid; grid-template-columns:2fr 1fr 90px 90px 28px; gap:8px; margin-bottom:8px; align-items:center;}
-  .ledger-row.head{font-size:11px; text-transform:uppercase; opacity:0.55; letter-spacing:0.03em;}
-  .ledger-row select{padding:8px 4px; font-size:12px;}
-  .ledger-row button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:34px;}
   .btn{
     background:var(--brand); color:var(--brand-ink); border:none; border-radius:4px; padding:8px 14px;
     font-size:13px; font-weight:600; cursor:pointer; font-family:var(--sans);
@@ -171,6 +210,83 @@
   .btn.ghost{background:none; border:1px solid var(--line); color:var(--ink);}
   .btn.small{padding:6px 10px; font-size:12px;}
 
+  .mp-controls{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;}
+  .mp-controls .seg{min-width:260px;}
+  .mp-stack{display:flex; flex-direction:column; gap:20px;}
+  .mp-stack .card + .card{margin-top:0;}
+  .mp-card{min-width:0; overflow-x:auto;}
+  .mp-table{width:100%; border-collapse:collapse; font-size:13px; min-width:560px;}
+  .mp-table th:first-child, .mp-table td:first-child{width:28%;}
+  .mp-table.single th:first-child, .mp-table.single td:first-child{width:40%;}
+  .mp-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:8px 10px; background:var(--navy); color:#fff; text-align:center;}
+  .mp-table th:first-child{text-align:left; border-radius:4px 0 0 0;}
+  .mp-table th:last-child, .mp-table.single th.col-old{border-radius:0 4px 0 0;}
+  .mp-table td{padding:6px 10px; border-bottom:1px dashed var(--line);}
+  .mp-table td:first-child{font-weight:600; opacity:0.85;}
+  .mp-table td:first-child .mp-per{font-weight:400; opacity:0.7; font-size:12px;}
+  .mp-table input{padding:7px 9px; font-size:13px; min-width:0;}
+  .mp-table td.num{font-family:var(--mono); text-align:right; font-weight:600; white-space:nowrap;}
+  .mp-table td.num small{display:block; font-family:var(--sans); font-weight:400; font-size:11px; opacity:0.65;}
+  .mp-table tr.calc td{opacity:0.85;}
+  .mp-table tr.pro td{background:var(--green-dim); color:var(--green); font-weight:700;}
+  .mp-table tr.pro td:first-child{opacity:1;}
+  .mp-table tr.total td{background:var(--navy); color:#fff; font-weight:700; font-size:14px; border-bottom:none;}
+  .mp-table tr.total td:first-child{opacity:1; border-radius:0 0 0 4px;}
+  .mp-table tr.total td:last-child{border-radius:0 0 4px 0; text-align:right;}
+  .mp-table tr.gap td{border-bottom:none; padding:4px;}
+  .mp-pattern{display:flex; gap:4px; flex-wrap:nowrap;}
+  .mp-day{margin:0; opacity:1; cursor:pointer;}
+  .mp-day input{position:absolute; opacity:0; width:0; height:0;}
+  .mp-day span{
+    display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:28px; padding:0 4px;
+    border:1px solid var(--line); border-radius:4px; font-size:12px; font-weight:700; background:var(--paper); opacity:0.55;
+  }
+  .mp-day input:checked + span{background:var(--brand); border-color:var(--brand); color:var(--brand-ink); opacity:1;}
+  .mp-day input:focus-visible + span{outline:2px solid var(--brand); outline-offset:1px;}
+  .mp-leave{display:flex; flex-direction:column; align-items:stretch; gap:2px;}
+  .mp-leave span{font-family:var(--mono); font-size:12px; color:var(--red); white-space:nowrap;}
+  .mp-warn .warn{margin:10px 0 0;}
+  .ov-run{border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:14px;}
+  .ov-run-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px;}
+  .ov-run-head .ov-label{flex:1 1 180px; font-weight:700; font-family:var(--sans);}
+  .ov-run-head label{display:flex; align-items:center; gap:6px; margin:0; font-size:12px; white-space:nowrap;}
+  .ov-run-head select, .ov-run-head input.ov-sg{width:auto; padding:6px 8px; font-size:12.5px;}
+  .ov-run-head input.ov-sg{width:70px;}
+  .ov-rmrun{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; font-size:12px; padding:6px 10px;}
+  .ov-table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:860px;}
+  .ov-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; padding:5px 6px; text-align:center;}
+  .ov-table tr.grp th:first-child, .ov-table tr.grp th:nth-child(2){text-align:left; vertical-align:bottom;}
+  .ov-table th.c-paid{background:var(--red-dim); color:var(--red);}
+  .ov-table th.c-should{background:var(--green-dim); color:var(--green);}
+  .ov-table th.c-var{background:var(--teal-dim); color:var(--teal);}
+  .ov-table td{padding:3px 4px; border-bottom:1px dashed var(--line);}
+  .ov-table input, .ov-table select{padding:5px 6px; font-size:12.5px;}
+  .ov-table input[type=number]{text-align:right; min-width:80px;}
+  .ov-table .ov-desc{min-width:140px; font-family:var(--sans);}
+  .ov-table .ov-type{min-width:168px; font-family:var(--sans);}
+  .ov-table td.num{font-family:var(--mono); text-align:right; white-space:nowrap; padding-right:8px; font-weight:600;}
+  .ov-table .neg, .ov-totals .neg{color:var(--red);}
+  .ov-table .pos, .ov-totals .pos{color:var(--green);}
+  .ov-table tbody.ov-sum td{background:var(--amber-dim); font-weight:700; border-bottom:1px solid var(--panel);}
+  .ov-table tbody.ov-sum tr:first-child td{border-top:2px solid var(--rule);}
+  .ov-table tbody.ov-sum td.v{background:var(--teal-dim);}
+  /* Dividers: solid between Paid / Should be / Variance, dashed between hours and amount */
+  .ov-table .g{border-left:2px solid var(--divider); padding-left:8px;}
+  .ov-table .mid{border-left:1px dashed var(--divider); padding-left:8px;}
+  .ov-table .gend{border-right:2px solid var(--divider);}
+  .ov-table button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:28px; width:28px;}
+  .ov-bottom{display:grid; grid-template-columns:1fr minmax(320px, auto); gap:24px; align-items:start; margin-top:6px;}
+  @media (max-width:860px){ .ov-bottom{grid-template-columns:1fr;} }
+  .ov-totals{border-collapse:collapse; font-size:13px;}
+  .ov-totals th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--teal); padding:6px 10px; text-align:right;}
+  .ov-totals td{padding:7px 10px; border-bottom:1px solid var(--line); font-weight:700;}
+  .ov-totals td.num{font-family:var(--mono); text-align:right; white-space:nowrap;}
+  .ov-totals td.v{background:var(--amber-dim);}
+  .tm-other-row{display:grid; grid-template-columns:minmax(0,2fr) 70px 100px 70px 30px; gap:6px; margin-bottom:6px; align-items:center;}
+  .tm-other-row.head{font-size:11px; text-transform:uppercase; opacity:0.55; letter-spacing:0.03em; margin-bottom:4px;}
+  .tm-other-row input, .tm-other-row select{padding:7px 6px; font-size:12.5px;}
+  .tm-other-row input:disabled{opacity:0.35;}
+  .tm-other-row button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:32px;}
   .tm-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
   .tm-tile{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:12px 14px;}
   .tm-tile .lbl{font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; opacity:0.6; font-weight:600;}
@@ -184,7 +300,7 @@
   .tm-block-head .s{font-size:12px; opacity:0.6; text-align:right;}
   .tm-block .result-line .k small{display:block; font-size:11.5px; opacity:0.75;}
   .tm-block .result-line.deduct .v{color:var(--red);}
-  .tm-block .result-line.net{border-top:1px solid var(--ink); border-bottom:none; font-weight:700;}
+  .tm-block .result-line.net{border-top:1px solid var(--rule); border-bottom:none; font-weight:700;}
   .tm-block .result-line.super{opacity:0.75; border-bottom:none;}
   .tm-block .empty{font-size:12.5px; opacity:0.55; padding:4px 0 10px;}
 
@@ -206,7 +322,7 @@
   .mcb-table tr.partial td{background:var(--amber-dim);}
   .mcb-table tr.capped td{background:var(--red-dim);}
   .mcb-table tr.capped td.val{color:var(--red);}
-  .mcb-table tr.tot td{border-top:2px solid var(--ink); border-bottom:none; font-weight:700;}
+  .mcb-table tr.tot td{border-top:2px solid var(--rule); border-bottom:none; font-weight:700;}
   /* Super column — the figure that matters each pay run */
   .mcb-table th.sup{text-align:right; color:var(--teal); border-bottom:2px solid var(--teal);}
   .mcb-table td.sup{
@@ -241,6 +357,59 @@
   details.rules dd{margin:0; opacity:0.85;}
   @media (max-width:640px){ details.rules dl{grid-template-columns:1fr;} details.rules dd{margin-bottom:8px;} }
 
+  textarea{
+    width:100%; padding:10px 12px; border:1px solid var(--field-line); border-radius:4px; resize:vertical;
+    background:var(--field); color:var(--ink); font-family:var(--sans); font-size:13.5px; line-height:1.5;
+  }
+  textarea:focus{outline:2px solid var(--brand); outline-offset:1px;}
+  .dropzone{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-align:center;
+    border:2px dashed var(--line); border-radius:8px; padding:26px 16px; cursor:pointer; background:var(--paper);
+    font-weight:400; opacity:1;
+  }
+  .dropzone:hover, .dropzone.over{border-color:var(--brand); background:var(--teal-dim);}
+  .dropzone input{display:none;}
+  .dropzone strong{font-size:14px;}
+  .dropzone span{font-size:12px; opacity:0.6; max-width:420px;}
+  .nh-file{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:6px; margin-top:8px; font-size:13px;}
+  .nh-file .s{margin-left:auto; font-size:12px; opacity:0.6;}
+  .nh-file.err .s{color:var(--red); opacity:1;}
+  .nh-file button{background:none; border:none; color:var(--red); cursor:pointer; font-size:16px;}
+  .empty-state{font-size:13px; opacity:0.55; padding:8px 0;}
+  .nh-find{border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:10px;}
+  .nh-find.main{border:2px solid var(--brand); padding:9px 11px;}
+  .nh-find-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .nh-find-head .v{font-family:var(--mono); font-weight:700; font-size:15px; margin-right:auto;}
+  .nh-find-head .v small{font-family:var(--sans); font-weight:400; font-size:12px; opacity:0.6;}
+  .nh-snip{font-size:12.5px; opacity:0.85; margin-top:6px; line-height:1.55;}
+  .nh-snip mark{padding:0 2px; border-radius:2px; color:inherit;}
+  .nh-snip mark.amt{background:var(--teal-dim); font-weight:700;}
+  .nh-snip mark.incl, .nh-snip mark.excl{background:var(--amber-dim); font-weight:700;}
+  .nh-also{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12.5px; margin-top:4px; opacity:0.85;}
+  .nh-table td{vertical-align:middle;}
+  .nh-table td:first-child{font-weight:600; white-space:nowrap;}
+  .nh-table input, .nh-table select{min-width:150px;}
+  .nh-pair{display:flex; gap:6px;}
+  .nh-pair input{min-width:120px;}
+  .nh-pair select{min-width:120px;}
+  .nh-table input[data-edited="1"], .nh-table select[data-edited="1"]{border-color:var(--amber); background:var(--amber-dim);}
+  .nh-src{font-size:11.5px; margin-top:4px; opacity:0.75;}
+  .nh-src.found{color:var(--green); opacity:1;}
+  .nh-src.assumed{color:var(--amber); opacity:1;}
+  .nh-src.edited{color:var(--amber); opacity:1;}
+  .nh-src button{background:none; border:none; padding:0; color:var(--teal); font:inherit; font-weight:600; text-decoration:underline; cursor:pointer;}
+  .nh-fixed{font-size:12.5px; opacity:0.7;}
+  .nh-why{font-size:11.5px; opacity:0.8; margin-top:4px; max-width:280px;}
+  .nh-super{display:flex; flex-direction:column; gap:4px; padding:14px 16px; border-radius:8px; margin-bottom:12px; background:var(--navy); color:#fff; font-size:13px;}
+  .nh-super .lbl{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; opacity:0.7;}
+  .nh-super .big{font-size:18px; font-weight:700; color:var(--brand);}
+  .nh-super.unknown .big{color:#f0c27a;}
+  .nh-banner{padding:12px 14px; border-radius:6px; font-size:13.5px; margin-bottom:10px;}
+  .nh-banner.bad{background:var(--red-dim); color:var(--red);}
+  .nh-banner.warnb{background:var(--amber-dim); color:var(--amber);}
+  .nh-banner.good{background:var(--green-dim); color:var(--green);}
+  .note.nh-amber{background:var(--amber-dim); border-left-color:var(--amber);}
+
   footer.foot{margin-top:36px; font-size:11.5px; opacity:0.5; border-top:1px solid var(--line); padding-top:14px;}
 </style>
 </head>
@@ -250,7 +419,7 @@
   <header class="top">
     <div>
       <h1>Payroll Calculator</h1>
-      <p>PAYG Schedule 5 Method B(ii) · Base pay (FT/PT, super in/exclusive) · Variances &amp; adjustments</p>
+      <p>Pay · Tax · Super · Termination · Onboarding</p>
     </div>
     <div class="top-right">
       <div class="fy-badge">FY2026–27 tax tables · resident, Scale 1/2 only</div>
@@ -258,19 +427,57 @@
     </div>
   </header>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="base">Base Pay</button>
-    <button class="tab-btn" data-tab="payg">PAYG — Method B(ii)</button>
-    <button class="tab-btn" data-tab="variance">Variances &amp; Adjustments</button>
-    <button class="tab-btn" data-tab="term">Termination</button>
-    <button class="tab-btn" data-tab="mcb">Super — Max Contribution Base</button>
-  </nav>
+  <div class="layout">
+  <aside class="sidenav" aria-label="Calculators">
+    <div class="nav-group">
+      <div class="nav-cat">Pay</div>
+      <button class="tab-btn active" data-tab="base" data-cat="Pay"
+        data-desc="Pay per period from an annual salary or hourly rate — full-time or part-time, super inclusive or exclusive.">Base pay</button>
+      <button class="tab-btn" data-tab="variance" data-cat="Pay"
+        data-desc="Pro-rata salary and allowances for part of a weekly, fortnightly or monthly pay period, split between an old and a new rate by work pattern.">Mid-period rate change</button>
+      <button class="tab-btn" data-tab="overpay" data-cat="Pay"
+        data-desc="Compare what was paid with what should have been paid, pay run by pay run — gross, tax, net and super.">Over/underpayments</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cat">Tax</div>
+      <button class="tab-btn" data-tab="payg" data-cat="Tax"
+        data-desc="PAYG withholding on back pay, bonuses and commissions using the ATO's Schedule 5 Method B(ii).">PAYG — Method B(ii)</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cat">Super</div>
+      <button class="tab-btn" data-tab="mcb" data-cat="Super"
+        data-desc="Super Guarantee for each pay run, reduced once OTE reaches the maximum contribution base.">Max contribution base</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cat">Termination</div>
+      <button class="tab-btn" data-tab="term" data-cat="Termination"
+        data-desc="Final pay — wages, unused leave, redundancy and ETPs — with NES notice and STP reporting labels.">Termination pay</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cat">Onboarding</div>
+      <button class="tab-btn" data-tab="nh" data-cat="Onboarding"
+        data-desc="Check a new starter's set-up against the client's instructions, including whether pay is inclusive or exclusive of super.">New hire check</button>
+    </div>
+  </aside>
+
+  <main class="content">
+  <div class="page-head">
+    <div class="eyebrow" id="page-cat">Pay</div>
+    <h2 id="page-title">Base pay</h2>
+    <p id="page-desc">Pay per period from an annual salary or hourly rate — full-time or part-time, super inclusive or exclusive.</p>
+  </div>
 
   <!-- ============ BASE PAY ============ -->
   <div class="panel active" id="panel-base">
     <div class="grid">
       <div class="card">
         <h2>Employee &amp; pay basis</h2>
+
+        <div class="field">
+          <label>Start date</label>
+          <input type="date" id="bp-startDate">
+          <div class="hint">Shown in the salary summary heading, e.g. "New Employee - 01 June 2026".</div>
+        </div>
 
         <div class="field">
           <label>Employment type</label>
@@ -348,6 +555,10 @@
         <div id="bp-results"></div>
       </div>
     </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div id="bp-summary"></div>
+    </div>
   </div>
 
   <!-- ============ PAYG METHOD B(ii) ============ -->
@@ -423,68 +634,95 @@
 
   <!-- ============ VARIANCE & ADJUSTMENTS ============ -->
   <div class="panel" id="panel-variance">
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="mp-controls">
+          <div class="field" style="margin:0;">
+            <label>Calculation</label>
+            <div class="seg" id="mp-mode">
+              <button class="active" data-val="change">Old → new rate</button>
+              <button data-val="single">Single rate</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn ghost small" id="mp-loadSample" type="button">Load sample</button>
+      </div>
+      <div class="hint" id="mp-method" style="font-size:12px; opacity:0.65; margin-top:12px;"></div>
+    </div>
+    <div class="mp-stack">
+      <div class="card mp-card" data-sec="nt">
+        <h2>Normal time</h2>
+        <table class="mp-table">
+          <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
+          <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
+          <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" value="38" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" value="38" step="0.25"></td></tr>
+          <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
+          <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
+          <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
+          <tr class="pro"><td>PRO-RATA hours</td><td class="col-old num" data-o="proHrs" data-c="old"></td><td class="col-new num" data-o="proHrs" data-c="new"></td></tr>
+          <tr class="gap"><td colspan="3"></td></tr>
+          <tr><td>Base salary (annual)</td><td class="col-old"><input type="number" class="mp-in" data-f="amount" data-c="old" step="0.01"></td><td class="col-new"><input type="number" class="mp-in" data-f="amount" data-c="new" step="0.01"></td></tr>
+          <tr><td>Base hourly rate</td><td class="col-old"><input type="number" class="mp-in" data-f="rate" data-c="old" step="0.00001"></td><td class="col-new"><input type="number" class="mp-in" data-f="rate" data-c="new" step="0.00001"></td></tr>
+          <tr><td>Processed for the period</td><td colspan="2" class="span"><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></td></tr>
+          <tr class="pro"><td>PRO-RATA salary</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
+          <tr class="total"><td>TOTAL</td><td colspan="2" class="num span" data-o="total"></td></tr>
+        </table>
+        <div class="mp-warn"></div>
+      </div>
+
+      <div class="card mp-card" data-sec="al">
+        <h2>Allowance</h2>
+        <table class="mp-table">
+          <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
+          <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
+          <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" value="38" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" value="38" step="0.25"></td></tr>
+          <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
+          <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
+          <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
+          <tr class="pro"><td>PRO-RATA hours</td><td class="col-old num" data-o="proHrs" data-c="old"></td><td class="col-new num" data-o="proHrs" data-c="new"></td></tr>
+          <tr class="gap"><td colspan="3"></td></tr>
+          <tr><td>Allowance amount <span class="mp-per">(per pay period)</span></td><td class="col-old"><input type="number" class="mp-in" data-f="amount" data-c="old" step="0.01"></td><td class="col-new"><input type="number" class="mp-in" data-f="amount" data-c="new" step="0.01"></td></tr>
+          <tr><td>Base hourly rate</td><td class="col-old"><input type="number" class="mp-in" data-f="rate" data-c="old" step="0.00001"></td><td class="col-new"><input type="number" class="mp-in" data-f="rate" data-c="new" step="0.00001"></td></tr>
+          <tr><td>Leave taken (hours)</td><td class="col-old"><div class="mp-leave"><input type="number" class="mp-in" data-f="leave" data-c="old" step="0.01" placeholder="0"><span data-o="leaveAmt" data-c="old"></span></div></td><td class="col-new"><div class="mp-leave"><input type="number" class="mp-in" data-f="leave" data-c="new" step="0.01" placeholder="0"><span data-o="leaveAmt" data-c="new"></span></div></td></tr>
+          <tr><td>Processed for the period</td><td colspan="2" class="span"><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></td></tr>
+          <tr class="pro"><td>PRO-RATA allowance</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
+          <tr class="total"><td>TOTAL</td><td colspan="2" class="num span" data-o="total"></td></tr>
+        </table>
+        <div class="hint" style="font-size:11.5px; opacity:0.6; margin-top:8px;">TOTAL = pro-rata allowance − leave taken − processed for the period. Leave taken is deducted at the hourly allowance rate.</div>
+        <div class="mp-warn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ OVER/UNDERPAYMENTS ============ -->
+  <div class="panel" id="panel-overpay">
     <div class="grid">
-
-      <!-- Mid-period rate change -->
-      <div class="card" style="grid-column:1/-1;">
-        <h2>Mid-period salary change proration</h2>
-        <div class="row2">
-          <div>
-            <h3>By hours worked (timesheet-based)</h3>
-            <div class="row2">
-              <div class="field"><label>Hours at old rate</label><input type="number" id="mp-hoursOld" value="30" step="0.25"></div>
-              <div class="field"><label>Old hourly rate ($)</label><input type="number" id="mp-rateOld" value="38.00" step="0.01"></div>
-            </div>
-            <div class="row2">
-              <div class="field"><label>Hours at new rate</label><input type="number" id="mp-hoursNew" value="46" step="0.25"></div>
-              <div class="field"><label>New hourly rate ($)</label><input type="number" id="mp-rateNew" value="41.50" step="0.01"></div>
-            </div>
-            <div class="result-line"><span class="k">Pay at old rate</span><span class="v" id="mp-payOld">$0</span></div>
-            <div class="result-line"><span class="k">Pay at new rate</span><span class="v" id="mp-payNew">$0</span></div>
-            <div class="result-line total"><span class="k">Total gross this period</span><span class="v" id="mp-total">$0</span></div>
-          </div>
-          <div>
-            <h3>By calendar days (salaried, no timesheet split)</h3>
-            <div class="row2">
-              <div class="field"><label>Period start date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-periodStart"></div>
-              <div class="field"><label>Period end date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-periodEnd"></div>
-            </div>
-            <div class="field"><label>Rate change effective date (first day at new rate)</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mp-changeDate"></div>
-            <div class="row2">
-              <div class="field"><label>Old rate — pay for a full period at this rate ($)</label><input type="number" id="mp-periodPayOld" value="2923.08" step="0.01"></div>
-              <div class="field"><label>New rate — pay for a full period at this rate ($)</label><input type="number" id="mp-periodPayNew" value="3115.38" step="0.01"></div>
-            </div>
-            <div class="result-line"><span class="k">Days at old rate / new rate</span><span class="v" id="mp-daySplit">–</span></div>
-            <div class="result-line"><span class="k">Pay at old rate</span><span class="v" id="mp-dayPayOld">$0</span></div>
-            <div class="result-line"><span class="k">Pay at new rate</span><span class="v" id="mp-dayPayNew">$0</span></div>
-            <div class="result-line total"><span class="k">Total gross this period</span><span class="v" id="mp-dayTotal">$0</span></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Over/underpayment -->
-      <div class="card">
-        <h2>Over/underpayment reconciliation</h2>
-        <div class="field"><label>Correct gross pay for the period ($)</label><input type="number" id="ov-correct" value="3200.00" step="0.01"></div>
-        <div class="field"><label>Gross pay actually paid ($)</label><input type="number" id="ov-actual" value="3450.00" step="0.01"></div>
-        <div class="field"><label>Pay periods to recover the variance over</label><input type="number" id="ov-periods" value="1" step="1" min="1"></div>
-        <div id="ov-results"></div>
-        <div class="note" id="ov-note"></div>
-      </div>
-
-      <!-- Other payments ledger -->
-      <div class="card">
-        <h2>Other payments this period</h2>
-        <div class="ledger-row head">
-          <span>Description</span><span>Amount ($)</span><span>Taxable</span><span>Super?</span><span></span>
+      <div class="card" style="grid-column:1/-1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+          <h2 style="margin:0;">Over/underpayment reconciliation</h2>
+          <div style="display:flex; gap:8px;">
+            <button class="btn ghost small" id="ov-loadSample" type="button">Load sample</button>
+            <button class="btn small" id="ov-addRun" type="button">+ Add pay run</button>
+          </div>
         </div>
-        <div id="op-rows"></div>
-        <button class="btn ghost small" id="op-add" type="button">+ Add line</button>
-        <div style="margin-top:14px;">
-          <div class="result-line"><span class="k">Taxable other payments</span><span class="v" id="op-taxable">$0</span></div>
-          <div class="result-line"><span class="k">Non-taxable other payments</span><span class="v" id="op-nontaxable">$0</span></div>
-          <div class="result-line"><span class="k">Super-applicable other payments</span><span class="v" id="op-super">$0</span></div>
-          <div class="result-line total"><span class="k">Total other payments</span><span class="v" id="op-total">$0</span></div>
+        <div class="hint" style="font-size:12px; opacity:0.65; margin-bottom:14px;">
+          For each affected pay run, enter what was paid and what it should have been, line by line. Variance = should be − paid, so <strong>brackets mean the employee was overpaid</strong>.
+          Tax and super: leave blank to calculate (tax table / super %), or type the payslip figure. Cross-check tax with the
+          <a href="https://www.ato.gov.au/calculators-and-tools/tax-withheld-calculator" target="_blank" rel="noopener">ATO tax withheld calculator ↗</a>.
+        </div>
+        <div id="ov-runs"></div>
+        <div class="ov-bottom">
+          <div>
+            <div class="field" style="max-width:260px;"><label>Pay periods to recover over</label><input type="number" id="ov-periods" value="1" step="1" min="1"></div>
+            <div id="ov-results"></div>
+            <div class="note" id="ov-note"></div>
+          </div>
+          <table class="ov-totals" id="ov-totals"></table>
         </div>
       </div>
 
@@ -496,7 +734,7 @@
     <div class="card" style="margin-bottom:20px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
         <div>
-          <h2 style="margin-bottom:4px;">Termination</h2>
+          <h2 style="margin-bottom:4px;">What happened?</h2>
           <div class="lead">Pick what happened, then answer the follow-up that appears. This sets the tax treatment for every payment below.</div>
         </div>
         <button class="btn ghost small" id="tm-loadSample" type="button">Load sample</button>
@@ -511,7 +749,7 @@
       <div class="followup" data-for="normal">
         <div class="row2">
           <div class="field">
-            <label>What happened?</label>
+            <label>Reason</label>
             <select id="tm-reason">
               <option value="resign" selected>Employee resigned</option>
               <option value="retire">Employee retired</option>
@@ -634,19 +872,11 @@
             <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" value="0" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
           </div>
 
-          <h3>Earlier this financial year</h3>
-          <div class="row2">
-            <div class="field">
-              <label>Taxable payments before this pay ($)</label>
-              <input type="number" id="tm-ytdTaxable" value="0" step="0.01">
-              <div class="hint">Reduces the whole-of-income cap.</div>
-            </div>
-            <div class="field">
-              <label>OTE paid before this pay ($)</label>
-              <input type="number" id="tm-ytdOte" value="0" step="0.01">
-              <div class="hint">For the super maximum contribution base.</div>
-            </div>
-          </div>
+          <h3>Other pay in this period</h3>
+          <div class="tm-other-row head"><span>Pay item</span><span>Hours</span><span>Amount ($)</span><span>Super?</span><span></span></div>
+          <div id="tm-otherRows"></div>
+          <button class="btn ghost small" id="tm-addOther" type="button">+ Add pay item</button>
+          <div class="hint" style="margin:6px 0 4px;">Paid with the final wages and taxed together with them using the tax table. Leave the amount blank to use hours × the hourly rate (overtime at 1.5×).</div>
 
           <h3>Leave</h3>
           <div class="row2">
@@ -816,6 +1046,102 @@
         <div style="overflow-x:auto;"><table class="steps mcb-table" id="mcb-table"></table></div>
       </div>
     </div>
+  </div>
+
+  <!-- ============ NEW HIRE CHECK ============ -->
+  <div class="panel" id="panel-nh">
+    <div class="note">
+      Upload the client's instructions — offer letter, contract or email — and compare them with what's been entered in Xero. Files are read <strong>in your browser only</strong> and never uploaded anywhere. Reading is keyword-based, so always review the values it pulls out before relying on the result.
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">1. Client instructions</h2>
+          <button class="btn ghost small" id="nh-loadSample" type="button">Load sample</button>
+        </div>
+        <label class="dropzone" id="nh-drop">
+          <input type="file" id="nh-files" multiple accept=".pdf,.docx,.txt,.eml,.csv,.xlsx,.xls,.html,.htm,.md">
+          <strong>Drop files here or click to choose</strong>
+          <span>PDF, Word (.docx), Excel, .eml, .txt — Outlook .msg and scanned images can't be read; save as PDF or paste the text instead.</span>
+        </label>
+        <div id="nh-fileList"></div>
+        <div class="field" style="margin-top:14px;">
+          <label>Or paste the client's email / instructions</label>
+          <textarea id="nh-paste" rows="7" placeholder="e.g. Please set up Alex on $95,200 per annum including super, 38 hours a week, paid fortnightly, starting 3 November 2026."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Found in the instructions</h2>
+        <div id="nh-findings"><div class="empty-state">Upload a file or paste the instructions to start.</div></div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+          <h2 style="margin:0;">2. Compare with Xero</h2>
+          <button class="btn ghost small" id="nh-autofill" type="button">↻ Auto-fill from instructions</button>
+        </div>
+        <div class="hint" style="font-size:12px; opacity:0.6; margin:-6px 0 12px;">The client column fills in from the instructions — correct anything it misread. Enter what's set up in Xero on the right. The Xero amount is treated as base pay <strong>excluding</strong> super, which is how Xero stores it.</div>
+        <div style="overflow-x:auto;">
+          <table class="steps nh-table">
+            <tr><th>Field</th><th>Client instruction</th><th>Xero</th><th>Check</th></tr>
+            <tr>
+              <td>Pay amount</td>
+              <td><div class="nh-pair"><input type="number" id="nh-iAmount" step="0.01" class="nh-i"><select id="nh-iBasis" class="nh-i">
+                <option value="annual">per year</option><option value="hourly">per hour</option><option value="weekly">per week</option><option value="fortnightly">per fortnight</option><option value="monthly">per month</option></select></div></td>
+              <td><div class="nh-pair"><input type="number" id="nh-sAmount" step="0.01"><select id="nh-sBasis">
+                <option value="annual">per year</option><option value="hourly">per hour</option></select></div></td>
+              <td id="nh-cAmount"></td>
+            </tr>
+            <tr>
+              <td>Super</td>
+              <td><select id="nh-iSuper" class="nh-i">
+                <option value="unknown">Not stated</option><option value="incl">Inclusive of super (package)</option><option value="excl">Exclusive of super (plus super)</option></select></td>
+              <td class="nh-fixed">Base pay excl. super</td>
+              <td id="nh-cSuper"></td>
+            </tr>
+            <tr>
+              <td>Super rate (%)</td>
+              <td><input type="number" id="nh-iSg" step="0.1" class="nh-i" placeholder="12"></td>
+              <td><input type="number" id="nh-sSg" step="0.1" value="12"></td>
+              <td id="nh-cSg"></td>
+            </tr>
+            <tr>
+              <td>Hours / week</td>
+              <td><input type="number" id="nh-iHours" step="0.25" class="nh-i"><div class="nh-src" data-key="hours"></div></td>
+              <td><input type="number" id="nh-sHours" step="0.25"></td>
+              <td id="nh-cHours"></td>
+            </tr>
+            <tr>
+              <td>Employment type</td>
+              <td><select id="nh-iType" class="nh-i"><option value="">Not stated</option><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="casual">Casual</option><option value="fixed-term">Fixed-term</option></select><div class="nh-src" data-key="type"></div></td>
+              <td><select id="nh-sType"><option value="">—</option><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="casual">Casual</option><option value="fixed-term">Fixed-term</option></select></td>
+              <td id="nh-cType"></td>
+            </tr>
+            <tr>
+              <td>Pay frequency</td>
+              <td><select id="nh-iFreq" class="nh-i"><option value="">Not stated</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select><div class="nh-src" data-key="freq"></div></td>
+              <td><select id="nh-sFreq"><option value="">—</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></td>
+              <td id="nh-cFreq"></td>
+            </tr>
+            <tr>
+              <td>Start date</td>
+              <td><input type="text" class="date-au nh-i" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="nh-iStart"><div class="nh-src" data-key="start"></div></td>
+              <td><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="nh-sStart"></td>
+              <td id="nh-cStart"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1;">
+        <h2>3. Result</h2>
+        <div id="nh-result"></div>
+      </div>
+    </div>
+  </div>
+
+  </main>
   </div>
 
   <footer class="foot">
@@ -1042,14 +1368,24 @@ darkQuery.addEventListener("change", renderThemeBtn);
 renderThemeBtn();
 
 /* ---------------- tabs ---------------- */
+function showTool(btn){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+  document.getElementById("page-cat").textContent = btn.dataset.cat;
+  document.getElementById("page-title").textContent = btn.textContent;
+  document.getElementById("page-desc").textContent = btn.dataset.desc;
+}
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+    showTool(btn);
+    history.replaceState(null, "", "#" + btn.dataset.tab);
   });
 });
+// Open the tool named in the address (e.g. index.html#term) so a link goes straight to it
+const startTool = document.querySelector(`.tab-btn[data-tab="${location.hash.slice(1)}"]`);
+if(startTool) showTool(startTool);
 
 /* ---------------- segmented controls ---------------- */
 function wireSeg(id, onChange){
@@ -1075,7 +1411,7 @@ wireSeg("bp-basis", (val)=>{
   document.getElementById("bp-hourly-fields").style.display = val==="hourly" ? "block":"none";
   calcBase();
 });
-["bp-annualSalary","bp-ftHours","bp-hourlyRate","bp-ptHours","bp-hoursWorked","bp-sgRate"].forEach(id=>{
+["bp-startDate","bp-annualSalary","bp-ftHours","bp-hourlyRate","bp-ptHours","bp-hoursWorked","bp-sgRate"].forEach(id=>{
   document.getElementById(id).addEventListener("input", calcBase);
 });
 
@@ -1134,6 +1470,51 @@ function calcBase(){
     <div class="result-line" style="margin-top:8px;"><span class="k">Annualised gross (excl. super), at contracted hours</span><span class="v">${fmt(annualisedFromRate)}</span></div>
   `;
   document.getElementById("bp-results").innerHTML = html;
+
+  // Salary summary at contracted hours, laid out like the new-employee email table
+  const fteFraction = contractedHours / ftHours;
+  const periodLabel = {weekly:"Weekly", fortnightly:"Fortnightly", monthly:"Monthly"}[freq];
+  const periodUnit = {weekly:"week", fortnightly:"fortnight", monthly:"month"}[freq];
+  const annualSuper = annualisedFromRate * sgRate;
+  const annualPackage = annualisedFromRate + annualSuper;
+  const periodSalary = annualisedFromRate / periodsPerYear;
+  const periodSuper = annualSuper / periodsPerYear;
+  const fmtN = (v,dp=2)=>(Number(v)||0).toLocaleString("en-AU",{minimumFractionDigits:dp, maximumFractionDigits:dp});
+  const fmtH = v=>parseFloat(v.toFixed(4)).toString();
+  const sgPct = parseFloat((sgRate*100).toFixed(2));
+  const startDate = document.getElementById("bp-startDate").value;
+  const startLabel = startDate
+    ? " - " + new Date(startDate + "T00:00:00").toLocaleDateString("en-AU",{day:"2-digit", month:"long", year:"numeric"})
+    : "";
+  document.getElementById("bp-summary").innerHTML = `
+    <div class="sal-head">
+      <div>
+        <h2>Salary summary — New Employee${startLabel}</h2>
+        <div class="basis">${empType==="pt" ? "Part-time" : "Full-time"} ${fmtH(contractedHours)} hrs/week (${fmtH(standardHoursThisPeriod)} hrs/${periodUnit})</div>
+      </div>
+      <span class="fte">${fmtH(fteFraction*100)}% FTE</span>
+    </div>
+    <div class="sal-wrap">
+      <table class="steps sal">
+        <tr><th></th><th class="r">Salary</th><th class="r">Super ${sgPct}%</th><th class="r">Total</th></tr>
+        <tr class="hl">
+          <td><strong>Annual Salary Package</strong></td><td></td><td></td><td class="val">${fmtN(annualPackage)}</td>
+        </tr>
+        <tr>
+          <td>Annual Salary Exclusive of Super</td>
+          <td class="val">${fmtN(annualisedFromRate)}</td><td class="val">${fmtN(annualSuper)}</td><td class="val">${fmtN(annualPackage)}</td>
+        </tr>
+        <tr>
+          <td>${periodLabel} Salary Exclusive of Super</td>
+          <td class="val hl">${fmtN(periodSalary)}</td><td class="val">${fmtN(periodSuper)}</td><td class="val">${fmtN(periodSalary + periodSuper)}</td>
+        </tr>
+        <tr>
+          <td>Hourly Rate</td>
+          <td class="val">${fmtN(hourlyExSuper, 6)}</td><td></td><td></td>
+        </tr>
+      </table>
+    </div>
+  `;
 }
 calcBase();
 
@@ -1220,124 +1601,279 @@ calcPayg();
 
 /* ================= VARIANCE & ADJUSTMENTS ================= */
 
-// --- mid-period, by hours ---
-["mp-hoursOld","mp-rateOld","mp-hoursNew","mp-rateNew"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", calcMidPeriodHours);
+// --- mid-period rate change: monthly pro-rata by work pattern ---
+const MP_DAYS = [["M",1],["T",2],["W",3],["Th",4],["F",5],["Sa",6],["Su",0]];
+document.querySelectorAll("#panel-variance .mp-pattern").forEach(box=>{
+  box.innerHTML = MP_DAYS.map(([l, d])=>`<label class="mp-day" title="${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d]}"><input type="checkbox" class="mp-in" data-d="${d}" ${d >= 1 && d <= 5 ? "checked" : ""}><span>${l}</span></label>`).join("");
 });
-function calcMidPeriodHours(){
-  const payOld = num("mp-hoursOld") * num("mp-rateOld");
-  const payNew = num("mp-hoursNew") * num("mp-rateNew");
-  document.getElementById("mp-payOld").textContent = fmt(payOld);
-  document.getElementById("mp-payNew").textContent = fmt(payNew);
-  document.getElementById("mp-total").textContent = fmt(payOld + payNew);
+const mpDate = el => { const iso = auToISO(el.value); if(!iso) return null; const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d); };
+function mpCountDays(from, to, pattern){
+  let n = 0;
+  for(const d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) if(pattern.has(d.getDay())) n++;
+  return n;
 }
-calcMidPeriodHours();
-
-// --- mid-period, by calendar days ---
-["mp-periodStart","mp-periodEnd","mp-changeDate","mp-periodPayOld","mp-periodPayNew"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", calcMidPeriodDays);
-  document.getElementById(id).addEventListener("change", calcMidPeriodDays);
-});
-function calcMidPeriodDays(){
-  const start = dateISO("mp-periodStart");
-  const end = dateISO("mp-periodEnd");
-  const change = dateISO("mp-changeDate");
-  if(!start || !end || !change){
-    document.getElementById("mp-daySplit").textContent = "–";
-    document.getElementById("mp-dayPayOld").textContent = fmt(0);
-    document.getElementById("mp-dayPayNew").textContent = fmt(0);
-    document.getElementById("mp-dayTotal").textContent = fmt(0);
-    return;
+function mpColumn(card, c){
+  const sec = card.dataset.sec;
+  const f = name => card.querySelector(`.mp-in[data-f="${name}"][data-c="${c}"]`);
+  const pattern = new Set([...card.querySelectorAll(`.mp-pattern[data-c="${c}"] input:checked`)].map(i => +i.dataset.d));
+  const from = mpDate(f("from")), to = mpDate(f("to"));
+  const freq = f("freq").value;
+  const hours = parseFloat(f("hours").value) || 0;
+  // Standard hours for one full pay period
+  const std = freq === "weekly" ? hours : freq === "fortnightly" ? hours * 2 : hours * 52 / 12;
+  const res = {std, days:null, monthDays:null, proHrs:0, pro:0, leaveAmt:0, warn:[]};
+  if(from && to){
+    if(to < from) res.warn.push("To date is before the from date.");
+    else {
+      res.days = mpCountDays(from, to, pattern);
+      if(freq === "monthly"){
+        if(to.getMonth() !== from.getMonth() || to.getFullYear() !== from.getFullYear())
+          res.warn.push("The date range runs into another month — pro-rata is worked out against the from-date's month. Split it into one range per month.");
+        res.monthDays = mpCountDays(new Date(from.getFullYear(), from.getMonth(), 1), new Date(from.getFullYear(), from.getMonth() + 1, 0), pattern);
+        res.month = from.toLocaleDateString("en-AU", {month:"short", year:"numeric"});
+      } else {
+        // Working days in a full week or fortnight on this pattern
+        const periodLen = freq === "weekly" ? 7 : 14;
+        res.monthDays = pattern.size * periodLen / 7;
+        res.month = freq === "weekly" ? "week" : "fortnight";
+        const span = Math.round((to - from) / 86400000) + 1;
+        if(span > periodLen) res.warn.push(`The date range is ${span} days — longer than one ${res.month}. Split it into one range per pay period.`);
+      }
+      if(!res.monthDays) res.warn.push("No work-pattern days ticked.");
+      res.proHrs = res.monthDays ? std * res.days / res.monthDays : 0;
+    }
   }
-  const d0 = new Date(start), d1 = new Date(end), dc = new Date(change);
-  const totalDays = Math.round((d1-d0)/86400000) + 1;
-  if(totalDays <= 0){ return; }
-  let daysNew = Math.round((d1-dc)/86400000) + 1;
-  daysNew = Math.max(0, Math.min(totalDays, daysNew));
-  const daysOld = totalDays - daysNew;
-
-  const periodPayOld = num("mp-periodPayOld");
-  const periodPayNew = num("mp-periodPayNew");
-  const payOld = periodPayOld * (daysOld/totalDays);
-  const payNew = periodPayNew * (daysNew/totalDays);
-
-  document.getElementById("mp-daySplit").textContent = daysOld + " days / " + daysNew + " days (of " + totalDays + ")";
-  document.getElementById("mp-dayPayOld").textContent = fmt(payOld);
-  document.getElementById("mp-dayPayNew").textContent = fmt(payNew);
-  document.getElementById("mp-dayTotal").textContent = fmt(payOld + payNew);
+  // Hourly rate: salary ÷ (hours × 52); allowance ÷ standard monthly hours. Type a rate to override.
+  const amount = parseFloat(f("amount").value) || 0;
+  const rateCalc = sec === "nt" ? (hours ? amount / (hours * 52) : 0) : (std ? amount / std : 0);
+  const rateEl = f("rate");
+  rateEl.placeholder = rateCalc ? rateCalc.toFixed(5) : "";
+  const rate = rateEl.value !== "" ? parseFloat(rateEl.value) || 0 : rateCalc;
+  if(sec === "al"){ res.leaveAmt = round2((parseFloat(f("leave").value) || 0) * rate); }
+  res.pro = round2(res.proHrs * rate);  // leave taken is deducted in the TOTAL
+  return res;
 }
-calcMidPeriodDays();
-
-// --- over/underpayment ---
-["ov-correct","ov-actual","ov-periods"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", calcOverUnder);
+const MP_METHOD = "Standard hours per pay period: weekly = hours per week · fortnightly = hours per week × 2 · monthly = hours per week × 52 ÷ 12. " +
+  "Pro-rata hours = standard hours × working days in the date range ÷ working days in the full pay period (the week, the fortnight, or that calendar month). Only the ticked work-pattern days count.";
+function calcProrata(){
+  const single = segVal("mp-mode") === "single";
+  document.getElementById("mp-method").textContent = MP_METHOD + " " +
+    (single ? "TOTAL = pro-rata amount − the amount already processed for the period." : "TOTAL = old + new − the amount already processed for the period.");
+  document.querySelectorAll("#panel-variance .mp-table").forEach(t=>t.classList.toggle("single", single));
+  document.querySelectorAll("#panel-variance .col-new").forEach(el=>{ el.style.display = single ? "none" : ""; });
+  document.querySelectorAll("#panel-variance td.span").forEach(el=>{ el.colSpan = single ? 1 : 2; });
+  document.querySelectorAll("#panel-variance th.col-old").forEach(el=>{ el.textContent = single ? "Rate" : "Old rate"; });
+  document.querySelectorAll("#panel-variance .mp-card").forEach(card=>{
+    const cols = single ? ["old"] : ["old", "new"];
+    const warns = [];
+    let total = 0;
+    cols.forEach(c=>{
+      const r = mpColumn(card, c);
+      const out = name => card.querySelector(`[data-o="${name}"][data-c="${c}"]`);
+      out("std").textContent = r.std ? r.std.toFixed(2) : "–";
+      out("days").innerHTML = r.days === null ? "–" : `${r.days} of ${r.monthDays}<small>${r.month}</small>`;
+      out("proHrs").textContent = r.proHrs ? r.proHrs.toFixed(2) : "–";
+      out("pro").textContent = fmt(r.pro);
+      if(out("leaveAmt")) out("leaveAmt").textContent = r.leaveAmt ? "−" + fmt(r.leaveAmt) : "";
+      total += r.pro - r.leaveAmt;
+      r.warn.forEach(w => warns.push((single ? "" : (c === "old" ? "Old rate: " : "New rate: ")) + w));
+    });
+    const processed = parseFloat(card.querySelector('.mp-in[data-f="processed"]').value) || 0;
+    total = round2(total - processed);
+    card.querySelector('[data-o="total"]').textContent = fmt(total);
+    card.querySelector(".mp-warn").innerHTML = warns.map(w=>`<div class="warn">${w}</div>`).join("");
+  });
+}
+document.querySelectorAll("#panel-variance .mp-in").forEach(el=>{
+  el.addEventListener("input", calcProrata); el.addEventListener("change", calcProrata);
 });
+wireSeg("mp-mode", calcProrata);
+function mpFill(sec, c, v){
+  const card = document.querySelector(`#panel-variance .mp-card[data-sec="${sec}"]`);
+  Object.entries(v).forEach(([k, val])=>{
+    if(k === "pattern") card.querySelectorAll(`.mp-pattern[data-c="${c}"] input`).forEach(i=>{ i.checked = val.includes(+i.dataset.d); });
+    else if(k === "processed") card.querySelector('.mp-in[data-f="processed"]').value = val;
+    else card.querySelector(`.mp-in[data-f="${k}"][data-c="${c}"]`).value = val;
+  });
+}
+function mpLoadSample(){
+  document.querySelectorAll("#mp-mode button").forEach(b=>b.classList.toggle("active", b.dataset.val === "change"));
+  mpFill("nt", "old", {freq:"monthly", from:"19/08/2024", to:"31/08/2024", hours:32, pattern:[1,2,4,5], amount:56936.94, rate:"", processed:4744.75});
+  mpFill("nt", "new", {freq:"monthly", from:"01/04/2024", to:"30/04/2024", hours:40, pattern:[1,2,3,4,5], amount:62155.86, rate:""});
+  mpFill("al", "old", {freq:"monthly", from:"01/03/2024", to:"24/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1126.13, rate:"", leave:"", processed:858.00});
+  mpFill("al", "new", {freq:"monthly", from:"01/03/2024", to:"24/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1885.37, rate:"", leave:52});
+  calcProrata();
+}
+document.getElementById("mp-loadSample").addEventListener("click", mpLoadSample);
+mpLoadSample();
+
+// --- over/underpayment: pay run by pay run, paid vs should be ---
+const OV_TYPES = {
+  ote:  "Earnings + super",
+  earn: "Earnings, no super",
+  ntax: "Non-taxable",
+  ded:  "Deduction (after tax)",
+};
+// Accounting style: negatives in brackets, zero as a dash
+function fmtAcc(v){
+  if(Math.abs(v) < 0.005) return "–";
+  const t = Math.abs(v).toLocaleString("en-AU", {minimumFractionDigits:2, maximumFractionDigits:2});
+  return v < 0 ? `(${t})` : t;
+}
+const ovEsc = v => String(v).replace(/[<>&"]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+let ovRunCount = 0;
+function addOvRun(data = {}){
+  ovRunCount++;
+  const run = document.createElement("div");
+  run.className = "ov-run";
+  run.innerHTML = `
+    <div class="ov-run-head">
+      <input type="text" class="ov-label" placeholder="Pay run, e.g. APR24 PAY" value="${ovEsc(data.label || "Pay run " + ovRunCount)}">
+      <label>Frequency <select class="ov-freq">
+        <option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></label>
+      <label>Tax scale <select class="ov-scale"><option value="2">2 — TFT claimed</option><option value="1">1 — no TFT</option></select></label>
+      <label>Super % <input type="number" class="ov-sg" step="0.1" value="${data.sg ?? 12}"></label>
+      <button type="button" class="ov-rmrun" title="Remove pay run">Remove</button>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="ov-table">
+      <thead>
+        <tr class="grp"><th rowspan="2">Pay item</th><th rowspan="2">Type</th>
+          <th colspan="2" class="c-paid g">Paid</th><th colspan="2" class="c-should g">Should be</th><th colspan="2" class="c-var g gend">Variance</th><th rowspan="2"></th></tr>
+        <tr class="sub"><th class="c-paid g">Hours</th><th class="c-paid mid">Amount</th><th class="c-should g">Hours</th><th class="c-should mid">Amount</th><th class="c-var g">Hours</th><th class="c-var mid gend">Amount</th></tr>
+      </thead>
+      <tbody class="ov-lines"></tbody>
+      <tbody class="ov-sum">
+        <tr data-k="gross"><td colspan="2">Gross</td><td class="g"></td><td class="num p mid"></td><td class="g"></td><td class="num s mid"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
+        <tr data-k="tax"><td colspan="2">Tax</td><td class="g"></td><td class="mid"><input type="number" class="ov-taxP" step="1"></td><td class="g"></td><td class="mid"><input type="number" class="ov-taxS" step="1"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
+        <tr data-k="net"><td colspan="2">Net</td><td class="g"></td><td class="num p mid"></td><td class="g"></td><td class="num s mid"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
+        <tr data-k="super"><td colspan="2">Super</td><td class="g"></td><td class="mid"><input type="number" class="ov-supP" step="0.01"></td><td class="g"></td><td class="mid"><input type="number" class="ov-supS" step="0.01"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <button type="button" class="btn ghost small ov-addline">+ Add line</button>`;
+  run.querySelector(".ov-freq").value = data.freq || "fortnightly";
+  run.querySelector(".ov-scale").value = data.scale || "2";
+  if(data.taxP !== undefined) run.querySelector(".ov-taxP").value = data.taxP;
+  if(data.taxS !== undefined) run.querySelector(".ov-taxS").value = data.taxS;
+  run.querySelectorAll(".ov-run-head input, .ov-run-head select, .ov-sum input").forEach(el=>{
+    el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder);
+  });
+  run.querySelector(".ov-rmrun").addEventListener("click", ()=>{ run.remove(); calcOverUnder(); });
+  run.querySelector(".ov-addline").addEventListener("click", ()=>{ addOvLine(run, {}); calcOverUnder(); });
+  document.getElementById("ov-runs").appendChild(run);
+  (data.lines || [{desc:"Ordinary hours", type:"ote"}]).forEach(l => addOvLine(run, l));
+  return run;
+}
+function addOvLine(run, l){
+  const tr = document.createElement("tr");
+  const v = x => x === undefined || x === null ? "" : x;
+  tr.innerHTML = `
+    <td><input type="text" class="ov-desc" placeholder="e.g. Annual leave" value="${ovEsc(v(l.desc))}"></td>
+    <td><select class="ov-type">${Object.entries(OV_TYPES).map(([k, t])=>`<option value="${k}">${t}</option>`).join("")}</select></td>
+    <td class="g"><input type="number" class="ov-hP" step="0.01" value="${v(l.hP)}"></td>
+    <td class="mid"><input type="number" class="ov-aP" step="0.01" value="${v(l.aP)}"></td>
+    <td class="g"><input type="number" class="ov-hS" step="0.01" value="${v(l.hS)}"></td>
+    <td class="mid"><input type="number" class="ov-aS" step="0.01" value="${v(l.aS)}"></td>
+    <td class="num vh g"></td><td class="num va mid gend"></td>
+    <td><button type="button" class="rm" title="Remove line">×</button></td>`;
+  tr.querySelector(".ov-type").value = l.type || "ote";
+  tr.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder); });
+  tr.querySelector(".rm").addEventListener("click", ()=>{ tr.remove(); calcOverUnder(); });
+  run.querySelector(".ov-lines").appendChild(tr);
+}
+
 function calcOverUnder(){
-  const correct = num("ov-correct");
-  const actual = num("ov-actual");
+  const val = el => parseFloat(el.value) || 0;
+  const tot = {gross:[0,0], tax:[0,0], net:[0,0], super:[0,0]};
+  document.querySelectorAll("#ov-runs .ov-run").forEach(run=>{
+    const freq = run.querySelector(".ov-freq").value;
+    const scale = parseInt(run.querySelector(".ov-scale").value, 10);
+    const sg = val(run.querySelector(".ov-sg")) / 100;
+    const side = {p:{gross:0, ote:0, adj:0}, s:{gross:0, ote:0, adj:0}};
+    run.querySelectorAll(".ov-lines tr").forEach(tr=>{
+      const type = tr.querySelector(".ov-type").value;
+      const hP = val(tr.querySelector(".ov-hP")), hS = val(tr.querySelector(".ov-hS"));
+      let aP = val(tr.querySelector(".ov-aP")), aS = val(tr.querySelector(".ov-aS"));
+      if(type === "ded"){ aP = -Math.abs(aP); aS = -Math.abs(aS); }   // deductions always reduce net
+      [["p", aP], ["s", aS]].forEach(([k, a])=>{
+        if(type === "ote" || type === "earn") side[k].gross += a;
+        if(type === "ote") side[k].ote += a;
+        if(type === "ntax" || type === "ded") side[k].adj += a;
+      });
+      tr.querySelector(".vh").textContent = fmtAcc(hS - hP);
+      tr.querySelector(".va").textContent = fmtAcc(aS - aP);
+      tr.querySelector(".va").className = "num va mid gend" + (aS - aP < -0.005 ? " neg" : aS - aP > 0.005 ? " pos" : "");
+    });
+    const out = {};
+    ["p", "s"].forEach(k=>{
+      const g = round2(side[k].gross);
+      const taxEl = run.querySelector(k === "p" ? ".ov-taxP" : ".ov-taxS");
+      const supEl = run.querySelector(k === "p" ? ".ov-supP" : ".ov-supS");
+      const taxCalc = g > 0 ? periodWithholding(g, scale, freq) : 0;
+      const supCalc = round2(Math.max(0, side[k].ote) * sg);
+      taxEl.placeholder = taxCalc.toFixed(0); supEl.placeholder = supCalc.toFixed(2);
+      const tax = taxEl.value !== "" ? val(taxEl) : taxCalc;
+      const sup = supEl.value !== "" ? val(supEl) : supCalc;
+      out[k] = {gross:g, tax, net:round2(g - tax + side[k].adj), super:sup};
+    });
+    ["gross","tax","net","super"].forEach(key=>{
+      const row = run.querySelector(`.ov-sum tr[data-k="${key}"]`);
+      if(row.querySelector(".p")) row.querySelector(".p").textContent = fmtAcc(out.p[key]);
+      if(row.querySelector(".s")) row.querySelector(".s").textContent = fmtAcc(out.s[key]);
+      const d = round2(out.s[key] - out.p[key]);
+      row.querySelector(".v").textContent = fmtAcc(d);
+      row.querySelector(".v").className = "num v mid gend" + (d < -0.005 ? " neg" : d > 0.005 ? " pos" : "");
+      tot[key][0] += out.p[key]; tot[key][1] += out.s[key];
+    });
+  });
+
+  const runs = document.querySelectorAll("#ov-runs .ov-run").length;
+  const d = k => round2(tot[k][1] - tot[k][0]);
+  document.getElementById("ov-totals").innerHTML = `
+    <tr><th></th><th>Paid</th><th>Should be</th><th>Variance</th></tr>
+    ${["gross","tax","net","super"].map(k=>`<tr><td>Total ${k}</td><td class="num">${fmtAcc(tot[k][0])}</td><td class="num">${fmtAcc(tot[k][1])}</td>
+      <td class="num v ${d(k) < -0.005 ? "neg" : d(k) > 0.005 ? "pos" : ""}">${fmtAcc(d(k))}</td></tr>`).join("")}`;
+
   const periods = Math.max(1, num("ov-periods"));
-  const variance = actual - correct;
-  const perPeriod = Math.abs(variance) / periods;
-
+  const netVar = d("net"), grossVar = d("gross");
   let flag, label, note;
-  if(Math.abs(variance) < 0.005){
+  if(!runs || (Math.abs(netVar) < 0.005 && Math.abs(grossVar) < 0.005)){
     flag = "ok"; label = "Balanced — no variance";
-    note = "Paid amount matches the correct gross pay for the period.";
-  } else if(variance > 0){
-    flag = "over"; label = "Overpaid by " + fmt(variance);
-    note = "Overpayment of gross pay, not an additional/back payment — it's usually recovered by reducing gross pay in a future period (by agreement with the employee), rather than run through Schedule 5. If it crosses a BAS/STP period already reported, check whether an STP pay event correction is needed instead of a straight deduction.";
+    note = "What was paid matches what should have been paid.";
+  } else if(netVar < 0){
+    flag = "over"; label = `Overpaid — ${fmt(-netVar)} net (${fmt(-grossVar)} gross)`;
+    note = "The employee was overpaid. Within the same financial year it's usually recovered by reducing gross pay in later pay runs (by written agreement with the employee), which corrects tax and STP year-to-date figures automatically. If the overpayment was in a prior financial year, the employee generally repays the gross amount and the earlier year's STP figures are corrected instead. Super paid on the overpayment can be offset against future SG only within the rules — check before adjusting.";
   } else {
-    flag = "under"; label = "Underpaid by " + fmt(-variance);
-    note = "Underpayment of gross pay owed to the employee. If it relates to work performed in a prior pay period this financial year, it may need to be treated as a back payment under Method B(i) (recalculating the earlier period) or Method B(ii) (if it relates to a prior financial year or an undefined period) rather than simply added to this period's normal earnings.";
+    flag = "under"; label = `Underpaid — ${fmt(netVar)} net (${fmt(grossVar)} gross)`;
+    note = "The employee was underpaid. If it relates to an earlier pay run this financial year, treat it as a back payment under Schedule 5 Method B(i) (recalculate the earlier period); if it relates to a prior financial year, use Method B(ii) — see the Tax section.";
   }
-
   document.getElementById("ov-results").innerHTML = `
-    <div class="result-line"><span class="k">Variance</span><span class="v"><span class="flag ${flag}">${label}</span></span></div>
-    <div class="result-line"><span class="k">Suggested adjustment per period (over ${periods} period${periods>1?"s":""})</span><span class="v">${fmt(perPeriod)}</span></div>
-  `;
+    <div class="result-line"><span class="k">Result</span><span class="v"><span class="flag ${flag}">${label}</span></span></div>
+    <div class="result-line"><span class="k">Per period over ${periods} pay period${periods>1?"s":""} — gross</span><span class="v">${fmt(Math.abs(grossVar)/periods)}</span></div>
+    <div class="result-line"><span class="k">Per period — net</span><span class="v">${fmt(Math.abs(netVar)/periods)}</span></div>`;
   document.getElementById("ov-note").textContent = note;
 }
+document.getElementById("ov-periods").addEventListener("input", calcOverUnder);
+document.getElementById("ov-addRun").addEventListener("click", ()=>{ addOvRun(); calcOverUnder(); });
+document.getElementById("ov-loadSample").addEventListener("click", ()=>{
+  document.getElementById("ov-runs").innerHTML = ""; ovRunCount = 0;
+  addOvRun({label:"APR24 PAY", freq:"monthly", sg:11.5, taxP:3367, taxS:0, lines:[
+    {desc:"Ordinary hours", type:"ote", hP:173.33, aP:16891.88, hS:173.33, aS:16891.88},
+    {desc:"Annual leave", type:"ote", hS:-122, aS:-11889.33},
+    {desc:"Sick leave", type:"earn", aP:-974.53, aS:-974.53},
+    {desc:"Adjustment", type:"earn", aP:-4000, aS:-4000},
+    {desc:"Adjustment", type:"earn", aP:-100, aS:-100},
+    {desc:"Deduction", type:"ded", aP:10, aS:10},
+  ]});
+  addOvRun({label:"MAY24 PAY", freq:"monthly", sg:11.5, taxP:1712, taxS:230, lines:[
+    {desc:"Gross pay", type:"ote", aP:6501.50, aS:2500.58},
+  ]});
+  calcOverUnder();
+});
+addOvRun();
 calcOverUnder();
 
-// --- other payments ledger ---
-let opRowId = 0;
-function addOpRow(desc, amount, taxable, superApplicable){
-  opRowId++;
-  const id = "op-row-" + opRowId;
-  const div = document.createElement("div");
-  div.className = "ledger-row";
-  div.id = id;
-  div.innerHTML = `
-    <input type="text" class="op-desc" placeholder="e.g. Tool allowance" value="${desc||''}">
-    <input type="number" class="op-amount" step="0.01" value="${amount!==undefined?amount:''}">
-    <select class="op-taxable"><option value="yes" ${taxable!=="no"?"selected":""}>Yes</option><option value="no" ${taxable==="no"?"selected":""}>No</option></select>
-    <select class="op-super"><option value="yes" ${superApplicable==="yes"?"selected":""}>Yes</option><option value="no" ${superApplicable!=="yes"?"selected":""}>No</option></select>
-    <button type="button" class="rm">×</button>
-  `;
-  document.getElementById("op-rows").appendChild(div);
-  div.querySelectorAll("input,select").forEach(el=>el.addEventListener("input", calcOtherPayments));
-  div.querySelectorAll("select").forEach(el=>el.addEventListener("change", calcOtherPayments));
-  div.querySelector(".rm").addEventListener("click", ()=>{ div.remove(); calcOtherPayments(); });
-}
-document.getElementById("op-add").addEventListener("click", ()=>addOpRow());
-addOpRow("Overtime meal allowance", 25.00, "no", "no");
-addOpRow("First aid officer allowance", 15.50, "yes", "yes");
-
-function calcOtherPayments(){
-  let taxable=0, nontaxable=0, superTotal=0;
-  document.querySelectorAll("#op-rows .ledger-row").forEach(row=>{
-    const amt = parseFloat(row.querySelector(".op-amount").value) || 0;
-    const isTaxable = row.querySelector(".op-taxable").value === "yes";
-    const isSuper = row.querySelector(".op-super").value === "yes";
-    if(isTaxable) taxable += amt; else nontaxable += amt;
-    if(isSuper) superTotal += amt;
-  });
-  document.getElementById("op-taxable").textContent = fmt(taxable);
-  document.getElementById("op-nontaxable").textContent = fmt(nontaxable);
-  document.getElementById("op-super").textContent = fmt(superTotal);
-  document.getElementById("op-total").textContent = fmt(taxable+nontaxable);
-}
-calcOtherPayments();
 
 /* ================= TERMINATION ================= */
 // FY2026–27 rates — see "The rates and rules behind this calculator" on the Termination tab
@@ -1446,7 +1982,7 @@ function nesRedundancy(hired, last, smallBiz, casual){
 
 const TERM_INPUTS = ["tm-name","tm-dob","tm-hired","tm-last","tm-reason","tm-casual","tm-noticeDate","tm-noticeExtra",
  "tm-genuine","tm-smallBiz","tm-redWks","tm-certified","tm-retireDate","tm-deathTo",
- "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-stsl","tm-ytdTaxable","tm-ytdOte",
+ "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-stsl",
  "tm-alBal","tm-alAccrue","tm-lslHrs","tm-normalGross","tm-s7Hours","tm-s7Tax1","tm-s7Tax2",
  "tm-noticeWks","tm-exGratia","tm-etpRate"];
 TERM_INPUTS.forEach(id=>{
@@ -1481,8 +2017,6 @@ const TM_SAMPLE = {
   "tm-sgRate": "12",
   "tm-ordHrs": "38",
   "tm-stsl": "0",
-  "tm-ytdTaxable": "0",
-  "tm-ytdOte": "0",
   "tm-alBal": "60.3073",
   "tm-alAccrue": "no",
   "tm-lslHrs": "0",
@@ -1493,9 +2027,55 @@ const TM_SAMPLE = {
 };
 document.getElementById("tm-loadSample").addEventListener("click", ()=>{
   setTermType("normal");
+  document.getElementById("tm-otherRows").innerHTML = "";
   Object.entries(TM_SAMPLE).forEach(([id, v])=>{ document.getElementById(id).value = v; });
   calcTermination();
 });
+
+// Other pay in the final period — taxed with the final wages
+const TM_OTHER_TYPES = {
+  ph:        {label:"Public holiday",               super:"yes", hours:true},
+  sick:      {label:"Sick / carer's leave taken",   super:"yes", hours:true},
+  al:        {label:"Annual leave taken",           super:"yes", hours:true},
+  lsl:       {label:"Long service leave taken",     super:"yes", hours:true},
+  overtime:  {label:"Overtime (1.5×)",              super:"no",  hours:true, mult:1.5},
+  allowance: {label:"Allowance",                    super:"no",  hours:false},
+  bonus:     {label:"Bonus / commission",           super:"yes", hours:false},
+  other:     {label:"Other",                        super:"no",  hours:false},
+};
+function addOtherPay(type, hours, amount){
+  const row = document.createElement("div");
+  row.className = "tm-other-row";
+  row.innerHTML = `
+    <select class="tm-o-type">${Object.entries(TM_OTHER_TYPES).map(([k, t])=>`<option value="${k}">${t.label}</option>`).join("")}</select>
+    <input type="number" class="tm-o-hours" step="0.25" placeholder="hrs">
+    <input type="number" class="tm-o-amount" step="0.01">
+    <select class="tm-o-super"><option value="yes">Yes</option><option value="no">No</option></select>
+    <button type="button" class="rm" title="Remove">×</button>`;
+  const typeEl = row.querySelector(".tm-o-type"), superEl = row.querySelector(".tm-o-super");
+  typeEl.value = type || "ph";
+  superEl.value = TM_OTHER_TYPES[typeEl.value].super;
+  if(hours !== undefined) row.querySelector(".tm-o-hours").value = hours;
+  if(amount !== undefined) row.querySelector(".tm-o-amount").value = amount;
+  typeEl.addEventListener("change", ()=>{ if(superEl.dataset.edited !== "1") superEl.value = TM_OTHER_TYPES[typeEl.value].super; });
+  superEl.addEventListener("change", ()=>{ superEl.dataset.edited = "1"; });
+  row.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input", calcTermination); el.addEventListener("change", calcTermination); });
+  row.querySelector(".rm").addEventListener("click", ()=>{ row.remove(); calcTermination(); });
+  document.getElementById("tm-otherRows").appendChild(row);
+}
+document.getElementById("tm-addOther").addEventListener("click", ()=>{ addOtherPay(); calcTermination(); });
+function readOtherPay(hourlyRate){
+  return [...document.querySelectorAll("#tm-otherRows .tm-other-row")].map(row=>{
+    const t = TM_OTHER_TYPES[row.querySelector(".tm-o-type").value];
+    const hrsEl = row.querySelector(".tm-o-hours"), amtEl = row.querySelector(".tm-o-amount");
+    const hours = parseFloat(hrsEl.value) || 0;
+    const calc = round2(hours * hourlyRate * (t.mult || 1));
+    amtEl.placeholder = hours ? calc.toFixed(2) : "0.00";
+    hrsEl.disabled = !t.hours;
+    const amount = amtEl.value !== "" ? parseFloat(amtEl.value) || 0 : (t.hours ? calc : 0);
+    return {label:t.label, hours: t.hours ? hours : 0, amount, super: row.querySelector(".tm-o-super").value === "yes"};
+  }).filter(o => o.amount);
+}
 
 wireSeg("tm-s7mode", calcTermination);
 function addS7Run(amount){
@@ -1561,7 +2141,11 @@ function calcTermination(){
 
   // ---- Final wages
   const ordHrs = num("tm-ordHrs");
-  const ordGross = round2(ordHrs * hourlyRate);
+  const ordPay = round2(ordHrs * hourlyRate);
+  const otherPay = readOtherPay(hourlyRate);
+  const otherGross = round2(otherPay.reduce((a, o)=>a + o.amount, 0));
+  const otherOte = otherPay.filter(o=>o.super).reduce((a, o)=>a + o.amount, 0);
+  const ordGross = round2(ordPay + otherGross);  // everything taxed with the tax table in the final pay
   const ordPayg = isDeath ? 0 : periodWithholding(ordGross, scale, freq);
   const stsl = isDeath ? 0 : num("tm-stsl");
   const ordNet = ordGross - ordPayg - stsl;
@@ -1681,10 +2265,10 @@ function calcTermination(){
     if(excluded){
       cap = TERM.etpCap; capNote = `Excluded ETP — ETP cap ${fmt(TERM.etpCap)}`;
     } else {
-      const otherTaxable = num("tm-ytdTaxable") + ordGross + leaveGross;
+      const otherTaxable = ordGross + leaveGross;
       const wioLeft = Math.max(0, TERM.wioCap - otherTaxable);
       cap = Math.min(TERM.etpCap, wioLeft);
-      capNote = `Smaller of the ETP cap (${fmt(TERM.etpCap)}) and the whole-of-income cap less other taxable pay this FY (${fmt(TERM.wioCap)} − ${fmt(otherTaxable)})`;
+      capNote = `Smaller of the ETP cap (${fmt(TERM.etpCap)}) and the whole-of-income cap less other taxable pay in this termination (${fmt(TERM.wioCap)} − ${fmt(otherTaxable)})`;
     }
   }
   const underCap = Math.min(etpTaxable, cap);
@@ -1694,10 +2278,11 @@ function calcTermination(){
   const etpNet = etpGross - etpTax;
 
   // ---- Super: OTE is final wages + base pay in notice in lieu, limited by the maximum contribution base
-  const mcbLeft = Math.max(0, TERM.mcb - num("tm-ytdOte"));
-  const ordSuper = round2(Math.min(ordGross, mcbLeft) * sgRate);
-  const noticeSuper = round2(Math.min(noticeBase, Math.max(0, mcbLeft - ordGross)) * sgRate);
-  const superCapped = ordGross + noticeBase > mcbLeft;
+  const mcbLeft = TERM.mcb;
+  const finalOte = ordPay + otherOte;
+  const ordSuper = round2(Math.min(finalOte, mcbLeft) * sgRate);
+  const noticeSuper = round2(Math.min(noticeBase, Math.max(0, mcbLeft - finalOte)) * sgRate);
+  const superCapped = finalOte + noticeBase > mcbLeft;
 
   // ---- Totals
   const totalGross = round2(ordGross + leaveGross + taxFree + etpGross);
@@ -1772,9 +2357,11 @@ function calcTermination(){
       <div class="tm-tile"><div class="lbl">Super (to fund)</div><div class="amt">${fmt(totalSuper)}</div></div>
     </div>`;
 
-  const superNote = superCapped ? `Limited by the maximum contribution base (${fmt(mcbLeft)} OTE left this FY)` : "Paid to fund, not to employee";
+  const superNote = superCapped ? `Limited by the maximum contribution base (${fmt(mcbLeft)})` : `On ${fmt(finalOte)} OTE · paid to fund, not to employee`;
   const finalPay = block(`${++n}. Final wages`, isDeath ? "Paid to the estate" : "Schedule 1 tax table",
-    line("Ordinary hours", fmt(ordGross), "", `${ordHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}`) +
+    line("Ordinary hours", fmt(ordPay), "", `${ordHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}`) +
+    otherPay.map(o => line(o.label, fmt(o.amount), "", `${o.hours ? o.hours.toFixed(2) + " hrs · " : ""}${o.super ? "super applies" : "no super"}`)).join("") +
+    (otherPay.length ? line("Gross final wages", fmt(ordGross)) : "") +
     line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : "") +
     (stsl ? line("STSL withheld", minus(stsl), "deduct") : "") +
     line("Net", fmt(ordNet), "net") +
@@ -2009,6 +2596,547 @@ document.getElementById("mcb-loadSample").addEventListener("click", ()=>{
   calcMcb();
 });
 buildMcbRows();
+
+/* ================= NEW HIRE CHECK ================= */
+// Client instructions are read locally (FileReader + pdf.js / mammoth / SheetJS from the CDN) — nothing is uploaded.
+const NH_LIBS = {
+  pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+  pdfWorker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
+  docx: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
+  xlsx: "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+};
+const nhLoaded = {};
+function nhLoadScript(src){
+  if(!nhLoaded[src]){
+    nhLoaded[src] = new Promise((resolve, reject)=>{
+      const s = document.createElement("script");
+      s.src = src; s.onload = resolve;
+      s.onerror = () => { delete nhLoaded[src]; reject(new Error("Couldn't load the file reader — check your internet connection.")); };
+      document.head.appendChild(s);
+    });
+  }
+  return nhLoaded[src];
+}
+const nhEsc = s => String(s).replace(/[<>&"]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+
+function decodeQuotedPrintable(t){
+  return t.replace(/=\r?\n/g, "").replace(/=([0-9A-F]{2})/gi, (_, h)=>String.fromCharCode(parseInt(h, 16)));
+}
+function htmlToText(html){
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.querySelectorAll("script,style").forEach(n=>n.remove());
+  return doc.body ? doc.body.innerText || doc.body.textContent : html;
+}
+
+async function nhExtractText(file){
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  if(ext === "pdf"){
+    await nhLoadScript(NH_LIBS.pdf);
+    pdfjsLib.GlobalWorkerOptions.workerSrc = NH_LIBS.pdfWorker;
+    const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
+    let text = "";
+    for(let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it => it.str + (it.hasEOL ? "\n" : "")).join("") + "\n";
+    }
+    if(!text.trim()) throw new Error("No text found — this PDF looks like a scan. Paste the text instead.");
+    return text;
+  }
+  if(ext === "docx"){
+    await nhLoadScript(NH_LIBS.docx);
+    const res = await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()});
+    return res.value;
+  }
+  if(ext === "xlsx" || ext === "xls"){
+    await nhLoadScript(NH_LIBS.xlsx);
+    const wb = XLSX.read(await file.arrayBuffer(), {type:"array"});
+    return wb.SheetNames.map(n => XLSX.utils.sheet_to_csv(wb.Sheets[n], {FS:"  "})).join("\n");
+  }
+  if(ext === "eml"){
+    let raw = await file.text();
+    if(/content-transfer-encoding:\s*quoted-printable/i.test(raw)) raw = decodeQuotedPrintable(raw);
+    // Keep the plain-text part if there is one, otherwise strip the HTML part
+    const plain = raw.match(/content-type:\s*text\/plain[^]*?\r?\n\r?\n([^]*?)(?:\r?\n--|$)/i);
+    if(plain) return plain[1];
+    const html = raw.match(/<html[^]*<\/html>/i);
+    return html ? htmlToText(html[0]) : raw;
+  }
+  if(ext === "html" || ext === "htm") return htmlToText(await file.text());
+  if(ext === "msg") throw new Error("Outlook .msg files can't be read in the browser — save the email as PDF or paste its text.");
+  return await file.text();
+}
+
+/* ---------- reading the instructions ---------- */
+const NH_INCL = [
+  /\b(?:incl(?:usive|uding|\.)?|inc\.?)\s*(?:of\s+)?(?:the\s+)?(?:\d{1,2}(?:\.\d+)?\s?%\s*)?(?:statutory\s+|compulsory\s+|employer\s+)?(?:super(?:annuation)?|sg)\b/gi,
+  /\b(?:super(?:annuation)?|sg)\s+(?:is\s+)?(?:included|inclusive)\b/gi,
+  /\b(?:total\s+fixed\s+remuneration|TFR|TRP|total\s+remuneration(?:\s+package)?|(?:salary\s+|remuneration\s+|total\s+)?package)\b/gi,
+];
+const NH_EXCL = [
+  /(?:\bplus|\+)\s*(?:\d{1,2}(?:\.\d+)?\s?%\s*)?(?:statutory\s+|compulsory\s+|employer\s+)?(?:super(?:annuation)?|sg)\b/gi,
+  /\b(?:excl(?:usive|uding|\.)?|ex\.?)\s*(?:of\s+)?(?:the\s+)?(?:\d{1,2}(?:\.\d+)?\s?%\s*)?(?:statutory\s+|compulsory\s+|employer\s+)?(?:super(?:annuation)?|sg)\b/gi,
+  /\b(?:super(?:annuation)?|sg)\s+(?:will\s+be\s+|is\s+)?(?:paid\s+)?(?:on\s+top|in\s+addition)\b/gi,
+  /\bon\s+top\s+of\s+(?:your\s+|the\s+)?(?:base\s+)?salary\b/gi,
+];
+const NH_MONEY = /(?:A?\$|AUD\s?)\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?\s?([kK])?\b|\b(\d{2,3}(?:\.\d+)?)\s?[kK]\b/g;
+
+function nhFindAll(text, patterns){
+  const hits = [];
+  patterns.forEach((re, i)=>{
+    re.lastIndex = 0;
+    let m;
+    while((m = re.exec(text))){ hits.push({index:m.index, end:m.index + m[0].length, phrase:m[0], weak: re === NH_INCL[2]}); }
+  });
+  return hits;
+}
+function nhBasis(after, before){
+  const a = after.slice(0, 50).toLowerCase(), b = before.slice(-40).toLowerCase();
+  if(/^\s*(?:per\s+hour|\/\s?h(?:ou)?r\b|p\/?h\b|an\s+hour|ph\b|hourly)/.test(a) || /hourly\s+rate[^$]{0,15}$/.test(b)) return "hourly";
+  if(/^\s*(?:per\s+week|\/\s?w(?:ee)?k\b|p\/?w\b|a\s+week|weekly)/.test(a)) return "weekly";
+  if(/^\s*(?:per\s+fortnight|\/\s?fortnight|a\s+fortnight|fortnightly)/.test(a)) return "fortnightly";
+  if(/^\s*(?:per\s+(?:calendar\s+)?month|\/\s?m(?:on)?th\b|a\s+month|monthly|pcm)/.test(a)) return "monthly";
+  if(/^\s*(?:per\s+annum|p\.?\s?a\.?\b|per\s+year|a\s+year|annually|\/\s?y(?:ea)?r\b)/.test(a)) return "annual";
+  return null;
+}
+
+function nhAnalyse(text){
+  const t = text.replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ");
+  const incl = nhFindAll(t, NH_INCL), excl = nhFindAll(t, NH_EXCL);
+  const amounts = [];
+  let m;
+  NH_MONEY.lastIndex = 0;
+  while((m = NH_MONEY.exec(t))){
+    let value, k;
+    if(m[1] !== undefined){ value = parseFloat(m[1].replace(/,/g, "") + (m[2] ? "." + m[2] : "")); k = !!m[3]; }
+    else { value = parseFloat(m[4]); k = true; }
+    if(k) value *= 1000;
+    if(!value) continue;
+    const start = m.index, end = m.index + m[0].length;
+    const before = t.slice(Math.max(0, start - 160), start), after = t.slice(end, end + 160);
+    let basis = nhBasis(after, before);
+    const ctx = (before.slice(-80) + " " + after.slice(0, 80)).toLowerCase();
+    if(!basis){
+      if(/salary|annum|package|remuneration|per year/.test(ctx) && value >= 1000) basis = "annual";
+      else basis = value >= 1000 ? "annual" : value < 200 ? "hourly" : "weekly";
+    }
+    // How likely this is the main pay figure
+    let score = 0;
+    if(/salary|remuneration|package|base|wage|pay rate|rate of pay|hourly rate|tfr|trp/.test(ctx)) score += 3;
+    if(/allowance|bonus|commission|reimburs|phone|car|vehicle|parking|laptop|incentive|overtime|meal|travel|uniform|training|referral/.test(ctx)) score -= 4;
+    if(/super(?:annuation)?\s+(?:contribution|of|amount|component)|super\s*(?:of|:)\s*$/.test(before.slice(-30).toLowerCase())) score -= 3;
+    if(basis === "annual" && value >= 20000) score += 2;
+    if(basis === "hourly" && value >= 15 && value <= 300) score += 2;
+    // Nearest super wording in the same sentence (or within ~120 characters)
+    const sentStart = Math.max(t.lastIndexOf(".", start - 1), t.lastIndexOf("\n", start - 1), start - 160);
+    let sentEnd = t.slice(end).search(/[.\n](?:\s|$)/);
+    sentEnd = sentEnd < 0 ? t.length : end + sentEnd;
+    const near = h => h.index >= sentStart - 1 && h.index <= Math.max(sentEnd, end + 120);
+    const dist = h => h.index >= end ? h.index - end : start - h.end;
+    const nearIncl = incl.filter(near).sort((a,b)=>dist(a)-dist(b));
+    const nearExcl = excl.filter(near).sort((a,b)=>dist(a)-dist(b));
+    let superT = "unknown", evidence = null, conflict = false;
+    const strongIncl = nearIncl.filter(h=>!h.weak);
+    if(nearExcl.length && (strongIncl.length || nearIncl.length)){
+      const bi = (strongIncl[0] || nearIncl[0]), be = nearExcl[0];
+      if(strongIncl.length) conflict = true;
+      // Explicit wording wins over a "package" mention; otherwise the closest phrase wins
+      const pickIncl = strongIncl.length ? dist(bi) < dist(be) : false;
+      superT = pickIncl ? "incl" : "excl"; evidence = pickIncl ? bi : be;
+    } else if(nearIncl.length){ superT = "incl"; evidence = strongIncl[0] || nearIncl[0]; }
+    else if(nearExcl.length){ superT = "excl"; evidence = nearExcl[0]; }
+    const sStart = Math.max(sentStart + 1, 0), sEnd = Math.min(Math.max(sentEnd + 1, end + 1), t.length);
+    amounts.push({value, basis, superT, evidence, conflict, score, start, end, raw:m[0], sStart, sEnd});
+  }
+  amounts.forEach((a, i)=>{ a.id = i; });
+  const main = amounts.slice().sort((a,b)=> b.score - a.score || (b.basis === "annual") - (a.basis === "annual") || b.value - a.value)[0] || null;
+
+  // Super rate
+  let sg = null;
+  const sgM = t.match(/(\d{1,2}(?:\.\d+)?)\s?%\s*(?:of\s+\w+\s+)?(?:super(?:annuation)?|sg|super\s+guarantee)/i) ||
+              t.match(/(?:super(?:annuation)?|sg|super\s+guarantee)[^.%\n]{0,40}?(\d{1,2}(?:\.\d+)?)\s?%/i);
+  if(sgM) sg = parseFloat(sgM[1]);
+
+  // Hours
+  let hours = null, hoursRaw = null, hoursAssumed = null;
+  const hPatterns = [
+    [/(\d{1,2}(?:\.\d+)?)\s*(?:ordinary\s+)?(?:hours|hrs|hr)\.?\s*(?:of\s+work\s+)?(?:per|a|\/|each|every|p\/?)\s*(week|wk|w\b|fortnight)/i, 1, 2],
+    [/(\d{1,2}(?:\.\d+)?)[\s-]*(?:hour|hr)\s+(week|fortnight)/i, 1, 2],                 // "38-hour week"
+    [/(\d{1,2}(?:\.\d+)?)\s*(?:hours|hrs)\s+(weekly|fortnightly)/i, 1, 2],             // "38 hours weekly"
+    [/(?:ordinary\s+hours|weekly\s+hours|hours\s+of\s+work|hours\s+per\s+week|working\s+hours|hours)\s*[:\-]\s*(\d{1,2}(?:\.\d+)?)/i, 1, 0], // "Hours: 38"
+  ];
+  for(const [re, gi, gp] of hPatterns){
+    const hm = t.match(re);
+    if(hm){ hours = parseFloat(hm[gi]) / (gp && /fortnight/i.test(hm[gp]) ? 2 : 1); hoursRaw = hm[0]; break; }
+  }
+  if(hours === null){
+    const dM = t.match(/\b(\d(?:\.\d)?)\s*days?\s*(?:per|a|\/|each)\s*week/i);
+    const fteM = t.match(/\b(0?\.\d+|1(?:\.0+)?)\s*FTE\b/i);
+    if(dM) hoursAssumed = {v: round2(parseFloat(dM[1]) * 7.6), why: `${dM[1]} days a week × 7.6 hours`};
+    else if(fteM) hoursAssumed = {v: round2(parseFloat(fteM[1]) * 38), why: `${fteM[1]} FTE × 38 hours`};
+  }
+
+  // Employment type — first one mentioned
+  const types = [["casual", /\bcasual\b/i], ["part-time", /\bpart[\s-]?time\b/i], ["full-time", /\bfull[\s-]?time\b/i], ["fixed-term", /\bfixed[\s-]?term\b/i]];
+  let type = null, typeAt = Infinity;
+  types.forEach(([v, re])=>{ const i = t.search(re); if(i >= 0 && i < typeAt){ type = v; typeAt = i; } });
+
+  // Pay frequency
+  let freq = null;
+  const fM = t.match(/\b(?:paid|pay(?:\s+cycle|\s+frequency|\s+period|\s+run|\s+schedule)?|payroll)\b\s*(?:is|will\s+be|:|-)?\s*(?:on\s+a\s+)?(?:paid\s+)?(weekly|fortnightly|bi-?weekly|monthly)\b/i) ||
+             t.match(/\b(weekly|fortnightly|bi-?weekly|monthly)\s+(?:pay|payroll|pay\s+cycle|basis|in\s+arrears|salary\s+payments)\b/i) ||
+             t.match(/\bpaid\s+every\s+(two\s+weeks|2\s+weeks|week|month)\b/i);
+  if(fM){
+    const f = fM[1].toLowerCase();
+    freq = /bi-?weekly|two|2/.test(f) ? "fortnightly" : /^week/.test(f) ? "weekly" : /^month/.test(f) ? "monthly" : f;
+  }
+
+  // Start date
+  let start = null, startRaw = null;
+  let startAssumed = null;
+  const sRe = /\b(?:start(?:ing|s)?|commenc\w*|first\s+day|join(?:ing|s)?\s+(?:us|the\s+team))\b(?:\s+date)?(?:\s+(?:on|from|is|of|will\s+be))?[\s:,-]*((?:mon|tue|wed|thu|fri|sat|sun)[a-z]*,?\s+)?([^\n.;]{4,34})/gi;
+  let sM;
+  while(!start && (sM = sRe.exec(t))){
+    const chunk = sM[2].replace(/\b(\d{1,2}(?:st|nd|rd|th)?)\s+of\s+/i, "$1 ");
+    const cands = [
+      chunk.match(/\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}/),
+      chunk.match(/\d{4}-\d{1,2}-\d{1,2}/),
+      chunk.match(/\d{1,2}(?:st|nd|rd|th)?\s+[a-z]{3,9}\.?,?\s+\d{4}/i),
+      chunk.match(/[a-z]{3,9}\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}/i),
+    ].filter(Boolean);
+    for(const c of cands){ const p = parseAnyDate(c[0]); if(p){ start = p; startRaw = sM[0].trim(); break; } }
+    if(!start && !startAssumed){
+      // A day and month with no year ("3rd November") — assume the next time that date comes round
+      const ny = chunk.match(/^(\d{1,2}(?:st|nd|rd|th)?\s+[a-z]{3,9}|[a-z]{3,9}\s+\d{1,2}(?:st|nd|rd|th)?)\b/i);
+      if(ny){
+        const today = new Date(), y = today.getFullYear();
+        let p = parseAnyDate(ny[1] + " " + y);
+        if(p && new Date(p.y, p.m-1, p.d) < new Date(y, today.getMonth(), today.getDate())) p = parseAnyDate(ny[1] + " " + (y + 1));
+        if(p) startAssumed = {v:p, why:`"${ny[1]}" has no year — assumed ${p.y}`};
+      }
+    }
+  }
+
+  return {text:t, amounts, main, incl, excl, sg, hours, hoursRaw, hoursAssumed, type, freq, start, startRaw, startAssumed};
+}
+
+/* ---------- state & rendering ---------- */
+const nhDocs = []; // {name, text, error}
+let nhAnalysis = null;
+
+function nhCombinedText(){
+  const parts = nhDocs.filter(d=>d.text).map(d=>d.text);
+  const pasted = document.getElementById("nh-paste").value;
+  if(pasted.trim()) parts.push(pasted);
+  return parts.join("\n\n");
+}
+
+function nhRenderFiles(){
+  document.getElementById("nh-fileList").innerHTML = nhDocs.map((d, i)=>`
+    <div class="nh-file ${d.error ? "err" : ""}">
+      <span>📄 ${nhEsc(d.name)}</span>
+      <span class="s">${d.loading ? "Reading…" : d.error ? nhEsc(d.error) : (d.text.trim().split(/\s+/).length + " words read")}</span>
+      <button type="button" data-i="${i}" title="Remove">×</button>
+    </div>`).join("");
+  document.querySelectorAll("#nh-fileList button").forEach(b=>b.addEventListener("click", ()=>{
+    nhDocs.splice(+b.dataset.i, 1); nhRenderFiles(); nhRefresh();
+  }));
+}
+
+async function nhAddFiles(files){
+  for(const f of files){
+    const doc = {name:f.name, text:"", loading:true};
+    nhDocs.push(doc); nhRenderFiles();
+    try{ doc.text = await nhExtractText(f); }
+    catch(e){ doc.error = e.message || "Couldn't read this file."; }
+    doc.loading = false; nhRenderFiles(); nhRefresh();
+  }
+}
+
+function nhSnippet(a){
+  // Sentence around the amount with the amount and super wording highlighted
+  const t = nhAnalysis.text;
+  const s = a.sStart, e = a.sEnd;
+  const marks = [{i:a.start, j:a.end, cls:"amt"}];
+  if(a.evidence && a.evidence.index >= s && a.evidence.end <= e) marks.push({i:a.evidence.index, j:a.evidence.end, cls:a.superT});
+  marks.sort((x,y)=>x.i-y.i);
+  let out = "", pos = s;
+  marks.forEach(mk=>{ if(mk.i < pos) return; out += nhEsc(t.slice(pos, mk.i)) + `<mark class="${mk.cls}">${nhEsc(t.slice(mk.i, mk.j))}</mark>`; pos = mk.j; });
+  out += nhEsc(t.slice(pos, e));
+  return out.replace(/\s+/g, " ").trim();
+}
+
+const NH_BASIS_LABEL = {annual:"per year", hourly:"per hour", weekly:"per week", fortnightly:"per fortnight", monthly:"per month"};
+const NH_SUPER_LABEL = {incl:"Inclusive of super", excl:"Exclusive of super", unknown:"Super not stated"};
+const NH_SUPER_FLAG = {incl:"ok", excl:"ok", unknown:"under"};
+
+function nhRenderFindings(){
+  const box = document.getElementById("nh-findings");
+  const a = nhAnalysis;
+  if(!a || !a.text.trim()){ box.innerHTML = `<div class="empty-state">Upload a file or paste the instructions to start.</div>`; return; }
+  if(!a.amounts.length){ box.innerHTML = `<div class="warn">No dollar amounts found. Check the file was read (see the word count) or paste the text.</div>`; return; }
+  const chosen = +(document.getElementById("nh-iAmount").dataset.from ?? -1);
+  box.innerHTML = a.amounts.map(x=>`
+    <div class="nh-find ${x.id === chosen ? "main" : ""}">
+      <div class="nh-find-head">
+        <span class="v">${fmt(x.value)} <small>${NH_BASIS_LABEL[x.basis]}</small></span>
+        <span class="flag ${x.conflict ? "over" : NH_SUPER_FLAG[x.superT]}">${x.conflict ? "Mixed wording — " + NH_SUPER_LABEL[x.superT].toLowerCase() + "?" : NH_SUPER_LABEL[x.superT]}</span>
+        ${x.id === chosen ? `<span class="flag ok">Used as pay</span>` : `<button type="button" class="btn ghost small" data-use="${x.id}">Use as pay</button>`}
+      </div>
+      <div class="nh-snip">“${nhSnippet(x)}”</div>
+    </div>`).join("") +
+    `<div class="nh-also">
+      ${a.hours ? `<span>Hours: <strong>${a.hours}/wk</strong></span>` : ""}
+      ${a.type ? `<span>Type: <strong>${a.type}</strong></span>` : ""}
+      ${a.freq ? `<span>Paid: <strong>${a.freq}</strong></span>` : ""}
+      ${a.sg ? `<span>Super: <strong>${a.sg}%</strong></span>` : ""}
+      ${a.start ? `<span>Start: <strong>${dmy(a.start)}</strong></span>` : ""}
+    </div>`;
+  box.querySelectorAll("[data-use]").forEach(b=>b.addEventListener("click", ()=>{
+    nhUseAmount(a.amounts[+b.dataset.use], true); nhRenderFindings(); nhCompare();
+  }));
+}
+
+// Fill the client column — fields the user has typed over are left alone
+function nhSet(id, value){
+  const el = document.getElementById(id);
+  if(el.dataset.edited === "1") return;
+  el.value = value === null || value === undefined ? "" : value;
+}
+function nhUseAmount(x, force){
+  ["nh-iAmount","nh-iBasis","nh-iSuper"].forEach(id=>{ if(force) document.getElementById(id).dataset.edited = ""; });
+  nhSet("nh-iAmount", x ? x.value : "");
+  nhSet("nh-iBasis", x ? x.basis : "annual");
+  nhSet("nh-iSuper", x ? x.superT : "unknown");
+  document.getElementById("nh-iAmount").dataset.from = x ? x.id : -1;
+}
+// What the client column would be filled with: found in the text, assumed from other details, or nothing
+let nhAuto = {};
+const NH_AUTO_FIELD = {hours:"nh-iHours", type:"nh-iType", freq:"nh-iFreq", start:"nh-iStart"};
+function nhComputeAuto(a){
+  const auto = {
+    hours: a.hours !== null ? {v:a.hours, src:"found", why:a.hoursRaw} : a.hoursAssumed ? {v:a.hoursAssumed.v, src:"assumed", why:a.hoursAssumed.why} : null,
+    type:  a.type ? {v:a.type, src:"found"} : null,
+    freq:  a.freq ? {v:a.freq, src:"found"} : null,
+    start: a.start ? {v:dmy(a.start), src:"found", why:a.startRaw} : a.startAssumed ? {v:dmy(a.startAssumed.v), src:"assumed", why:a.startAssumed.why} : null,
+  };
+  // Fill gaps from each other: full-time → 38 hrs; hours → full-time/part-time
+  if(!auto.hours && auto.type && auto.type.v === "full-time") auto.hours = {v:38, src:"assumed", why:"full-time — standard 38-hour week"};
+  if(!auto.type && auto.hours && a.text.trim()){
+    auto.type = auto.hours.v >= 38 ? {v:"full-time", src:"assumed", why:`${auto.hours.v} hours a week`} : {v:"part-time", src:"assumed", why:`${auto.hours.v} hours a week (under 38)`};
+  }
+  return auto;
+}
+function nhRefresh(){
+  nhAnalysis = nhAnalyse(nhCombinedText());
+  const a = nhAnalysis;
+  nhAuto = a.text.trim() ? nhComputeAuto(a) : {};
+  nhUseAmount(a.main, false);
+  nhSet("nh-iSg", a.sg);
+  Object.entries(NH_AUTO_FIELD).forEach(([k, id])=> nhSet(id, nhAuto[k] ? nhAuto[k].v : ""));
+  nhRenderFindings();
+  nhRenderSources();
+  nhCompare();
+}
+const nhShow = (k, v) => k === "hours" ? v + " hrs/wk" : k === "type" || k === "freq" ? v.charAt(0).toUpperCase() + v.slice(1) : v;
+function nhRenderSources(){
+  document.querySelectorAll("#panel-nh .nh-src").forEach(box=>{
+    const k = box.dataset.key, el = document.getElementById(NH_AUTO_FIELD[k]), au = nhAuto[k];
+    const edited = el.dataset.edited === "1";
+    if(edited){
+      box.innerHTML = au ? `Edited · <button type="button" data-restore="${k}">↻ Use instructions (${nhEsc(nhShow(k, au.v))})</button>` : "Edited — not in the instructions";
+      box.className = "nh-src edited";
+    } else if(au && au.src === "found"){
+      box.innerHTML = `✓ From the instructions`; box.title = au.why || ""; box.className = "nh-src found";
+    } else if(au && au.src === "assumed"){
+      box.innerHTML = `Assumed — ${nhEsc(au.why)}`; box.title = ""; box.className = "nh-src assumed";
+    } else {
+      box.innerHTML = nhAnalysis && nhAnalysis.text.trim() ? "Not in the instructions" : ""; box.title = ""; box.className = "nh-src";
+    }
+  });
+  document.querySelectorAll("#panel-nh [data-restore]").forEach(b=>b.addEventListener("click", ()=>{
+    const k = b.dataset.restore, el = document.getElementById(NH_AUTO_FIELD[k]);
+    el.dataset.edited = ""; el.value = nhAuto[k].v;
+    nhRenderSources(); nhCompare();
+  }));
+}
+
+/* ---------- comparison ---------- */
+const NH_PER_YEAR = {annual:1, weekly:52, fortnightly:26, monthly:12};
+function nhToAnnual(v, basis, hours){ return basis === "hourly" ? v * hours * WEEKS_PER_YEAR : v * NH_PER_YEAR[basis]; }
+function nhFromAnnual(v, basis, hours){ return basis === "hourly" ? (hours ? v / (hours * WEEKS_PER_YEAR) : 0) : v / NH_PER_YEAR[basis]; }
+const nhCell = (state, text) => `<span class="flag ${state}">${state === "ok" ? "✓ Match" : state === "over" ? "✗ Mismatch" : state === "under" ? "Check" : "—"}</span>${text ? `<div class="nh-why">${text}</div>` : ""}`;
+
+function nhCompare(){
+  const v = id => document.getElementById(id).value;
+  const n = id => { const x = parseFloat(v(id)); return isNaN(x) ? null : x; };
+  const iAmt = n("nh-iAmount"), iBasis = v("nh-iBasis"), iSuper = v("nh-iSuper");
+  const iSg = n("nh-iSg"), sSg = n("nh-sSg");
+  const sg = (iSg ?? sSg ?? 12) / 100;
+  const iHours = n("nh-iHours"), sHours = n("nh-sHours");
+  const hours = sHours ?? iHours ?? 38;
+  const sAmt = n("nh-sAmount"), sBasis = v("nh-sBasis");
+  const issues = [];
+
+  // Pay amount & super treatment
+  let amtState = "", amtText = "", superState = "", superText = "";
+  let expected = null;
+  if(iAmt !== null){
+    const iHrs = iHours ?? hours;
+    const annualAsGiven = nhToAnnual(iAmt, iBasis, iHrs);
+    const annualBase = iSuper === "incl" ? annualAsGiven / (1 + sg) : annualAsGiven;
+    expected = round2(nhFromAnnual(annualBase, sBasis, hours));
+    const asIfIncl = round2(nhFromAnnual(annualAsGiven / (1 + sg), sBasis, hours));
+    const asIfExcl = round2(nhFromAnnual(annualAsGiven, sBasis, hours));
+    const tol = sBasis === "hourly" ? 0.011 : 1.0;
+    const per = sBasis === "hourly" ? "/hr" : "/yr";
+    const yearly = x => sBasis === "hourly" ? x * hours * WEEKS_PER_YEAR : x;
+
+    if(iSuper === "incl") superText = `Client amount includes super: ${fmt(annualAsGiven)} package = ${fmt(round2(annualBase))} base + ${fmt(round2(annualAsGiven - annualBase))} super.`;
+    else if(iSuper === "excl") superText = `Client amount is base pay; super of ${fmt(round2(annualBase * sg))} a year is paid on top.`;
+    else superText = "The instructions don't say whether the amount includes super.";
+    superState = iSuper === "unknown" ? "under" : sAmt === null ? "" : "ok";
+
+    if(sAmt === null){
+      amtState = ""; amtText = `Enter the Xero amount. Expected: <strong>${fmt(expected)}${per}</strong>.`;
+    } else if(Math.abs(sAmt - expected) <= tol){
+      amtState = "ok"; amtText = `Expected ${fmt(expected)}${per}.`;
+      if(iSuper === "unknown"){
+        amtState = "under"; amtText = `Matches only if the amount is exclusive of super — confirm with the client.`;
+        issues.push({sev:"warn", text:`The Xero amount (${fmt(sAmt)}${per}) assumes the client's ${fmt(iAmt)} is <strong>exclusive</strong> of super, but the instructions don't say. If it's a package, the base should be ${fmt(asIfIncl)}${per}.`});
+      }
+    } else if(iSuper === "incl" && Math.abs(sAmt - asIfExcl) <= tol){
+      amtState = "over"; amtText = `Super wasn't taken out. Should be ${fmt(expected)}${per}.`;
+      superState = "over";
+      issues.push({sev:"error", text:`<strong>Inclusive/exclusive mix-up:</strong> the client said ${fmt(iAmt)} ${NH_BASIS_LABEL[iBasis]} <strong>includes super</strong>, but the full package was entered as the base. Enter <strong>${fmt(expected)}${per}</strong>. As entered, the employee would be overpaid about ${fmt(round2(yearly(sAmt - expected)))} a year, plus super on the excess.`});
+    } else if(iSuper === "excl" && Math.abs(sAmt - asIfIncl) <= tol){
+      amtState = "over"; amtText = `Super was taken out of a salary that excludes super. Should be ${fmt(expected)}${per}.`;
+      superState = "over";
+      issues.push({sev:"error", text:`<strong>Inclusive/exclusive mix-up:</strong> the client said ${fmt(iAmt)} ${NH_BASIS_LABEL[iBasis]} is <strong>plus super</strong>, but super has been taken out of it. Enter <strong>${fmt(expected)}${per}</strong>. As entered, the employee would be underpaid about ${fmt(round2(yearly(expected - sAmt)))} a year.`});
+    } else if(iSuper === "unknown" && Math.abs(sAmt - asIfIncl) <= tol){
+      amtState = "under"; amtText = `Matches only if the amount includes super — confirm with the client.`;
+      issues.push({sev:"warn", text:`The Xero amount (${fmt(sAmt)}${per}) treats the client's ${fmt(iAmt)} as <strong>inclusive</strong> of super, but the instructions don't say. If it's base pay, enter ${fmt(asIfExcl)}${per}.`});
+    } else {
+      amtState = "over"; amtText = `Expected ${fmt(expected)}${per} — difference ${fmt(round2(sAmt - expected))}.`;
+      issues.push({sev:"error", text:`Pay amount doesn't match: expected <strong>${fmt(expected)}${per}</strong> from the instructions, Xero has ${fmt(sAmt)}${per}.`});
+    }
+    if(iSuper === "unknown" && !issues.some(x=>/inclusive|exclusive/.test(x.text))){
+      issues.push({sev:"warn", text:"The instructions don't say whether the pay includes super. Confirm with the client before the first pay run."});
+    }
+    const mainFind = nhAnalysis && nhAnalysis.amounts[+document.getElementById("nh-iAmount").dataset.from];
+    if(mainFind && mainFind.conflict && document.getElementById("nh-iSuper").dataset.edited !== "1"){
+      issues.push({sev:"warn", text:"The sentence with the pay amount mentions both including and excluding super — read it again and set the Super row to what the client meant."});
+    }
+  } else {
+    amtText = "No pay amount in the instructions yet.";
+  }
+
+  // Super rate
+  let sgState = "", sgText = "";
+  if(sSg !== null && sSg < 12){ sgState = "over"; sgText = "Below the 12% Super Guarantee."; issues.push({sev:"error", text:`Super rate in Xero is ${sSg}% — below the 12% Super Guarantee.`}); }
+  else if(iSg !== null && sSg !== null){
+    if(Math.abs(iSg - sSg) < 0.001){ sgState = "ok"; }
+    else { sgState = "over"; sgText = `Client said ${iSg}%.`; issues.push({sev:"error", text:`Super rate: client said ${iSg}%, Xero has ${sSg}%.`}); }
+  }
+
+  // Hours
+  let hState = "", hText = "";
+  if(iHours !== null && sHours !== null){
+    if(Math.abs(iHours - sHours) < 0.001) hState = "ok";
+    else { hState = "over"; hText = `Client said ${iHours} hrs/wk.`; issues.push({sev:"error", text:`Hours: client said ${iHours} a week, Xero has ${sHours}.`}); }
+  } else if(iHours === null && sBasis === "hourly" && iBasis !== "hourly"){ hText = "Not in the instructions — needed to convert to an hourly rate."; }
+
+  const simple = (iv, sv, label) => {
+    if(!iv || !sv) return ["", ""];
+    if(iv === sv) return ["ok", ""];
+    issues.push({sev: label === "Pay frequency" ? "warn" : "error", text:`${label}: client said ${iv}, Xero has ${sv}.`});
+    return ["over", `Client said ${iv}.`];
+  };
+  const [tState, tText] = simple(v("nh-iType"), v("nh-sType"), "Employment type");
+  const [fState, fText] = simple(v("nh-iFreq"), v("nh-sFreq"), "Pay frequency");
+  const iStart = auToISO(v("nh-iStart")), sStart = auToISO(v("nh-sStart"));
+  let stState = "", stText = "";
+  if(iStart && sStart){
+    if(iStart === sStart) stState = "ok";
+    else { stState = "over"; stText = `Client said ${v("nh-iStart")}.`; issues.push({sev:"error", text:`Start date: client said ${v("nh-iStart")}, Xero has ${v("nh-sStart")}.`}); }
+  }
+
+  Object.entries(NH_AUTO_FIELD).forEach(([k, id])=>{
+    const au = nhAuto[k];
+    if(au && au.src === "assumed" && document.getElementById(id).dataset.edited !== "1"){
+      const label = {hours:"Hours", type:"Employment type", freq:"Pay frequency", start:"Start date"}[k];
+      issues.push({sev:"warn", text:`${label} isn't stated in the instructions — assumed <strong>${nhEsc(nhShow(k, au.v))}</strong> (${nhEsc(au.why)}). Confirm with the client.`});
+    }
+  });
+  const put = (id, s, t) => { document.getElementById(id).innerHTML = s || t ? nhCell(s, t) : ""; };
+  put("nh-cAmount", amtState, amtText);
+  put("nh-cSuper", superState, superText);
+  put("nh-cSg", sgState, sgText);
+  put("nh-cHours", hState, hText);
+  put("nh-cType", tState, tText);
+  put("nh-cFreq", fState, fText);
+  put("nh-cStart", stState, stText);
+
+  // Result
+  const box = document.getElementById("nh-result");
+  if(iAmt === null && !nhCombinedText().trim()){ box.innerHTML = `<div class="empty-state">Add the client's instructions and the Xero values to see the result.</div>`; return; }
+  const errors = issues.filter(x=>x.sev === "error"), warns = issues.filter(x=>x.sev === "warn");
+  const checked = [amtState, sgState, hState, tState, fState, stState].filter(Boolean).length;
+  let banner;
+  if(errors.length) banner = `<div class="nh-banner bad"><strong>${errors.length} problem${errors.length>1?"s":""} to fix</strong> before the first pay run.</div>`;
+  else if(warns.length) banner = `<div class="nh-banner warnb"><strong>Nothing wrong, but ${warns.length} thing${warns.length>1?"s":""} to confirm</strong> with the client.</div>`;
+  else if(checked) banner = `<div class="nh-banner good"><strong>Everything checked matches</strong> the client's instructions.</div>`;
+  else banner = `<div class="empty-state">Enter the Xero values to compare.</div>`;
+  const superSummary = iAmt !== null ? `<div class="nh-super ${iSuper}">
+      <span class="lbl">Client's super instruction</span>
+      <span class="big">${iSuper === "incl" ? "INCLUSIVE of super" : iSuper === "excl" ? "EXCLUSIVE of super (plus super)" : "NOT STATED"}</span>
+      <span>${superText}${expected !== null ? ` Base to enter: <strong>${fmt(expected)}${sBasis === "hourly" ? " per hour" : " per year"}</strong>.` : ""}</span>
+    </div>` : "";
+  box.innerHTML = superSummary + banner +
+    issues.map(x=>`<div class="${x.sev === "error" ? "warn" : "note nh-amber"}">${x.text}</div>`).join("");
+}
+
+/* ---------- wiring ---------- */
+document.getElementById("nh-files").addEventListener("change", e=>{ nhAddFiles([...e.target.files]); e.target.value = ""; });
+const nhDrop = document.getElementById("nh-drop");
+["dragenter","dragover"].forEach(ev=>nhDrop.addEventListener(ev, e=>{ e.preventDefault(); nhDrop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev=>nhDrop.addEventListener(ev, e=>{ e.preventDefault(); nhDrop.classList.remove("over"); }));
+nhDrop.addEventListener("drop", e=>{ if(e.dataTransfer.files.length) nhAddFiles([...e.dataTransfer.files]); });
+document.getElementById("nh-paste").addEventListener("input", nhRefresh);
+document.querySelectorAll("#panel-nh .nh-i").forEach(el=>{
+  const mark = () => {
+    const k = Object.keys(NH_AUTO_FIELD).find(x => NH_AUTO_FIELD[x] === el.id);
+    const autoV = k && nhAuto[k] ? String(nhAuto[k].v) : null;
+    el.dataset.edited = el.value === "" || el.value === autoV ? "" : "1";
+    nhRenderFindings(); nhRenderSources(); nhCompare();
+  };
+  el.addEventListener("input", mark); el.addEventListener("change", mark);
+});
+["nh-sAmount","nh-sBasis","nh-sSg","nh-sHours","nh-sType","nh-sFreq","nh-sStart"].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener("input", nhCompare); el.addEventListener("change", nhCompare);
+});
+document.getElementById("nh-autofill").addEventListener("click", ()=>{
+  document.querySelectorAll("#panel-nh .nh-i").forEach(el=>{ el.dataset.edited = ""; });
+  nhRefresh();
+});
+document.getElementById("nh-loadSample").addEventListener("click", ()=>{
+  nhDocs.length = 0; nhRenderFiles();
+  document.querySelectorAll("#panel-nh .nh-i").forEach(el=>{ el.dataset.edited = ""; });
+  document.getElementById("nh-paste").value =
+`Hi team,
+
+Please set up our new Marketing Coordinator, Alex Sample, who starts on Monday 3 November 2026.
+
+Alex is full-time on a salary of $95,200 per annum inclusive of superannuation, working 38 hours per week. Super is 12%. They'll be paid fortnightly, with a $50 per week phone allowance.
+
+Thanks!`;
+  const set = (id, val) => { document.getElementById(id).value = val; };
+  set("nh-sAmount", "95200"); set("nh-sBasis", "annual"); set("nh-sSg", "12"); set("nh-sHours", "38");
+  set("nh-sType", "full-time"); set("nh-sFreq", "fortnightly"); set("nh-sStart", "03/11/2026");
+  nhRefresh();
+});
+nhRefresh();
 </script>
 </body>
 </html>
