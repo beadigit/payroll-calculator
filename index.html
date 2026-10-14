@@ -23,6 +23,7 @@
     --header:#132335;      /* top header band */
     --rule:#132335;        /* heavy divider lines above totals */
     --divider:#c3ced8;     /* column group dividers in tables */
+    --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23132335' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     --line:#dde3e9;
     --teal:#167690;        /* cyan text/lines on light surfaces (AA contrast) */
     --teal-dim:#e3f3f7;
@@ -43,6 +44,7 @@
       --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
       --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
       --rule:#4b5563; --divider:#4b5563;
+      --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     }
   }
   :root[data-theme="dark"]{
@@ -52,6 +54,7 @@
     --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
     --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
     --rule:#4b5563; --divider:#4b5563;
+      --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
   *{box-sizing:border-box;}
   body{
@@ -123,6 +126,9 @@
     padding:18px 20px;
   }
   .card + .card{margin-top:16px;}
+  .grid > .card{margin-top:0;}   /* grids space their cards with gap */
+  .tm-stack{display:flex; flex-direction:column; gap:20px; margin-top:20px;}
+  .tm-stack > .card{margin-top:0;}
   .card h2{font-size:14px; margin:0 0 14px; font-weight:700; letter-spacing:0.01em;}
   .card h3{font-size:12.5px; margin:18px 0 8px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:0.04em;}
   .card h3:first-child{margin-top:0;}
@@ -132,14 +138,44 @@
   .field .hint{font-size:11.5px; opacity:0.55; margin-top:3px;}
   input[type=number], input[type=text], input[type=date], select{
     width:100%; padding:8px 10px; border:1px solid var(--field-line); border-radius:4px;
-    background:var(--field); color:var(--ink); font-family:var(--mono); font-size:14px;
+    background:var(--field); color:var(--ink); font-family:var(--mono); font-size:14px; line-height:1.4;
   }
+  /* Draw dropdowns ourselves so they match the height of text boxes */
+  select{
+    -webkit-appearance:none; appearance:none; cursor:pointer;
+    background-image:var(--chev); background-repeat:no-repeat; background-position:right 10px center; background-size:10px 6px;
+  }
+  select:not([multiple]){padding-right:28px !important;}
+  /* Safari ignores vertical padding on selects, so set the height to match a text box: line + padding + border */
+  select{height:calc(1.4em + var(--pad-y, 8px) * 2 + 2px);}
+  .ov-table{--pad-y:5px;}
+  .ov-run-head{--pad-y:6px;}
+  .tm-other-row{--pad-y:7px;}
+  .mp-table{--pad-y:7px;}
+  .mp-table select{font-size:13px; padding-left:9px;}
   input:focus, select:focus{outline:2px solid var(--brand); outline-offset:1px;}
   ::placeholder{color:var(--ink); opacity:0.4;}
   :root[data-theme="dark"]{color-scheme:dark;}
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){color-scheme:dark;} }
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; column-gap:10px; row-gap:0;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; column-gap:10px; row-gap:0;}
+  /* Fields in a row share its height and sit at the bottom, so the controls line up even when one label wraps */
+  .row2 > .field, .row3 > .field{display:flex; flex-direction:column; justify-content:flex-end;}
+
+  /* "?" help tips */
+  .tip{
+    display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:6px; padding:0;
+    border-radius:50%; border:1px solid var(--divider); background:var(--panel); color:var(--teal);
+    font:700 10.5px/1 var(--sans); cursor:help; vertical-align:1px; opacity:1;
+  }
+  h3 .tip{text-transform:none; letter-spacing:0; vertical-align:2px;}
+  .tip:hover, .tip:focus-visible, .tip.open{background:var(--brand); border-color:var(--brand); color:var(--brand-ink); outline:none;}
+  #tipbox{
+    position:fixed; z-index:50; max-width:280px; padding:8px 11px; border-radius:6px; pointer-events:none;
+    background:var(--navy); color:#fff; font:400 12px/1.45 var(--sans); box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    border:1px solid var(--line); opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s;
+  }
+  #tipbox.show{opacity:1; transform:none;}
 
   .seg{display:flex; border:1px solid var(--line); border-radius:4px; overflow:hidden;}
   .seg button{
@@ -243,8 +279,7 @@
   }
   .mp-day input:checked + span{background:var(--brand); border-color:var(--brand); color:var(--brand-ink); opacity:1;}
   .mp-day input:focus-visible + span{outline:2px solid var(--brand); outline-offset:1px;}
-  .mp-leave{display:flex; flex-direction:column; align-items:stretch; gap:2px;}
-  .mp-leave span{font-family:var(--mono); font-size:12px; color:var(--red); white-space:nowrap;}
+  .mp-table td.num.neg{color:var(--red);}
   .mp-warn .warn{margin:10px 0 0;}
   .ov-run{border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:14px;}
   .ov-run-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px;}
@@ -287,7 +322,7 @@
   .tm-other-row input, .tm-other-row select{padding:7px 6px; font-size:12.5px;}
   .tm-other-row input:disabled{opacity:0.35;}
   .tm-other-row button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:32px;}
-  .tm-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+  .tm-tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; margin-bottom:20px;}
   .tm-tile{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:12px 14px;}
   .tm-tile .lbl{font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; opacity:0.6; font-weight:600;}
   .tm-tile .amt{font-family:var(--mono); font-size:20px; font-weight:700; margin-top:4px;}
@@ -335,18 +370,7 @@
   .mcb-table tr.tot td.sup{background:var(--teal-dim); font-size:15px;}
 
   .lead{font-size:13px; opacity:0.7; max-width:620px;}
-  .type-cards{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin:16px 0 4px;}
-  @media (max-width:860px){ .type-cards{grid-template-columns:1fr 1fr;} }
-  @media (max-width:520px){ .type-cards{grid-template-columns:1fr;} }
-  .type-card{
-    text-align:left; background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px;
-    padding:14px 16px; cursor:pointer; font-family:var(--sans); display:flex; flex-direction:column; gap:4px;
-  }
-  .type-card strong{font-size:13.5px;}
-  .type-card span{font-size:12px; opacity:0.7; line-height:1.4;}
-  .type-card:hover{border-color:var(--brand);}
-  .type-card.active{border:2px solid var(--brand); padding:13px 15px; background:var(--teal-dim);}
-  .followup{margin-top:14px; padding:14px 16px 2px; background:var(--paper); border:1px solid var(--line); border-radius:8px;}
+  .followup{margin:-4px 0 14px; padding:12px 14px 0; background:var(--paper); border:1px solid var(--line); border-radius:8px;}
   .followup > .hint{font-size:11.5px; opacity:0.6; margin:-4px 0 12px;}
   .stp-row{margin:-2px 0 6px;}
   .stp-tag{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; color:var(--teal); background:var(--teal-dim); padding:2px 8px; border-radius:10px;}
@@ -475,7 +499,7 @@
 
         <div class="field">
           <label>Start date</label>
-          <input type="date" id="bp-startDate">
+          <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="bp-startDate">
           <div class="hint">Shown in the salary summary heading, e.g. "New Employee - 01 June 2026".</div>
         </div>
 
@@ -687,7 +711,8 @@
           <tr class="gap"><td colspan="3"></td></tr>
           <tr><td>Allowance amount <span class="mp-per">(per pay period)</span></td><td class="col-old"><input type="number" class="mp-in" data-f="amount" data-c="old" step="0.01"></td><td class="col-new"><input type="number" class="mp-in" data-f="amount" data-c="new" step="0.01"></td></tr>
           <tr><td>Base hourly rate</td><td class="col-old"><input type="number" class="mp-in" data-f="rate" data-c="old" step="0.00001"></td><td class="col-new"><input type="number" class="mp-in" data-f="rate" data-c="new" step="0.00001"></td></tr>
-          <tr><td>Leave taken (hours)</td><td class="col-old"><div class="mp-leave"><input type="number" class="mp-in" data-f="leave" data-c="old" step="0.01" placeholder="0"><span data-o="leaveAmt" data-c="old"></span></div></td><td class="col-new"><div class="mp-leave"><input type="number" class="mp-in" data-f="leave" data-c="new" step="0.01" placeholder="0"><span data-o="leaveAmt" data-c="new"></span></div></td></tr>
+          <tr><td>Leave taken (hours)</td><td class="col-old"><input type="number" class="mp-in" data-f="leave" data-c="old" step="0.01" placeholder="0"></td><td class="col-new"><input type="number" class="mp-in" data-f="leave" data-c="new" step="0.01" placeholder="0"></td></tr>
+          <tr class="calc"><td>Leave deduction</td><td class="col-old num neg" data-o="leaveAmt" data-c="old"></td><td class="col-new num neg" data-o="leaveAmt" data-c="new"></td></tr>
           <tr><td>Processed for the period</td><td colspan="2" class="span"><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></td></tr>
           <tr class="pro"><td>PRO-RATA allowance</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
           <tr class="total"><td>TOTAL</td><td colspan="2" class="num span" data-o="total"></td></tr>
@@ -718,11 +743,15 @@
         <div id="ov-runs"></div>
         <div class="ov-bottom">
           <div>
+            <h3>Recovery</h3>
             <div class="field" style="max-width:260px;"><label>Pay periods to recover over</label><input type="number" id="ov-periods" value="1" step="1" min="1"></div>
             <div id="ov-results"></div>
             <div class="note" id="ov-note"></div>
           </div>
-          <table class="ov-totals" id="ov-totals"></table>
+          <div>
+            <h3>Totals — all pay runs</h3>
+            <table class="ov-totals" id="ov-totals"></table>
+          </div>
         </div>
       </div>
 
@@ -731,23 +760,71 @@
 
   <!-- ============ TERMINATION ============ -->
   <div class="panel" id="panel-term">
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-        <div>
-          <h2 style="margin-bottom:4px;">What happened?</h2>
-          <div class="lead">Pick what happened, then answer the follow-up that appears. This sets the tax treatment for every payment below.</div>
+    <div class="grid">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">Employee</h2>
+          <button class="btn ghost small" id="tm-loadSample" type="button">Load sample</button>
         </div>
-        <button class="btn ghost small" id="tm-loadSample" type="button">Load sample</button>
-      </div>
-      <div class="type-cards" id="tm-type">
-        <button type="button" class="type-card" data-val="redundancy"><strong>Redundancy</strong><span>The role is being abolished, whether or not it qualifies as genuine for tax</span></button>
-        <button type="button" class="type-card active" data-val="normal"><strong>Resignation / dismissal / retirement</strong><span>Any ordinary termination, including performance dismissals and retirement</span></button>
-        <button type="button" class="type-card" data-val="invalidity"><strong>Invalidity</strong><span>Permanent incapacity, certified by two legally qualified medical practitioners</span></button>
-        <button type="button" class="type-card" data-val="death"><strong>Death of the employee</strong><span>Final amounts paid to a beneficiary or the estate</span></button>
-      </div>
-
-      <div class="followup" data-for="normal">
+        <div class="field"><label>Name</label><input type="text" id="tm-name" placeholder="optional"></div>
+        <div class="row3">
+          <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob" value="01/01/1990"></div>
+          <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired" value="15/03/2021"></div>
+          <div class="field"><label>Last day</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-last" value="02/10/2026"></div>
+        </div>
         <div class="row2">
+          <div class="field">
+            <label>Casual employee?</label>
+            <select id="tm-casual">
+              <option value="no" selected>No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Date notice given</label>
+            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-noticeDate">
+            <div class="hint">NES age &amp; service are tested on this day. Blank = last day.</div>
+          </div>
+        </div>
+
+        <h3>Pay details</h3>
+        <div class="row2">
+          <div class="field">
+            <label>Pay frequency</label>
+            <select id="tm-freq">
+              <option value="weekly">Weekly (52/yr)</option>
+              <option value="fortnightly" selected>Fortnightly (26/yr)</option>
+              <option value="monthly">Monthly (12/yr)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tax-free threshold claimed?</label>
+            <select id="tm-scale">
+              <option value="2" selected>Yes — Scale 2</option>
+              <option value="1">No — Scale 1</option>
+            </select>
+          </div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" value="38" step="0.25"></div>
+          <div class="field"><label>Annual salary ($)</label><input type="number" id="tm-salary" value="85000" step="0.01"></div>
+          <div class="field"><label>Hourly rate ($)</label><input type="number" id="tm-rate" value="" step="0.0001" placeholder="from salary"></div>
+        </div>
+        <div class="field"><label>Super Guarantee rate (%)</label><input type="number" id="tm-sgRate" value="12" step="0.1"></div>
+      </div>
+      <div class="card">
+        <h2 id="tm-heading">Termination calculation</h2>
+        <div class="field">
+          <label>Termination type</label>
+          <select id="tm-type">
+            <option value="redundancy">Redundancy</option>
+            <option value="normal" selected>Resignation / dismissal / retirement</option>
+            <option value="invalidity">Invalidity</option>
+            <option value="death">Death of the employee</option>
+          </select>
+          <div class="hint">Pick what happened, then answer the follow-up below. This sets the tax treatment for every payment.</div>
+        </div>
+        <div class="followup" data-for="normal">
           <div class="field">
             <label>Reason</label>
             <select id="tm-reason">
@@ -759,48 +836,46 @@
             </select>
           </div>
         </div>
-      </div>
-      <div class="followup" data-for="redundancy" style="display:none;">
-        <div class="row3">
-          <div class="field">
-            <label>Genuine redundancy for tax?</label>
-            <select id="tm-genuine">
-              <option value="yes" selected>Yes — meets the ATO conditions</option>
-              <option value="no">No — not genuine</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Employer size</label>
-            <select id="tm-smallBiz">
-              <option value="no" selected>15 or more employees</option>
-              <option value="yes">Small business (under 15)</option>
-            </select>
+        <div class="followup" data-for="redundancy" style="display:none;">
+          <div class="row2">
+            <div class="field">
+              <label>Genuine redundancy for tax?</label>
+              <select id="tm-genuine">
+                <option value="yes" selected>Yes — genuine</option>
+                <option value="no">No — not genuine</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Employer size</label>
+              <select id="tm-smallBiz">
+                <option value="no" selected>15 or more employees</option>
+                <option value="yes">Small business (under 15)</option>
+              </select>
+            </div>
           </div>
           <div class="field">
             <label>Redundancy pay (weeks)</label>
             <input type="number" id="tm-redWks" value="" step="0.2" placeholder="NES scale">
           </div>
+          <div class="hint">Genuine if the position (not the person) is abolished, the employee is under age pension age (67), the dismissal is at arm's length, and there's no arrangement to re-employ. Redundancy pay blank = NES scale (s119) at the base rate of pay.</div>
         </div>
-        <div class="hint">Genuine if the position (not the person) is abolished, the employee is under age pension age (67), the dismissal is at arm's length, and there's no arrangement to re-employ. Redundancy pay blank = NES scale (s119) at the base rate of pay.</div>
-      </div>
-      <div class="followup" data-for="invalidity" style="display:none;">
-        <div class="row2">
-          <div class="field">
-            <label>Certified by two legally qualified medical practitioners?</label>
-            <select id="tm-certified">
-              <option value="yes" selected>Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Last retirement day</label>
-            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-retireDate">
-            <div class="hint">Blank = 67th birthday. Used for the tax-free invalidity segment.</div>
+        <div class="followup" data-for="invalidity" style="display:none;">
+          <div class="row2">
+            <div class="field">
+              <label>Certified by two legally qualified medical practitioners?</label>
+              <select id="tm-certified">
+                <option value="yes" selected>Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Last retirement day</label>
+              <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-retireDate">
+              <div class="hint">Blank = 67th birthday. Used for the tax-free invalidity segment.</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="followup" data-for="death" style="display:none;">
-        <div class="row2">
+        <div class="followup" data-for="death" style="display:none;">
           <div class="field">
             <label>Who receives the death benefit?</label>
             <select id="tm-deathTo">
@@ -809,168 +884,111 @@
               <option value="trustee">The estate (trustee)</option>
             </select>
           </div>
+          <div class="hint">Wages and unused leave owed at death are paid to the estate without withholding. The recipient only changes the tax on the ETP.</div>
         </div>
-        <div class="hint">Wages and unused leave owed at death are paid to the estate without withholding. The recipient only changes the tax on the ETP.</div>
+        <div id="tm-summary"></div>
       </div>
     </div>
 
-    <div class="grid">
-      <div>
-        <div class="card">
-          <h2>Employee</h2>
-          <div class="field"><label>Name</label><input type="text" id="tm-name" placeholder="optional"></div>
-          <div class="row3">
-            <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob" value="01/01/1990"></div>
-            <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired" value="15/03/2021"></div>
-            <div class="field"><label>Last day</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-last" value="02/10/2026"></div>
-          </div>
-          <div class="row2">
-            <div class="field">
-              <label>Casual employee?</label>
-              <select id="tm-casual">
-                <option value="no" selected>No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Date notice given</label>
-              <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-noticeDate">
-              <div class="hint">NES age &amp; service are tested on this day. Blank = last day.</div>
-            </div>
-          </div>
-
-          <h3>Pay details</h3>
-          <div class="row2">
-            <div class="field">
-              <label>Pay frequency</label>
-              <select id="tm-freq">
-                <option value="weekly">Weekly (52/yr)</option>
-                <option value="fortnightly" selected>Fortnightly (26/yr)</option>
-                <option value="monthly">Monthly (12/yr)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Tax-free threshold claimed?</label>
-              <select id="tm-scale">
-                <option value="2" selected>Yes — Scale 2</option>
-                <option value="1">No — Scale 1</option>
-              </select>
-            </div>
-          </div>
-          <div class="row3">
-            <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" value="38" step="0.25"></div>
-            <div class="field"><label>Annual salary ($)</label><input type="number" id="tm-salary" value="85000" step="0.01"></div>
-            <div class="field"><label>Hourly rate ($)</label><input type="number" id="tm-rate" value="" step="0.0001" placeholder="from salary"></div>
-          </div>
-          <div class="field"><label>Super Guarantee rate (%)</label><input type="number" id="tm-sgRate" value="12" step="0.1"></div>
+    <div class="tm-stack">
+      <div class="card">
+        <h2>Final pay period</h2>
+        <div class="row2">
+          <div class="field"><label>Ordinary hours worked</label><input type="number" id="tm-ordHrs" value="76" step="0.25"></div>
+          <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" value="0" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
         </div>
 
-        <div class="card">
-          <h2>Final pay period</h2>
-          <div class="row2">
-            <div class="field"><label>Ordinary hours worked</label><input type="number" id="tm-ordHrs" value="76" step="0.25"></div>
-            <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" value="0" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
-          </div>
+        <h3 id="tm-otherHead">Other pay in this period</h3>
+        <div class="tm-other-row head"><span>Pay item</span><span>Hours</span><span>Amount ($)</span><span>Super?</span><span></span></div>
+        <div id="tm-otherRows"></div>
+        <button class="btn ghost small" id="tm-addOther" type="button">+ Add pay item</button>
+        <div class="hint" data-tip-for="#tm-otherHead">Paid with the final wages and taxed together with them using the tax table. Leave the amount blank to use hours × the hourly rate (overtime at 1.5×).</div>
 
-          <h3>Other pay in this period</h3>
-          <div class="tm-other-row head"><span>Pay item</span><span>Hours</span><span>Amount ($)</span><span>Super?</span><span></span></div>
-          <div id="tm-otherRows"></div>
-          <button class="btn ghost small" id="tm-addOther" type="button">+ Add pay item</button>
-          <div class="hint" style="margin:6px 0 4px;">Paid with the final wages and taxed together with them using the tax table. Leave the amount blank to use hours × the hourly rate (overtime at 1.5×).</div>
-
-          <h3>Leave</h3>
-          <div class="row2">
-            <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" value="64" step="0.01"></div>
-            <div class="field">
-              <label>Add AL accrued on final period?</label>
-              <select id="tm-alAccrue">
-                <option value="no" selected>No — balance already includes it</option>
-                <option value="yes">Yes — ordinary hours ÷ 13</option>
-              </select>
-            </div>
-          </div>
-          <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" value="0" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
-
-          <h3>Employment termination payment (ETP)</h3>
-          <div class="row2">
-            <div class="field">
-              <label>Notice in lieu (weeks)</label>
-              <input type="number" id="tm-noticeWks" value="" step="0.2" placeholder="NES minimum">
-              <div class="hint">Blank = NES minimum. Enter the award/contract period if it's longer.</div>
-            </div>
-            <div class="field"><label>Ex-gratia ($)</label><input type="number" id="tm-exGratia" value="0" step="0.01"></div>
-          </div>
+        <h3>Leave</h3>
+        <div class="row2">
+          <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" value="64" step="0.01"></div>
           <div class="field">
-            <label>Other weekly amounts in full rate of pay ($/week)</label>
-            <input type="number" id="tm-noticeExtra" value="0" step="0.01">
-            <div class="hint">Allowances, loadings, incentive payments, overtime/penalties the employee would normally have earned. Added to notice in lieu; super is applied to the base portion only.</div>
-          </div>
-          <div class="field">
-            <label>ETP rate up to the cap</label>
-            <select id="tm-etpRate">
-              <option value="auto" selected>Auto — preservation age (60) by 30 June 2027?</option>
-              <option value="0.17">17% — at or over preservation age</option>
-              <option value="0.32">32% — under preservation age</option>
+            <label>Add AL accrued on final period?</label>
+            <select id="tm-alAccrue">
+              <option value="no" selected>No — balance already includes it</option>
+              <option value="yes">Yes — ordinary hours ÷ 13</option>
             </select>
-            <div class="hint">Anything above the cap is withheld at 47%. Death benefits use their own rates.</div>
           </div>
+        </div>
+        <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" value="0" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
+
+        <h3>Employment termination payment (ETP)</h3>
+        <div class="row2">
+          <div class="field">
+            <label>Notice in lieu (weeks)</label>
+            <input type="number" id="tm-noticeWks" value="" step="0.2" placeholder="NES minimum">
+            <div class="hint">Blank = NES minimum. Enter the award/contract period if it's longer.</div>
+          </div>
+          <div class="field"><label>Ex-gratia ($)</label><input type="number" id="tm-exGratia" value="0" step="0.01"></div>
+        </div>
+        <div class="field">
+          <label>Other weekly amounts in full rate of pay ($/week)</label>
+          <input type="number" id="tm-noticeExtra" value="0" step="0.01">
+          <div class="hint">Allowances, loadings, incentive payments, overtime/penalties the employee would normally have earned. Added to notice in lieu; super is applied to the base portion only.</div>
+        </div>
+        <div class="field">
+          <label>ETP rate up to the cap</label>
+          <select id="tm-etpRate">
+            <option value="auto" selected>Auto — preservation age (60) by 30 June 2027?</option>
+            <option value="0.17">17% — at or over preservation age</option>
+            <option value="0.32">32% — under preservation age</option>
+          </select>
+          <div class="hint">Anything above the cap is withheld at 47%. Death benefits use their own rates.</div>
         </div>
       </div>
-
-      <div>
-        <div class="card">
-          <h2 id="tm-heading">Termination calculation</h2>
-          <div id="tm-summary"></div>
-        </div>
-        <div class="card">
-          <h2>Fair Work entitlements (NES)</h2>
-          <div id="tm-nes"></div>
-        </div>
-        <div class="card">
-          <h2>Withholding &amp; STP reporting</h2>
-          <div id="tm-pay"></div>
-        </div>
-        <div class="card">
-          <h2 id="tm-s7title">Schedule 7 — tax on unused leave (marginal rates)</h2>
-          <div id="tm-s7inputs">
-            <div class="field">
-              <label>Normal gross earnings for a regular pay period</label>
-              <div class="seg" id="tm-s7mode">
-                <button class="active" data-val="std">Standard hours</button>
-                <button data-val="hours">Hours</button>
-                <button data-val="avg">Average of pay runs</button>
-                <button data-val="manual">Amount</button>
-              </div>
-            </div>
-            <div class="field tm-s7-field" data-mode="hours" style="display:none;">
-              <label>Hours in a regular pay period</label>
-              <input type="number" id="tm-s7Hours" value="" step="0.25" placeholder="e.g. 64.5">
-              <div class="hint">Multiplied by the hourly rate.</div>
-            </div>
-            <div class="field tm-s7-field" data-mode="avg" style="display:none;">
-              <label>Gross earnings of recent pay runs ($)</label>
-              <div id="tm-s7Runs"></div>
-              <button class="btn ghost small" id="tm-s7AddRun" type="button">+ Add pay run</button>
-              <div class="hint">Normal earnings only — leave out bonuses, back pay and other one-off payments.</div>
-            </div>
-            <div class="field tm-s7-field" data-mode="manual" style="display:none;">
-              <label>Normal gross earnings ($)</label>
-              <input type="number" id="tm-normalGross" value="" step="0.01">
-            </div>
-            <div class="row2">
-              <div class="field">
-                <label>Override step 1 withholding ($)</label>
-                <input type="number" id="tm-s7Tax1" value="" step="1" placeholder="calculated">
-              </div>
-              <div class="field">
-                <label>Override step 5 withholding ($)</label>
-                <input type="number" id="tm-s7Tax2" value="" step="1" placeholder="calculated">
-              </div>
+      <div class="card">
+        <h2>Fair Work entitlements (NES)</h2>
+        <div id="tm-nes"></div>
+      </div>
+      <div class="card">
+        <h2>Withholding &amp; STP reporting</h2>
+        <div id="tm-pay"></div>
+      </div>
+      <div class="card">
+        <h2 id="tm-s7title">Schedule 7 — tax on unused leave (marginal rates)</h2>
+        <div id="tm-s7inputs">
+          <div class="field">
+            <label>Normal gross earnings for a regular pay period</label>
+            <div class="seg" id="tm-s7mode">
+              <button class="active" data-val="std">Standard hours</button>
+              <button data-val="hours">Hours</button>
+              <button data-val="avg">Average of pay runs</button>
+              <button data-val="manual">Amount</button>
             </div>
           </div>
-          <div id="tm-s7note"></div>
-          <table class="steps" id="tm-sched7"></table>
+          <div class="field tm-s7-field" data-mode="hours" style="display:none;">
+            <label>Hours in a regular pay period</label>
+            <input type="number" id="tm-s7Hours" value="" step="0.25" placeholder="e.g. 64.5">
+            <div class="hint">Multiplied by the hourly rate.</div>
+          </div>
+          <div class="field tm-s7-field" data-mode="avg" style="display:none;">
+            <label>Gross earnings of recent pay runs ($)</label>
+            <div id="tm-s7Runs"></div>
+            <button class="btn ghost small" id="tm-s7AddRun" type="button">+ Add pay run</button>
+            <div class="hint">Normal earnings only — leave out bonuses, back pay and other one-off payments.</div>
+          </div>
+          <div class="field tm-s7-field" data-mode="manual" style="display:none;">
+            <label>Normal gross earnings ($)</label>
+            <input type="number" id="tm-normalGross" value="" step="0.01">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Override step 1 withholding ($)</label>
+              <input type="number" id="tm-s7Tax1" value="" step="1" placeholder="calculated">
+            </div>
+            <div class="field">
+              <label>Override step 5 withholding ($)</label>
+              <input type="number" id="tm-s7Tax2" value="" step="1" placeholder="calculated">
+            </div>
+          </div>
         </div>
+        <div id="tm-s7note"></div>
+        <table class="steps" id="tm-sched7"></table>
       </div>
     </div>
 
@@ -1001,18 +1019,19 @@
           <button class="btn ghost small" id="mcb-loadSample" type="button">Load sample</button>
         </div>
         <div class="row2">
-          <div class="field"><label>Total fixed remuneration ($)</label><input type="number" id="mcb-amount" value="325300" step="0.01"><div class="hint">Including super.</div></div>
-          <div class="field"><label>Standard hours / week</label><input type="number" id="mcb-hours" value="38" step="0.25"></div>
+          <div class="field"><label>Total fixed remuneration ($)</label><input type="number" id="mcb-amount" value="325300" step="0.01"><div class="hint">Including super. Enter this or the base salary — the other is worked out at the SG rate.</div></div>
+          <div class="field"><label>Base salary ($)</label><input type="number" id="mcb-base" step="0.01"><div class="hint">Excluding super. Enter this or the total fixed remuneration — the other is worked out at the SG rate.</div></div>
         </div>
         <div class="row2">
           <div class="field"><label>SG rate (%)</label><input type="number" id="mcb-sgRate" value="12" step="0.1"></div>
+          <div class="field"><label>Standard hours / week</label><input type="number" id="mcb-hours" value="38" step="0.25"></div>
+        </div>
+        <div class="row2">
           <div class="field">
             <label>Maximum contribution base ($)</label>
             <input type="number" id="mcb-max" value="270830" step="1">
             <div class="hint">FY2026–27 annual limit.</div>
           </div>
-        </div>
-        <div class="row2">
           <div class="field">
             <label>Pay frequency</label>
             <select id="mcb-freq">
@@ -1021,12 +1040,14 @@
               <option value="monthly" selected>Monthly</option>
             </select>
           </div>
+        </div>
+        <div class="row2">
           <div class="field" id="mcb-firstPayField" style="display:none;">
             <label>First pay date in the FY</label>
             <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mcb-firstPay" value="02/07/2026">
+            <div class="hint">Pay dates run from the first pay date to 30 June 2027 — some years have 27 fortnightly or 53 weekly pays.</div>
           </div>
         </div>
-        <div class="hint" id="mcb-firstPayHint" style="display:none; font-size:11.5px; opacity:0.55; margin:-6px 0 12px;">Pay dates run from the first pay date to 30 June 2027 — some years have 27 fortnightly or 53 weekly pays.</div>
 
         <h3>Base salary (excl. super)</h3>
         <div id="mcb-breakdown"></div>
@@ -1279,6 +1300,40 @@ document.querySelectorAll("input.date-au").forEach(input=>{
   });
 });
 
+/* ---------------- "?" help tips for field notes ---------------- */
+const tipbox = document.createElement("div");
+tipbox.id = "tipbox"; tipbox.setAttribute("role", "tooltip");
+document.body.appendChild(tipbox);
+function showTip(btn){
+  tipbox.textContent = btn.dataset.tip;
+  tipbox.classList.add("show");
+  const r = btn.getBoundingClientRect(), w = tipbox.offsetWidth, h = tipbox.offsetHeight;
+  let left = Math.min(Math.max(8, r.left + r.width/2 - w/2), window.innerWidth - w - 8);
+  let top = r.top - h - 8;
+  if(top < 8) top = r.bottom + 8;   // no room above — show below
+  tipbox.style.left = left + "px"; tipbox.style.top = top + "px";
+}
+function hideTip(){ tipbox.classList.remove("show"); document.querySelectorAll(".tip.open").forEach(t=>t.classList.remove("open")); }
+// Field notes attach to the field's label; a note with data-tip-for attaches to that element (e.g. a section heading)
+document.querySelectorAll(".field > .hint, .followup > .hint, .hint[data-tip-for]").forEach(hint=>{
+  const box = hint.parentElement;
+  const label = hint.dataset.tipFor ? document.querySelector(hint.dataset.tipFor)
+    : box.classList.contains("followup") ? box.querySelector("label") : box.querySelector(":scope > label");
+  if(!label) return;
+  const tip = document.createElement("button");
+  tip.type = "button"; tip.className = "tip"; tip.textContent = "?";
+  tip.dataset.tip = hint.textContent.trim().replace(/\s+/g, " ");
+  tip.setAttribute("aria-label", "Help: " + tip.dataset.tip);
+  tip.addEventListener("mouseenter", ()=>showTip(tip));
+  tip.addEventListener("mouseleave", ()=>{ if(!tip.classList.contains("open")) hideTip(); });
+  tip.addEventListener("focus", ()=>showTip(tip));
+  tip.addEventListener("blur", hideTip);
+  tip.addEventListener("click", e=>{ e.preventDefault(); const was = tip.classList.contains("open"); hideTip(); if(!was){ tip.classList.add("open"); showTip(tip); } });
+  label.appendChild(tip);
+  hint.remove();
+});
+window.addEventListener("scroll", hideTip, true);
+
 /* ---------------- helpers ---------------- */
 function fmt(v){
   const n = Number(v)||0;
@@ -1482,7 +1537,7 @@ function calcBase(){
   const fmtN = (v,dp=2)=>(Number(v)||0).toLocaleString("en-AU",{minimumFractionDigits:dp, maximumFractionDigits:dp});
   const fmtH = v=>parseFloat(v.toFixed(4)).toString();
   const sgPct = parseFloat((sgRate*100).toFixed(2));
-  const startDate = document.getElementById("bp-startDate").value;
+  const startDate = dateISO("bp-startDate");
   const startLabel = startDate
     ? " - " + new Date(startDate + "T00:00:00").toLocaleDateString("en-AU",{day:"2-digit", month:"long", year:"numeric"})
     : "";
@@ -1674,7 +1729,7 @@ function calcProrata(){
       out("days").innerHTML = r.days === null ? "–" : `${r.days} of ${r.monthDays}<small>${r.month}</small>`;
       out("proHrs").textContent = r.proHrs ? r.proHrs.toFixed(2) : "–";
       out("pro").textContent = fmt(r.pro);
-      if(out("leaveAmt")) out("leaveAmt").textContent = r.leaveAmt ? "−" + fmt(r.leaveAmt) : "";
+      if(out("leaveAmt")) out("leaveAmt").textContent = r.leaveAmt ? "−" + fmt(r.leaveAmt) : "–";
       total += r.pro - r.leaveAmt;
       r.warn.forEach(w => warns.push((single ? "" : (c === "old" ? "Old rate: " : "New rate: ")) + w));
     });
@@ -1991,14 +2046,25 @@ TERM_INPUTS.forEach(id=>{
   el.addEventListener("change", calcTermination);
 });
 
-function termType(){ return document.querySelector("#tm-type .type-card.active").dataset.val; }
+const TERM_TYPE_DESC = {
+  redundancy: "Redundancy — the role is being abolished, whether or not it qualifies as genuine for tax.",
+  normal: "Resignation / dismissal / retirement — any ordinary termination, including performance dismissals and retirement.",
+  invalidity: "Invalidity — permanent incapacity, certified by two legally qualified medical practitioners.",
+  death: "Death of the employee — final amounts paid to a beneficiary or the estate.",
+};
+function termType(){ return document.getElementById("tm-type").value; }
 function setTermType(val){
-  document.querySelectorAll("#tm-type .type-card").forEach(c=>c.classList.toggle("active", c.dataset.val === val));
+  const sel = document.getElementById("tm-type");
+  sel.value = val;
   document.querySelectorAll("#panel-term .followup").forEach(f=>{ f.style.display = f.dataset.for === val ? "block" : "none"; });
+  const tip = sel.closest(".field").querySelector(".tip");
+  if(tip){
+    tip.dataset.tip = TERM_TYPE_DESC[val] + " Answer the follow-up below — this sets the tax treatment for every payment.";
+    tip.setAttribute("aria-label", "Help: " + tip.dataset.tip);
+  }
 }
-document.querySelectorAll("#tm-type .type-card").forEach(c=>{
-  c.addEventListener("click", ()=>{ setTermType(c.dataset.val); calcTermination(); });
-});
+document.getElementById("tm-type").addEventListener("change", e=>{ setTermType(e.target.value); calcTermination(); });
+setTermType(document.getElementById("tm-type").value);
 
 // Sample: weekly resignation, under a year's service, hourly rate with no salary
 const TM_SAMPLE = {
@@ -2481,7 +2547,6 @@ function mcbPeriods(){
 function buildMcbRows(){
   const freq = document.getElementById("mcb-freq").value;
   document.getElementById("mcb-firstPayField").style.display = freq === "monthly" ? "none" : "block";
-  document.getElementById("mcb-firstPayHint").style.display = freq === "monthly" ? "none" : "block";
   const labels = mcbPeriods();
   let html = `<tr><th>#</th><th>Pay run</th><th style="text-align:right">Regular OTE</th><th style="text-align:right">Additional OTE</th><th style="text-align:right">Total OTE</th><th style="text-align:right">OTE year to date</th><th class="sup">Super payable</th><th>Status</th></tr>`;
   labels.forEach((lbl, i)=>{
@@ -2509,19 +2574,30 @@ function buildMcbRows(){
 
 function calcMcb(){
   const sgRate = num("mcb-sgRate")/100;
-  const amount = num("mcb-amount");
-  const base = round2(amount / (1 + sgRate));
+  // Whichever of TFR / base salary was typed last drives the other
+  const tfrEl = document.getElementById("mcb-amount"), baseEl = document.getElementById("mcb-base");
+  let amount, base;
+  if(mcbSource === "base"){
+    base = num("mcb-base");
+    amount = round2(base * (1 + sgRate));
+    if(document.activeElement !== tfrEl) tfrEl.value = baseEl.value === "" ? "" : amount.toFixed(2);
+  } else {
+    amount = num("mcb-amount");
+    base = round2(amount / (1 + sgRate));
+    if(document.activeElement !== baseEl) baseEl.value = tfrEl.value === "" ? "" : base.toFixed(2);
+  }
   const hours = num("mcb-hours");
   const maxBase = num("mcb-max");
   const freq = document.getElementById("mcb-freq").value;
   const regDefault = round2(base / PERIODS_PER_YEAR[freq]);
   document.getElementById("mcb-breakdown").innerHTML =
-    line2("Annual", fmt(base), `${fmt(amount)} ÷ ${(1 + sgRate).toFixed(2)}`) +
+    line2("Annual", fmt(base), mcbSource === "base" ? "entered as base salary" : `${fmt(amount)} ÷ ${(1 + sgRate).toFixed(2)}`) +
     line2("Monthly", fmt(base / 12)) +
     line2("Fortnightly", fmt(base / 26)) +
     line2("Weekly", fmt(base / 52)) +
     line2("Hourly", hours > 0 ? fmt(base / (hours * WEEKS_PER_YEAR)) : "–", `${hours} hrs × ${WEEKS_PER_YEAR} weeks`) +
-    line2(`Super in package (${(sgRate*100).toFixed(1)}%)`, fmt(amount - base));
+    line2(`Super in package (${(sgRate*100).toFixed(1)}%)`, fmt(amount - base)) +
+    line2("Total fixed remuneration", fmt(amount), mcbSource === "base" ? `${fmt(base)} × ${(1 + sgRate).toFixed(2)}` : "entered");
 
   let cum = 0, totOte = 0, totSup = 0, totUncapped = 0, capRun = null;
   const regInputs = document.querySelectorAll("#mcb-table .mcb-reg");
@@ -2577,7 +2653,10 @@ function line2(k, v, sub){
   return `<div class="result-line"><span class="k">${k}${sub ? `<br><span style="font-size:11.5px; opacity:0.7;">${sub}</span>` : ""}</span><span class="v">${v}</span></div>`;
 }
 
-["mcb-amount","mcb-hours","mcb-sgRate","mcb-max"].forEach(id=>document.getElementById(id).addEventListener("input", calcMcb));
+let mcbSource = "tfr";
+document.getElementById("mcb-amount").addEventListener("input", ()=>{ mcbSource = "tfr"; calcMcb(); });
+document.getElementById("mcb-base").addEventListener("input", ()=>{ mcbSource = "base"; calcMcb(); });
+["mcb-hours","mcb-sgRate","mcb-max"].forEach(id=>document.getElementById(id).addEventListener("input", calcMcb));
 ["mcb-freq","mcb-firstPay"].forEach(id=>document.getElementById(id).addEventListener("change", buildMcbRows));
 document.getElementById("mcb-reset").addEventListener("click", ()=>{
   document.querySelectorAll("#mcb-table input").forEach(el=>{
@@ -2586,6 +2665,7 @@ document.getElementById("mcb-reset").addEventListener("click", ()=>{
   calcMcb();
 });
 document.getElementById("mcb-loadSample").addEventListener("click", ()=>{
+  mcbSource = "tfr";
   document.getElementById("mcb-amount").value = "325300";
   document.getElementById("mcb-hours").value = "37.5";
   document.getElementById("mcb-sgRate").value = "12";
