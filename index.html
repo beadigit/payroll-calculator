@@ -23,6 +23,8 @@
     --header:#132335;      /* top header band */
     --rule:#132335;        /* heavy divider lines above totals */
     --divider:#c3ced8;     /* column group dividers in tables */
+    --bubble:#f1f6f9;      /* column panels (mid-period old/new rate) */
+    --bubble-line:#dde6ec;
     --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23132335' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     --line:#dde3e9;
     --teal:#167690;        /* cyan text/lines on light surfaces (AA contrast) */
@@ -43,7 +45,7 @@
       --field:#374151; --field-line:#4b5563; --header:#1f2937;
       --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
       --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
-      --rule:#4b5563; --divider:#4b5563;
+      --rule:#4b5563; --divider:#4b5563; --bubble:#273444; --bubble-line:#374151;
       --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     }
   }
@@ -53,7 +55,7 @@
     --field:#374151; --field-line:#4b5563; --header:#1f2937;
     --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
     --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
-    --rule:#4b5563; --divider:#4b5563;
+    --rule:#4b5563; --divider:#4b5563; --bubble:#273444; --bubble-line:#374151;
       --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
   *{box-sizing:border-box;}
@@ -251,25 +253,37 @@
   .mp-stack{display:flex; flex-direction:column; gap:20px;}
   .mp-stack .card + .card{margin-top:0;}
   .mp-card{min-width:0; overflow-x:auto;}
-  .mp-table{width:100%; border-collapse:collapse; font-size:13px; min-width:560px;}
+  .mp-table{
+    width:calc(100% + 24px); margin:0 -12px; font-size:13px; min-width:560px;
+    border-collapse:separate; border-spacing:12px 0;   /* 12px gap between the description, old and new columns */
+  }
   .mp-table th:first-child, .mp-table td:first-child{width:28%;}
   .mp-table.single th:first-child, .mp-table.single td:first-child{width:40%;}
-  .mp-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:8px 10px; background:var(--navy); color:#fff; text-align:center;}
-  .mp-table th:first-child{text-align:left; border-radius:4px 0 0 0;}
-  .mp-table th:last-child, .mp-table.single th.col-old{border-radius:0 4px 0 0;}
+  .mp-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:9px 10px; text-align:center;}
+  .mp-table th:first-child{text-align:left; color:var(--teal); padding-left:0;}
+  .mp-table th.col-old, .mp-table th.col-new{background:var(--navy); color:#fff; border-radius:8px 8px 0 0;}
   .mp-table td{padding:6px 10px; border-bottom:1px dashed var(--line);}
-  .mp-table td:first-child{font-weight:600; opacity:0.85;}
+  .mp-table td:first-child{font-weight:600; opacity:0.85; padding-left:0;}
+  .mp-table td.col-old, .mp-table td.col-new{background:var(--bubble); border-bottom-color:var(--bubble-line);}
+  .mp-table td.col-old input, .mp-table td.col-new input, .mp-table td.col-old select, .mp-table td.col-new select{background-color:var(--panel);}
+  .mp-table tr:last-child td.col-old, .mp-table tr:last-child td.col-new{border-radius:0 0 8px 8px; border-bottom:none;}
   .mp-table td:first-child .mp-per{font-weight:400; opacity:0.7; font-size:12px;}
   .mp-table input{padding:7px 9px; font-size:13px; min-width:0;}
   .mp-table td.num{font-family:var(--mono); text-align:right; font-weight:600; white-space:nowrap;}
   .mp-table td.num small{display:block; font-family:var(--sans); font-weight:400; font-size:11px; opacity:0.65;}
-  .mp-table tr.calc td{opacity:0.85;}
-  .mp-table tr.pro td{background:var(--green-dim); color:var(--green); font-weight:700;}
+  .mp-table tr.calc td{opacity:0.9;}
+  .mp-table tr.pro td{color:var(--green); font-weight:700;}
+  .mp-table tr.pro td.col-old, .mp-table tr.pro td.col-new{background:var(--green-dim);}
   .mp-table tr.pro td:first-child{opacity:1;}
-  .mp-table tr.total td{background:var(--navy); color:#fff; font-weight:700; font-size:14px; border-bottom:none;}
-  .mp-table tr.total td:first-child{opacity:1; border-radius:0 0 0 4px;}
-  .mp-table tr.total td:last-child{border-radius:0 0 4px 0; text-align:right;}
-  .mp-table tr.gap td{border-bottom:none; padding:4px;}
+  .mp-table tr.gap td{padding:5px; border-bottom:none;}
+  .mp-foot{display:flex; gap:16px; align-items:flex-end; margin-top:16px; flex-wrap:wrap;}
+  .mp-foot .field{margin:0; flex:0 1 280px;}
+  .mp-total{
+    flex:1 1 260px; display:flex; justify-content:space-between; align-items:center;
+    height:calc(1.4 * 14px + 18px);   /* same height as a text box: line + padding + border */
+    background:var(--navy); color:#fff; border-radius:4px; padding:0 14px; font-weight:700; font-size:13.5px;
+  }
+  .mp-total .amt{font-family:var(--mono); font-size:15px;}
   .mp-pattern{display:flex; gap:4px; flex-wrap:nowrap;}
   .mp-day{margin:0; opacity:1; cursor:pointer;}
   .mp-day input{position:absolute; opacity:0; width:0; height:0;}
@@ -287,7 +301,9 @@
   .ov-run-head label{display:flex; align-items:center; gap:6px; margin:0; font-size:12px; white-space:nowrap;}
   .ov-run-head select, .ov-run-head input.ov-sg{width:auto; padding:6px 8px; font-size:12.5px;}
   .ov-run-head input.ov-sg{width:70px;}
-  .ov-rmrun{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; font-size:12px; padding:6px 10px;}
+  .ov-run-actions{display:flex; gap:6px; align-items:center; margin-left:auto;}
+  .ov-rmrun{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; font-size:16px; line-height:1; width:32px; height:32px; padding:0;}
+  .ov-rmrun:disabled{opacity:0.35; cursor:not-allowed;}
   .ov-table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:860px;}
   .ov-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; padding:5px 6px; text-align:center;}
   .ov-table tr.grp th:first-child, .ov-table tr.grp th:nth-child(2){text-align:left; vertical-align:bottom;}
@@ -309,14 +325,22 @@
   .ov-table .g{border-left:2px solid var(--divider); padding-left:8px;}
   .ov-table .mid{border-left:1px dashed var(--divider); padding-left:8px;}
   .ov-table .gend{border-right:2px solid var(--divider);}
-  .ov-table button.rm{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; height:28px; width:28px;}
-  .ov-bottom{display:grid; grid-template-columns:1fr minmax(320px, auto); gap:24px; align-items:start; margin-top:6px;}
+  .ov-table button.ov-act{background:none; border:1px solid var(--line); border-radius:4px; cursor:pointer; height:28px; width:28px; font-size:15px; line-height:1; padding:0;}
+  .ov-table button.ov-act.rm{color:var(--red);}
+  .ov-table button.ov-act.add{color:var(--brand-ink); background:var(--brand); border-color:var(--brand); font-weight:700;}
+  .ov-table button.ov-act:hover{filter:brightness(0.95);}
+  /* Recovery | Totals: equal columns, matching row height, padding and dividers */
+  .ov-bottom{display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; margin-top:6px;}
   @media (max-width:860px){ .ov-bottom{grid-template-columns:1fr;} }
-  .ov-totals{border-collapse:collapse; font-size:13px;}
-  .ov-totals th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--teal); padding:6px 10px; text-align:right;}
-  .ov-totals td{padding:7px 10px; border-bottom:1px solid var(--line); font-weight:700;}
+  .ov-bottom .field{max-width:none !important;}
+  .ov-totals{width:100%; border-collapse:collapse; font-size:13.5px;}
+  .ov-totals th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--teal); padding:0 10px 6px; text-align:right; border-bottom:1px solid var(--line);}
+  .ov-totals th:first-child{text-align:left; padding-left:0;}
+  .ov-totals td{padding:8px 10px; border-bottom:1px dashed var(--line); font-weight:600;}
+  .ov-totals td:first-child{padding-left:0; font-weight:600; opacity:0.85;}
+  .ov-totals tr:last-child td{border-bottom:none;}
   .ov-totals td.num{font-family:var(--mono); text-align:right; white-space:nowrap;}
-  .ov-totals td.v{background:var(--amber-dim);}
+  .ov-totals td.v{background:var(--amber-dim); border-radius:0;}
   .tm-other-row{display:grid; grid-template-columns:minmax(0,2fr) 70px 100px 70px 30px; gap:6px; margin-bottom:6px; align-items:center;}
   .tm-other-row.head{font-size:11px; text-transform:uppercase; opacity:0.55; letter-spacing:0.03em; margin-bottom:4px;}
   .tm-other-row input, .tm-other-row select{padding:7px 6px; font-size:12.5px;}
@@ -341,7 +365,7 @@
 
   .date-wrap{position:relative;}
   .date-wrap input.date-au{padding-right:38px;}
-  .date-wrap input.date-au.invalid{border-color:var(--red); outline-color:var(--red);}
+  .date-wrap input.date-au.invalid, .date-wrap input.date-au.range-invalid{border-color:var(--red); outline-color:var(--red); background:var(--red-dim);}
   .date-wrap .date-btn{
     position:absolute; right:4px; top:50%; transform:translateY(-50%);
     background:none; border:none; cursor:pointer; font-size:15px; padding:4px 6px; opacity:0.7;
@@ -685,14 +709,17 @@
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
           <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
+          <tr class="calc"><td>Hours worked</td><td class="col-old num" data-o="worked" data-c="old"></td><td class="col-new num" data-o="worked" data-c="new"></td></tr>
           <tr class="pro"><td>PRO-RATA hours</td><td class="col-old num" data-o="proHrs" data-c="old"></td><td class="col-new num" data-o="proHrs" data-c="new"></td></tr>
-          <tr class="gap"><td colspan="3"></td></tr>
+          <tr class="gap"><td></td><td class="col-old"></td><td class="col-new"></td></tr>
           <tr><td>Base salary (annual)</td><td class="col-old"><input type="number" class="mp-in" data-f="amount" data-c="old" step="0.01"></td><td class="col-new"><input type="number" class="mp-in" data-f="amount" data-c="new" step="0.01"></td></tr>
-          <tr><td>Base hourly rate</td><td class="col-old"><input type="number" class="mp-in" data-f="rate" data-c="old" step="0.00001"></td><td class="col-new"><input type="number" class="mp-in" data-f="rate" data-c="new" step="0.00001"></td></tr>
-          <tr><td>Processed for the period</td><td colspan="2" class="span"><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></td></tr>
+          <tr class="calc"><td>Base hourly rate</td><td class="col-old num" data-o="rate" data-c="old"></td><td class="col-new num" data-o="rate" data-c="new"></td></tr>
           <tr class="pro"><td>PRO-RATA salary</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
-          <tr class="total"><td>TOTAL</td><td colspan="2" class="num span" data-o="total"></td></tr>
         </table>
+        <div class="mp-foot">
+          <div class="field"><label>Processed for the period</label><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></div>
+          <div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div>
+        </div>
         <div class="mp-warn"></div>
       </div>
 
@@ -707,16 +734,19 @@
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
           <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
+          <tr class="calc"><td>Hours worked</td><td class="col-old num" data-o="worked" data-c="old"></td><td class="col-new num" data-o="worked" data-c="new"></td></tr>
           <tr class="pro"><td>PRO-RATA hours</td><td class="col-old num" data-o="proHrs" data-c="old"></td><td class="col-new num" data-o="proHrs" data-c="new"></td></tr>
-          <tr class="gap"><td colspan="3"></td></tr>
+          <tr class="gap"><td></td><td class="col-old"></td><td class="col-new"></td></tr>
           <tr><td>Allowance amount <span class="mp-per">(per pay period)</span></td><td class="col-old"><input type="number" class="mp-in" data-f="amount" data-c="old" step="0.01"></td><td class="col-new"><input type="number" class="mp-in" data-f="amount" data-c="new" step="0.01"></td></tr>
-          <tr><td>Base hourly rate</td><td class="col-old"><input type="number" class="mp-in" data-f="rate" data-c="old" step="0.00001"></td><td class="col-new"><input type="number" class="mp-in" data-f="rate" data-c="new" step="0.00001"></td></tr>
+          <tr class="calc"><td>Base hourly rate</td><td class="col-old num" data-o="rate" data-c="old"></td><td class="col-new num" data-o="rate" data-c="new"></td></tr>
           <tr><td>Leave taken (hours)</td><td class="col-old"><input type="number" class="mp-in" data-f="leave" data-c="old" step="0.01" placeholder="0"></td><td class="col-new"><input type="number" class="mp-in" data-f="leave" data-c="new" step="0.01" placeholder="0"></td></tr>
           <tr class="calc"><td>Leave deduction</td><td class="col-old num neg" data-o="leaveAmt" data-c="old"></td><td class="col-new num neg" data-o="leaveAmt" data-c="new"></td></tr>
-          <tr><td>Processed for the period</td><td colspan="2" class="span"><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></td></tr>
           <tr class="pro"><td>PRO-RATA allowance</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
-          <tr class="total"><td>TOTAL</td><td colspan="2" class="num span" data-o="total"></td></tr>
         </table>
+        <div class="mp-foot">
+          <div class="field"><label>Processed for the period</label><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></div>
+          <div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div>
+        </div>
         <div class="hint" style="font-size:11.5px; opacity:0.6; margin-top:8px;">TOTAL = pro-rata allowance − leave taken − processed for the period. Leave taken is deducted at the hourly allowance rate.</div>
         <div class="mp-warn"></div>
       </div>
@@ -732,7 +762,6 @@
           <h2 style="margin:0;">Over/underpayment reconciliation</h2>
           <div style="display:flex; gap:8px;">
             <button class="btn ghost small" id="ov-loadSample" type="button">Load sample</button>
-            <button class="btn small" id="ov-addRun" type="button">+ Add pay run</button>
           </div>
         </div>
         <div class="hint" style="font-size:12px; opacity:0.65; margin-bottom:14px;">
@@ -768,9 +797,9 @@
         </div>
         <div class="field"><label>Name</label><input type="text" id="tm-name" placeholder="optional"></div>
         <div class="row3">
-          <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob" value="01/01/1990"></div>
-          <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired" value="15/03/2021"></div>
-          <div class="field"><label>Last day</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-last" value="02/10/2026"></div>
+          <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob"></div>
+          <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired"></div>
+          <div class="field"><label>Last day</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-last"></div>
         </div>
         <div class="row2">
           <div class="field">
@@ -1044,7 +1073,7 @@
         <div class="row2">
           <div class="field" id="mcb-firstPayField" style="display:none;">
             <label>First pay date in the FY</label>
-            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mcb-firstPay" value="02/07/2026">
+            <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="mcb-firstPay">
             <div class="hint">Pay dates run from the first pay date to 30 June 2027 — some years have 27 fortnightly or 53 weekly pays.</div>
           </div>
         </div>
@@ -1100,7 +1129,7 @@
       <div class="card" style="grid-column:1/-1;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
           <h2 style="margin:0;">2. Compare with Xero</h2>
-          <button class="btn ghost small" id="nh-autofill" type="button">↻ Auto-fill from instructions</button>
+          <button class="btn ghost small" id="nh-autofill" type="button">↻ Auto fill</button>
         </div>
         <div class="hint" style="font-size:12px; opacity:0.6; margin:-6px 0 12px;">The client column fills in from the instructions — correct anything it misread. Enter what's set up in Xero on the right. The Xero amount is treated as base pay <strong>excluding</strong> super, which is how Xero stores it.</div>
         <div style="overflow-x:auto;">
@@ -1324,15 +1353,28 @@ document.querySelectorAll(".field > .hint, .followup > .hint, .hint[data-tip-for
   tip.type = "button"; tip.className = "tip"; tip.textContent = "?";
   tip.dataset.tip = hint.textContent.trim().replace(/\s+/g, " ");
   tip.setAttribute("aria-label", "Help: " + tip.dataset.tip);
-  tip.addEventListener("mouseenter", ()=>showTip(tip));
-  tip.addEventListener("mouseleave", ()=>{ if(!tip.classList.contains("open")) hideTip(); });
-  tip.addEventListener("focus", ()=>showTip(tip));
-  tip.addEventListener("blur", hideTip);
-  tip.addEventListener("click", e=>{ e.preventDefault(); const was = tip.classList.contains("open"); hideTip(); if(!was){ tip.classList.add("open"); showTip(tip); } });
   label.appendChild(tip);
   hint.remove();
 });
 window.addEventListener("scroll", hideTip, true);
+// One set of listeners for every tip, including ones drawn later in results
+document.addEventListener("mouseover", e=>{ const t = e.target.closest && e.target.closest(".tip"); if(t) showTip(t); });
+document.addEventListener("mouseout", e=>{ const t = e.target.closest && e.target.closest(".tip"); if(t && !t.classList.contains("open") && !t.contains(e.relatedTarget)) hideTip(); });
+document.addEventListener("focusin", e=>{ if(e.target.classList && e.target.classList.contains("tip")) showTip(e.target); });
+document.addEventListener("focusout", e=>{ if(e.target.classList && e.target.classList.contains("tip")) hideTip(); });
+document.addEventListener("click", e=>{
+  const t = e.target.closest && e.target.closest(".tip");
+  if(!t){ hideTip(); return; }
+  e.preventDefault();
+  const was = t.classList.contains("open"); hideTip();
+  if(!was){ t.classList.add("open"); showTip(t); }
+});
+// "?" for a note inside rendered results
+function tipHtml(text){
+  const t = String(text).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const a = t.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  return `<button type="button" class="tip" data-tip="${a}" aria-label="Help: ${a}">?</button>`;
+}
 
 /* ---------------- helpers ---------------- */
 function fmt(v){
@@ -1696,14 +1738,15 @@ function mpColumn(card, c){
       }
       if(!res.monthDays) res.warn.push("No work-pattern days ticked.");
       res.proHrs = res.monthDays ? std * res.days / res.monthDays : 0;
+      res.dailyHrs = pattern.size ? hours / pattern.size : 0;
+      res.worked = res.days * res.dailyHrs;
     }
   }
   // Hourly rate: salary ÷ (hours × 52); allowance ÷ standard monthly hours. Type a rate to override.
   const amount = parseFloat(f("amount").value) || 0;
   const rateCalc = sec === "nt" ? (hours ? amount / (hours * 52) : 0) : (std ? amount / std : 0);
-  const rateEl = f("rate");
-  rateEl.placeholder = rateCalc ? rateCalc.toFixed(5) : "";
-  const rate = rateEl.value !== "" ? parseFloat(rateEl.value) || 0 : rateCalc;
+  const rate = rateCalc;
+  res.rate = rate;
   if(sec === "al"){ res.leaveAmt = round2((parseFloat(f("leave").value) || 0) * rate); }
   res.pro = round2(res.proHrs * rate);  // leave taken is deducted in the TOTAL
   return res;
@@ -1728,14 +1771,29 @@ function calcProrata(){
       out("std").textContent = r.std ? r.std.toFixed(2) : "–";
       out("days").innerHTML = r.days === null ? "–" : `${r.days} of ${r.monthDays}<small>${r.month}</small>`;
       out("proHrs").textContent = r.proHrs ? r.proHrs.toFixed(2) : "–";
+      out("rate").textContent = r.rate ? "$" + r.rate.toFixed(5) : "–";
+      out("worked").innerHTML = r.days === null ? "–" : `${tipHtml(`${r.days} working day${r.days === 1 ? "" : "s"} × ${r.dailyHrs.toFixed(2)} hrs a day (hours per week ÷ ${r.dailyHrs ? Math.round((parseFloat(card.querySelector(`.mp-in[data-f="hours"][data-c="${c}"]`).value) || 0) / r.dailyHrs) : 0} pattern days)`)} ${r.worked.toFixed(2)}`;
       out("pro").textContent = fmt(r.pro);
       if(out("leaveAmt")) out("leaveAmt").textContent = r.leaveAmt ? "−" + fmt(r.leaveAmt) : "–";
       total += r.pro - r.leaveAmt;
       r.warn.forEach(w => warns.push((single ? "" : (c === "old" ? "Old rate: " : "New rate: ")) + w));
     });
+    // The new rate has to start after the old rate's dates
+    const d = (c, f) => card.querySelector(`.mp-in[data-f="${f}"][data-c="${c}"]`);
+    const oldFrom = mpDate(d("old","from")), oldTo = mpDate(d("old","to"));
+    const newFrom = mpDate(d("new","from")), newTo = mpDate(d("new","to"));
+    const oldEnd = oldTo || oldFrom;
+    const badFrom = !single && oldEnd && newFrom && newFrom <= oldEnd;
+    const badTo = !single && oldEnd && newTo && newTo <= oldEnd;
+    d("new","from").classList.toggle("range-invalid", !!badFrom);
+    d("new","to").classList.toggle("range-invalid", !!badTo);
+    if(badFrom || badTo){
+      const shown = [oldFrom, oldTo].filter(Boolean).map(fmtDateAU).join(" – ");
+      warns.unshift(`New rate dates must be after the old rate dates. The old rate runs ${shown}, so the new rate should start on ${fmtDateAU(new Date(oldEnd.getFullYear(), oldEnd.getMonth(), oldEnd.getDate() + 1))} or later.`);
+    }
     const processed = parseFloat(card.querySelector('.mp-in[data-f="processed"]').value) || 0;
     total = round2(total - processed);
-    card.querySelector('[data-o="total"]').textContent = fmt(total);
+    card.querySelector('[data-o="total"]').textContent = badFrom || badTo ? "Check dates" : fmt(total);
     card.querySelector(".mp-warn").innerHTML = warns.map(w=>`<div class="warn">${w}</div>`).join("");
   });
 }
@@ -1748,19 +1806,19 @@ function mpFill(sec, c, v){
   Object.entries(v).forEach(([k, val])=>{
     if(k === "pattern") card.querySelectorAll(`.mp-pattern[data-c="${c}"] input`).forEach(i=>{ i.checked = val.includes(+i.dataset.d); });
     else if(k === "processed") card.querySelector('.mp-in[data-f="processed"]').value = val;
-    else card.querySelector(`.mp-in[data-f="${k}"][data-c="${c}"]`).value = val;
+    else if(k !== "rate") card.querySelector(`.mp-in[data-f="${k}"][data-c="${c}"]`).value = val;
   });
 }
 function mpLoadSample(){
   document.querySelectorAll("#mp-mode button").forEach(b=>b.classList.toggle("active", b.dataset.val === "change"));
-  mpFill("nt", "old", {freq:"monthly", from:"19/08/2024", to:"31/08/2024", hours:32, pattern:[1,2,4,5], amount:56936.94, rate:"", processed:4744.75});
-  mpFill("nt", "new", {freq:"monthly", from:"01/04/2024", to:"30/04/2024", hours:40, pattern:[1,2,3,4,5], amount:62155.86, rate:""});
-  mpFill("al", "old", {freq:"monthly", from:"01/03/2024", to:"24/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1126.13, rate:"", leave:"", processed:858.00});
-  mpFill("al", "new", {freq:"monthly", from:"01/03/2024", to:"24/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1885.37, rate:"", leave:52});
+  mpFill("nt", "old", {freq:"monthly", from:"19/08/2024", to:"31/08/2024", hours:32, pattern:[1,2,4,5], amount:56936.94, processed:4744.75});
+  mpFill("nt", "new", {freq:"monthly", from:"01/09/2024", to:"30/09/2024", hours:40, pattern:[1,2,3,4,5], amount:62155.86});
+  mpFill("al", "old", {freq:"monthly", from:"01/03/2024", to:"15/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1126.13, leave:"", processed:1126.13});
+  mpFill("al", "new", {freq:"monthly", from:"18/03/2024", to:"31/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1885.37, leave:8});
   calcProrata();
 }
 document.getElementById("mp-loadSample").addEventListener("click", mpLoadSample);
-mpLoadSample();
+calcProrata();
 
 // --- over/underpayment: pay run by pay run, paid vs should be ---
 const OV_TYPES = {
@@ -1777,7 +1835,7 @@ function fmtAcc(v){
 }
 const ovEsc = v => String(v).replace(/[<>&"]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
 let ovRunCount = 0;
-function addOvRun(data = {}){
+function addOvRun(data = {}, after = null){
   ovRunCount++;
   const run = document.createElement("div");
   run.className = "ov-run";
@@ -1788,7 +1846,10 @@ function addOvRun(data = {}){
         <option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></label>
       <label>Tax scale <select class="ov-scale"><option value="2">2 — TFT claimed</option><option value="1">1 — no TFT</option></select></label>
       <label>Super % <input type="number" class="ov-sg" step="0.1" value="${data.sg ?? 12}"></label>
-      <button type="button" class="ov-rmrun" title="Remove pay run">Remove</button>
+      <div class="ov-run-actions">
+        <button type="button" class="btn small ov-addrun">+ Add pay run</button>
+        <button type="button" class="ov-rmrun" title="Remove this pay run" aria-label="Remove this pay run">×</button>
+      </div>
     </div>
     <div style="overflow-x:auto;">
     <table class="ov-table">
@@ -1805,8 +1866,7 @@ function addOvRun(data = {}){
         <tr data-k="super"><td colspan="2">Super</td><td class="g"></td><td class="mid"><input type="number" class="ov-supP" step="0.01"></td><td class="g"></td><td class="mid"><input type="number" class="ov-supS" step="0.01"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
       </tbody>
     </table>
-    </div>
-    <button type="button" class="btn ghost small ov-addline">+ Add line</button>`;
+    </div>`;
   run.querySelector(".ov-freq").value = data.freq || "fortnightly";
   run.querySelector(".ov-scale").value = data.scale || "2";
   if(data.taxP !== undefined) run.querySelector(".ov-taxP").value = data.taxP;
@@ -1814,11 +1874,27 @@ function addOvRun(data = {}){
   run.querySelectorAll(".ov-run-head input, .ov-run-head select, .ov-sum input").forEach(el=>{
     el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder);
   });
-  run.querySelector(".ov-rmrun").addEventListener("click", ()=>{ run.remove(); calcOverUnder(); });
-  run.querySelector(".ov-addline").addEventListener("click", ()=>{ addOvLine(run, {}); calcOverUnder(); });
-  document.getElementById("ov-runs").appendChild(run);
+  run.querySelector(".ov-rmrun").addEventListener("click", ()=>{
+    if(document.querySelectorAll("#ov-runs .ov-run").length <= 1) return;   // always keep one pay run
+    run.remove(); ovRunButtons(); calcOverUnder();
+  });
+  // New pay run goes straight after this one
+  run.querySelector(".ov-addrun").addEventListener("click", ()=>{ addOvRun({}, run); calcOverUnder(); });
+  if(after) after.after(run); else document.getElementById("ov-runs").appendChild(run);
+  ovRunButtons();
   (data.lines || [{desc:"Ordinary hours", type:"ote"}]).forEach(l => addOvLine(run, l));
   return run;
+}
+function ovRunButtons(){
+  const runs = document.querySelectorAll("#ov-runs .ov-run");
+  runs.forEach((r, i)=>{
+    // Default names follow the order; names typed by the user are left alone
+    const label = r.querySelector(".ov-label");
+    if(/^Pay run \d+$/.test(label.value)) label.value = "Pay run " + (i + 1);
+    const b = r.querySelector(".ov-rmrun");
+    b.disabled = runs.length <= 1;
+    b.title = b.disabled ? "At least one pay run is needed" : "Remove this pay run";
+  });
 }
 function addOvLine(run, l){
   const tr = document.createElement("tr");
@@ -1831,11 +1907,28 @@ function addOvLine(run, l){
     <td class="g"><input type="number" class="ov-hS" step="0.01" value="${v(l.hS)}"></td>
     <td class="mid"><input type="number" class="ov-aS" step="0.01" value="${v(l.aS)}"></td>
     <td class="num vh g"></td><td class="num va mid gend"></td>
-    <td><button type="button" class="rm" title="Remove line">×</button></td>`;
+    <td><button type="button" class="ov-act"></button></td>`;
   tr.querySelector(".ov-type").value = l.type || "ote";
   tr.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder); });
-  tr.querySelector(".rm").addEventListener("click", ()=>{ tr.remove(); calcOverUnder(); });
+  // First line's button adds a line (at the bottom); every other line's button removes it
+  tr.querySelector(".ov-act").addEventListener("click", e=>{
+    if(e.currentTarget.classList.contains("add")) addOvLine(run, {});
+    else tr.remove();
+    ovLineButtons(run);
+    calcOverUnder();
+  });
   run.querySelector(".ov-lines").appendChild(tr);
+  ovLineButtons(run);
+}
+function ovLineButtons(run){
+  const rows = [...run.querySelectorAll(".ov-lines tr")];
+  rows.forEach((tr, i)=>{
+    const b = tr.querySelector(".ov-act"), first = i === 0;
+    b.className = "ov-act " + (first ? "add" : "rm");
+    b.textContent = first ? "+" : "×";
+    b.title = first ? "Add a line" : "Remove this line";
+    b.setAttribute("aria-label", b.title);
+  });
 }
 
 function calcOverUnder(){
@@ -1910,7 +2003,6 @@ function calcOverUnder(){
   document.getElementById("ov-note").textContent = note;
 }
 document.getElementById("ov-periods").addEventListener("input", calcOverUnder);
-document.getElementById("ov-addRun").addEventListener("click", ()=>{ addOvRun(); calcOverUnder(); });
 document.getElementById("ov-loadSample").addEventListener("click", ()=>{
   document.getElementById("ov-runs").innerHTML = ""; ovRunCount = 0;
   addOvRun({label:"APR24 PAY", freq:"monthly", sg:11.5, taxP:3367, taxS:0, lines:[
@@ -2408,7 +2500,7 @@ function calcTermination(){
 
   /* ---------- render: withholding & STP ---------- */
   const line = (k, v, cls="", sub="") =>
-    `<div class="result-line${cls?" "+cls:""}"><span class="k">${k}${sub?`<small>${sub}</small>`:""}</span><span class="v">${v}</span></div>`;
+    `<div class="result-line${cls?" "+cls:""}"><span class="k">${k}${sub ? tipHtml(sub) : ""}</span><span class="v">${v}</span></div>`;
   const minus = v => v ? "−" + fmt(v) : fmt(0);
   const stpTag = t => `<span class="stp-tag">STP: ${t}</span>`;
   const block = (title, subtitle, body, stp) =>
@@ -2417,10 +2509,10 @@ function calcTermination(){
 
   const tiles = `
     <div class="tm-tiles">
-      <div class="tm-tile net"><div class="lbl">${isDeath ? "Net paid out" : "Net to employee"}</div><div class="amt">${fmt(totalNet)}</div></div>
       <div class="tm-tile"><div class="lbl">Total gross</div><div class="amt">${fmt(totalGross)}</div></div>
       <div class="tm-tile"><div class="lbl">Total withholding</div><div class="amt">${fmt(totalTax)}</div></div>
-      <div class="tm-tile"><div class="lbl">Super (to fund)</div><div class="amt">${fmt(totalSuper)}</div></div>
+      <div class="tm-tile"><div class="lbl">Super</div><div class="amt">${fmt(totalSuper)}</div></div>
+      <div class="tm-tile net"><div class="lbl">${isDeath ? "Net paid out" : "Net pay"}</div><div class="amt">${fmt(totalNet)}</div></div>
     </div>`;
 
   const superNote = superCapped ? `Limited by the maximum contribution base (${fmt(mcbLeft)})` : `On ${fmt(finalOte)} OTE · paid to fund, not to employee`;
@@ -2650,7 +2742,7 @@ function calcMcb(){
   `;
 }
 function line2(k, v, sub){
-  return `<div class="result-line"><span class="k">${k}${sub ? `<br><span style="font-size:11.5px; opacity:0.7;">${sub}</span>` : ""}</span><span class="v">${v}</span></div>`;
+  return `<div class="result-line"><span class="k">${k}${sub ? tipHtml(sub) : ""}</span><span class="v">${v}</span></div>`;
 }
 
 let mcbSource = "tfr";
