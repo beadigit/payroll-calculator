@@ -194,7 +194,7 @@
   :root[data-theme="dark"]{color-scheme:dark;}
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){color-scheme:dark;} }
   .row2{display:grid; grid-template-columns:1fr 1fr; column-gap:10px; row-gap:0;}
-  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; column-gap:10px; row-gap:0;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; column-gap:10px; row-gap:0; align-items: start;}
   /* Fields in a row share its height and sit at the bottom, so the controls line up even when one label wraps */
   .row2 > .field, .row3 > .field{display:flex; flex-direction:column; justify-content:flex-end;}
 
@@ -415,7 +415,8 @@
   .tm-ord-row{padding-bottom:6px; border-bottom:1px dashed var(--line); margin-bottom:8px;}
   .tm-total{background:var(--paper) !important; font-weight:700; cursor:default;}
   /* Automatic rate / total read as values (type over them to change) */
-  #tm-ordRate::placeholder, .tm-o-rate::placeholder, .tm-o-amount::placeholder{color:var(--ink); opacity:0.75;}
+  #tm-ordRate::placeholder, #tm-alRate::placeholder, .tm-l-rate::placeholder, .tm-l-amount::placeholder, .tm-o-rate::placeholder, .tm-o-amount::placeholder{color:var(--ink); opacity:0.75;}
+  .tm-leave-row{margin-bottom:6px;}
   .tm-other-row.head{font-size:11px; text-transform:uppercase; opacity:0.55; letter-spacing:0.03em; margin-bottom:4px;}
   .tm-other-row input, .tm-other-row select{padding:7px 6px; font-size:12.5px;}
   .tm-other-row input:disabled{opacity:0.35;}
@@ -437,12 +438,43 @@
   .tm-block .result-line.super{opacity:0.75; border-bottom:none;}
   .tm-block .empty{font-size:12.5px; opacity:0.55; padding:4px 0 10px;}
 
+  /* Date range field: Start date → End date */
+  .dr{display:flex; align-items:center; border:1px solid var(--field-line); border-radius:4px; background:var(--panel); min-width:0;}
+  .dr:focus-within{outline:2px solid var(--brand); outline-offset:1px;}
+  .dr input.dr-in{border:none !important; background:transparent !important; outline:none !important; flex:1 1 0; min-width:0; padding:7px 8px; font-size:13px; box-shadow:none;}
+  .dr input.dr-in:focus{box-shadow:inset 0 -2px 0 var(--brand) !important;}
+  .dr input.dr-in.invalid, .dr input.dr-in.range-invalid{color:var(--red); box-shadow:inset 0 -2px 0 var(--red) !important;}
+  .dr:has(.range-invalid), .dr:has(.invalid){border-color:var(--red); background:var(--red-dim);}
+  .dr-arrow{opacity:0.45; padding:0 2px; flex:0 0 auto;}
+  .dr-btn{background:none; border:none; color:var(--ink); opacity:0.6; padding:0 8px; line-height:0; cursor:pointer; flex:0 0 auto; height:100%;}
+  .dr-btn:hover{opacity:1;}
+  /* Calendar pop-up */
+  #calpop{position:fixed; z-index:60; background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,0.18); padding:10px 14px 12px; font-family:var(--sans);}
+  .cal-months{display:flex; gap:28px;}
+  .cal-head{display:flex; align-items:center; height:32px; margin-bottom:4px; border-bottom:1px solid var(--line);}
+  .cal-navs{flex:0 0 52px; display:flex; gap:2px;}
+  .cal-navs:last-child{justify-content:flex-end;}
+  .cal-title{flex:1; text-align:center; font-weight:700; font-size:13.5px;}
+  .cal-nav{background:none; border:none; color:var(--ink); opacity:0.45; font-size:16px; width:24px; height:24px; border-radius:4px; cursor:pointer; line-height:1;}
+  .cal-nav:hover{opacity:1; background:var(--paper);}
+  .cal-grid{display:grid; grid-template-columns:repeat(7, 36px); row-gap:2px; padding-top:4px;}
+  .cal-wd{font-size:12px; font-weight:600; text-align:center; padding:6px 0; opacity:0.75;}
+  .cal-day{height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px;}
+  .cal-day > span{width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:4px;}
+  .cal-day:hover > span{background:var(--paper);}
+  .cal-day.out{opacity:0.3;}
+  .cal-day.today > span{box-shadow:inset 0 0 0 1px var(--brand);}
+  .cal-day.in-range{background:var(--teal-dim);}
+  .cal-day.edge.start{background:linear-gradient(to right, transparent 50%, var(--teal-dim) 50%);}
+  .cal-day.edge.end{background:linear-gradient(to left, transparent 50%, var(--teal-dim) 50%);}
+  .cal-day.start > span, .cal-day.end > span, .cal-day.sel > span{background:var(--brand); color:var(--brand-ink); font-weight:700;}
   .date-wrap{position:relative;}
   .date-wrap input.date-au{padding-right:38px;}
   .date-wrap input.date-au.invalid, .date-wrap input.date-au.range-invalid{border-color:var(--red); outline-color:var(--red); background:var(--red-dim);}
   .date-wrap .date-btn{
     position:absolute; right:4px; top:50%; transform:translateY(-50%);
-    background:none; border:none; cursor:pointer; font-size:15px; padding:4px 6px; opacity:0.7;
+    background:none; border:none; cursor:pointer; padding:4px 6px; opacity:0.6; color:var(--ink);
+    display:flex; align-items:center; line-height:0;
   }
   .date-wrap .date-btn:hover{opacity:1;}
   .date-swap{display:none; font-size:11.5px; margin-top:4px; color:var(--amber);}
@@ -771,8 +803,7 @@
         <table class="mp-table">
           <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
           <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
-          <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
-          <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>Dates</td><td class="col-old"><div class="dr"><input type="text" class="date-au dr-in mp-in" data-f="from" data-c="old" placeholder="Start date" autocomplete="off" inputmode="numeric"><span class="dr-arrow">→</span><input type="text" class="date-au dr-in mp-in" data-f="to" data-c="old" placeholder="End date" autocomplete="off" inputmode="numeric"><button type="button" class="dr-btn" title="Pick the dates" aria-label="Pick the dates"></button></div></td><td class="col-new"><div class="dr"><input type="text" class="date-au dr-in mp-in" data-f="from" data-c="new" placeholder="Start date" autocomplete="off" inputmode="numeric"><span class="dr-arrow">→</span><input type="text" class="date-au dr-in mp-in" data-f="to" data-c="new" placeholder="End date" autocomplete="off" inputmode="numeric"><button type="button" class="dr-btn" title="Pick the dates" aria-label="Pick the dates"></button></div></td></tr>
           <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" step="0.25"></td></tr>
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
@@ -799,8 +830,7 @@
         <table class="mp-table">
           <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
           <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
-          <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
-          <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
+          <tr><td>Dates</td><td class="col-old"><div class="dr"><input type="text" class="date-au dr-in mp-in" data-f="from" data-c="old" placeholder="Start date" autocomplete="off" inputmode="numeric"><span class="dr-arrow">→</span><input type="text" class="date-au dr-in mp-in" data-f="to" data-c="old" placeholder="End date" autocomplete="off" inputmode="numeric"><button type="button" class="dr-btn" title="Pick the dates" aria-label="Pick the dates"></button></div></td><td class="col-new"><div class="dr"><input type="text" class="date-au dr-in mp-in" data-f="from" data-c="new" placeholder="Start date" autocomplete="off" inputmode="numeric"><span class="dr-arrow">→</span><input type="text" class="date-au dr-in mp-in" data-f="to" data-c="new" placeholder="End date" autocomplete="off" inputmode="numeric"><button type="button" class="dr-btn" title="Pick the dates" aria-label="Pick the dates"></button></div></td></tr>
           <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" step="0.25"></td></tr>
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
@@ -896,11 +926,13 @@
             </select>
           </div>
           <div class="field">
-            <label>Tax-free threshold claimed?</label>
+            <label>Tax scale</label>
             <select id="tm-scale">
-              <option value="2" selected>Yes — Scale 2</option>
-              <option value="1">No — Scale 1</option>
+              <option value="2" selected>Scale 2 — tax-free threshold claimed</option>
+              <option value="1">Scale 1 — no tax-free threshold</option>
+              <option value="stsl">STSL — enter PAYG manually</option>
             </select>
+            <div class="hint">Choose STSL when the employee has a study and training support loan (HELP, VSL, SSL, TSL). The calculator doesn't work out STSL, so you enter the final wages PAYG from Xero instead.</div>
           </div>
         </div>
         <div class="row3">
@@ -1006,22 +1038,37 @@
         <button class="btn ghost small" id="tm-addOther" type="button">+ Add pay item</button>
         <div class="hint" data-tip-for="#tm-otherHead">Everything paid in the final pay, taxed together using the tax table. Total = hours × rate; the rate starts at the employee's hourly rate (overtime 1.5×) and can be changed. For allowances and bonuses, type the total.</div>
 
-        <div class="row2" style="margin-top:16px;">
-          <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
-        </div>
-
-        <h3>Leave</h3>
-        <div class="row2">
-          <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" step="0.01"></div>
-          <div class="field">
-            <label>Add AL accrued on final period?</label>
-            <select id="tm-alAccrue">
-              <option value="no" selected>No — balance already includes it</option>
-              <option value="yes">Yes — ordinary hours ÷ 13</option>
-            </select>
+        <div id="tm-s5" style="display:none;">
+          <div class="row2" style="margin-top:12px;">
+            <div class="field">
+              <label>PAYG on bonus / commission ($)</label>
+              <input type="number" id="tm-bonusTax" step="1" placeholder="from Xero">
+              <div class="hint">Enter the PAYG Xero calculated for the bonus / commission. The rest of the final pay is taxed with the tax table, leaving the bonus out.</div>
+            </div>
           </div>
         </div>
-        <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
+
+        <div class="row2" id="tm-manualPaygRow" style="margin-top:16px; display:none;">
+          <div class="field">
+            <label>PAYG withheld on final wages ($)</label>
+            <input type="number" id="tm-manualPayg" step="1" placeholder="from Xero">
+            <div class="hint">Tax scale is STSL: enter the total PAYG Xero withheld on the final wages, including the STSL component and any bonus.</div>
+          </div>
+        </div>
+
+        <h3 id="tm-leaveHead">Leave</h3>
+        <div class="tm-other-row head"><span>Leave type</span><span>Hours</span><span>Rate ($)</span><span>Total ($)</span><span>Accrue?</span><span></span></div>
+        <div class="tm-other-row tm-ord-row">
+          <div class="tm-fixed">Annual leave (final pay)</div>
+          <input type="number" id="tm-alBal" step="any" placeholder="hrs">
+          <input type="number" id="tm-alRate" step="any">
+          <input type="text" id="tm-alTotal" class="tm-total" readonly tabindex="-1">
+          <select id="tm-alAccrue" title="Add the annual leave accrued on the final period's ordinary hours (hours ÷ 13)"><option value="no" selected>No</option><option value="yes">Yes</option></select>
+          <span></span>
+        </div>
+        <div id="tm-leaveRows"></div>
+        <button class="btn ghost small" id="tm-addLeave" type="button">+ Add leave</button>
+        <div class="hint" data-tip-for="#tm-leaveHead">Unused leave paid out on termination: hours × rate = total, with the rate starting at the employee's hourly rate. Accrue? Yes adds the annual leave accrued in the final period (ordinary hours ÷ 13) — choose No if the balance already includes it. Long service leave is assumed to have accrued after 15 August 1993. Unused leave isn't OTE, so no super applies.</div>
 
         <h3>Employment termination payment (ETP)</h3>
         <div class="row2">
@@ -1332,20 +1379,124 @@ function parseAnyDate(text){
 const dmy = p => pad2(p.d) + "/" + pad2(p.m) + "/" + p.y;
 const longDate = p => new Date(p.y, p.m-1, p.d).toLocaleDateString("en-AU", {day:"numeric", month:"long", year:"numeric"});
 
-document.querySelectorAll("input.date-au").forEach(input=>{
-  const wrap = document.createElement("div");
-  wrap.className = "date-wrap";
-  input.parentNode.insertBefore(wrap, input);
-  wrap.appendChild(input);
-  const picker = document.createElement("input");
-  picker.type = "date"; picker.tabIndex = -1; picker.className = "date-picker";
-  const btn = document.createElement("button");
-  btn.type = "button"; btn.className = "date-btn"; btn.title = "Pick a date"; btn.textContent = "📅";
-  wrap.append(picker, btn);
+const CAL_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/></svg>';
+
+/* ---------- calendar pop-up: one month for a single date, two months for a range ---------- */
+const calPop = document.createElement("div");
+calPop.id = "calpop"; calPop.hidden = true;
+document.body.appendChild(calPop);
+let calState = null;   // {mode, anchor, start, end, view, hover, onPick}
+const dayKey = d => d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+const sameDay = (a, b) => a && b && dayKey(a) === dayKey(b);
+function dateFromInput(el){
+  const iso = auToISO(el.value); if(!iso) return null;
+  const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d);
+}
+const CAL_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function openCal(opts){
+  const base = opts.start || opts.end || new Date();
+  calState = {...opts, hover:null, view:new Date(base.getFullYear(), base.getMonth(), 1)};
+  renderCal(); calPop.hidden = false; positionCal();
+}
+function closeCal(){ calPop.hidden = true; calState = null; }
+function positionCal(){
+  if(!calState) return;
+  const r = calState.anchor.getBoundingClientRect(), w = calPop.offsetWidth, h = calPop.offsetHeight;
+  const left = Math.max(8, Math.min(r.left, innerWidth - w - 8));
+  let top = r.bottom + 6;
+  if(top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;   // no room below — open above
+  calPop.style.left = left + "px"; calPop.style.top = top + "px";
+}
+function renderCal(){
+  const s = calState, months = s.mode === "range" ? 2 : 1, today = new Date();
+  let html = '<div class="cal-months">';
+  for(let i = 0; i < months; i++){
+    const v = new Date(s.view.getFullYear(), s.view.getMonth() + i, 1);
+    const first = i === 0, last = i === months - 1;
+    html += `<div class="cal-month"><div class="cal-head">
+      <span class="cal-navs">${first ? '<button type="button" class="cal-nav" data-nav="-12" title="Previous year">«</button><button type="button" class="cal-nav" data-nav="-1" title="Previous month">‹</button>' : ""}</span>
+      <span class="cal-title">${CAL_MONTHS[v.getMonth()]} ${v.getFullYear()}</span>
+      <span class="cal-navs">${last ? '<button type="button" class="cal-nav" data-nav="1" title="Next month">›</button><button type="button" class="cal-nav" data-nav="12" title="Next year">»</button>' : ""}</span>
+    </div><div class="cal-grid">${["Su","Mo","Tu","We","Th","Fr","Sa"].map(d=>`<span class="cal-wd">${d}</span>`).join("")}`;
+    const start = new Date(v.getFullYear(), v.getMonth(), 1 - v.getDay());
+    for(let c = 0; c < 42; c++){
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c);
+      const out = d.getMonth() !== v.getMonth();
+      const cls = ["cal-day"];
+      if(out) cls.push("out");
+      if(sameDay(d, today)) cls.push("today");
+      if(s.mode === "single" && sameDay(d, s.start)) cls.push("sel");
+      html += `<span class="${cls.join(" ")}" data-day="${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}"><span>${d.getDate()}</span></span>`;
+    }
+    html += "</div></div>";
+  }
+  calPop.innerHTML = html + "</div>";
+  calPop.className = "cal " + s.mode;
+  paintCal();
+}
+// Range highlight only changes classes on the existing cells. (Rebuilding the grid on hover would
+// replace the day under the mouse, so the browser would never register the click.)
+function paintCal(){
+  const s = calState;
+  if(!s || s.mode !== "range") return;
+  let lo = s.start, hi = s.end;
+  if(s.start && !s.end && s.hover){ lo = s.hover < s.start ? s.hover : s.start; hi = s.hover < s.start ? s.start : s.hover; }
+  calPop.querySelectorAll(".cal-day:not(.out)").forEach(cell=>{
+    const [y,m,d] = cell.dataset.day.split("-").map(Number), day = new Date(y, m-1, d);
+    const isLo = !!lo && sameDay(day, lo), isHi = !!hi && sameDay(day, hi);
+    cell.classList.toggle("start", isLo);
+    cell.classList.toggle("end", isHi);
+    cell.classList.toggle("in-range", !!(lo && hi && day > lo && day < hi));
+    cell.classList.toggle("edge", !!(lo && hi && !sameDay(lo, hi) && (isLo || isHi)));
+  });
+}
+calPop.addEventListener("mousedown", e=>e.preventDefault());   // keep focus in the date field
+calPop.addEventListener("click", e=>{
+  if(!calState) return;
+  const nav = e.target.closest("[data-nav]");
+  if(nav){ calState.view = new Date(calState.view.getFullYear(), calState.view.getMonth() + (+nav.dataset.nav), 1); renderCal(); return; }
+  const cell = e.target.closest("[data-day]"); if(!cell) return;
+  const [y,m,d] = cell.dataset.day.split("-").map(Number), day = new Date(y, m-1, d);
+  if(calState.mode === "single"){ const cb = calState.onPick; closeCal(); cb(day); return; }
+  if(!calState.start || calState.end){ calState.start = day; calState.end = null; calState.hover = null; paintCal(); return; }   // first click: start
+  let a = calState.start, b = day; if(b < a) [a, b] = [b, a];                                            // second click: end
+  const cb = calState.onPick; closeCal(); cb(a, b);
+});
+calPop.addEventListener("mouseover", e=>{
+  if(!calState || calState.mode !== "range" || !calState.start || calState.end) return;
+  const cell = e.target.closest("[data-day]"); if(!cell) return;
+  const [y,m,d] = cell.dataset.day.split("-").map(Number), day = new Date(y, m-1, d);
+  if(sameDay(day, calState.hover)) return;
+  calState.hover = day; paintCal();
+});
+document.addEventListener("mousedown", e=>{
+  if(calState && !calPop.contains(e.target) && !calState.anchor.contains(e.target)) closeCal();
+});
+document.addEventListener("keydown", e=>{ if(e.key === "Escape" && calState) closeCal(); });
+window.addEventListener("resize", positionCal);
+window.addEventListener("scroll", positionCal, true);
+
+/* ---------- typed date fields (dd/mm/yyyy) ---------- */
+function enhanceDateInput(input, withButton){
+  let after = input;
+  let btn = null;
+  if(withButton){
+    const wrap = document.createElement("div");
+    wrap.className = "date-wrap";
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "date-btn"; btn.title = "Pick a date"; btn.setAttribute("aria-label", "Pick a date");
+    btn.innerHTML = CAL_ICON;
+    wrap.append(btn);
+    after = wrap;
+  } else {
+    after = input.closest(".dr") || input;
+  }
   // Shown after pasting a date that reads both ways, e.g. 05/07/2026
   const swap = document.createElement("div");
   swap.className = "date-swap";
-  wrap.after(swap);
+  after.after(swap);
 
   const commit = () => {
     input.classList.remove("invalid");
@@ -1356,23 +1507,11 @@ document.querySelectorAll("input.date-au").forEach(input=>{
   const showSwap = (p) => {
     swap.innerHTML = `Read as <strong>${longDate(p)}</strong>. <button type="button">Meant ${longDate(p.alt)}?</button>`;
     swap.style.display = "block";
-    swap.querySelector("button").addEventListener("click", ()=>{
-      input.value = dmy(p.alt);
-      hideSwap();
-      commit();
-    });
+    swap.querySelector("button").addEventListener("click", ()=>{ input.value = dmy(p.alt); hideSwap(); commit(); });
   };
-
-  btn.addEventListener("click", ()=>{
-    picker.value = auToISO(input.value);
-    try{ picker.showPicker(); }catch(e){ picker.focus(); picker.click(); }
-  });
-  picker.addEventListener("change", ()=>{
-    if(!picker.value) return;
-    const [y,m,d] = picker.value.split("-");
-    input.value = d + "/" + m + "/" + y;
-    hideSwap();
-    commit();
+  if(btn) btn.addEventListener("click", ()=>{
+    if(calState && calState.anchor === after){ closeCal(); return; }
+    openCal({mode:"single", anchor:after, start:dateFromInput(input), onPick:d=>{ input.value = fmtDateAU(d); hideSwap(); commit(); }});
   });
   input.addEventListener("paste", e=>{
     const text = (e.clipboardData || window.clipboardData).getData("text");
@@ -1398,7 +1537,24 @@ document.querySelectorAll("input.date-au").forEach(input=>{
     }
     input.classList.toggle("invalid", input.value.trim() !== "" && !p);
   });
+}
+// Range fields: "Start date → End date" with a two-month calendar
+document.querySelectorAll(".dr").forEach(dr=>{
+  const [fromEl, toEl] = dr.querySelectorAll("input.dr-in");
+  const btn = dr.querySelector(".dr-btn");
+  btn.innerHTML = CAL_ICON;
+  const open = () => openCal({mode:"range", anchor:dr, start:dateFromInput(fromEl), end:dateFromInput(toEl), onPick:(a, b)=>{
+    fromEl.value = fmtDateAU(a); toEl.value = fmtDateAU(b);
+    [fromEl, toEl].forEach(el=>{ el.classList.remove("invalid"); el.dispatchEvent(new Event("input")); el.dispatchEvent(new Event("change")); });
+  }});
+  btn.addEventListener("click", ()=>{ if(calState && calState.anchor === dr) closeCal(); else open(); });
+  [fromEl, toEl].forEach(el=>{
+    el.addEventListener("focus", ()=>{ if(!calState || calState.anchor !== dr) open(); });
+    // Typing a date moves the calendar's highlight with it
+    el.addEventListener("input", ()=>{ if(calState && calState.anchor === dr){ calState.start = dateFromInput(fromEl); calState.end = dateFromInput(toEl); paintCal(); } });
+  });
 });
+document.querySelectorAll("input.date-au").forEach(input=>enhanceDateInput(input, !input.classList.contains("dr-in")));
 
 /* ---------------- "?" help tips for field notes ---------------- */
 const tipbox = document.createElement("div");
@@ -1455,7 +1611,7 @@ const MONEY_SEL = [
   "#pg-ytdNormal", "#pg-curNormal", "#pg-ytdAdditional", "#pg-ytdAdditionalTax", "#pg-currentAdditional",
   '#panel-variance .mp-in[data-f="amount"]',
   ".ov-aP", ".ov-aS", ".ov-taxP", ".ov-taxS", ".ov-supP", ".ov-supS",
-  "#tm-salary", "#tm-rate", "#tm-stsl", "#tm-exGratia", "#tm-noticeExtra", "#tm-normalGross", "#tm-s7Tax1", "#tm-s7Tax2",
+  "#tm-salary", "#tm-rate", "#tm-alRate", "#tm-alTotal", ".tm-l-rate", ".tm-l-amount", "#tm-bonusTax", "#tm-manualPayg", "#tm-exGratia", "#tm-noticeExtra", "#tm-normalGross", "#tm-s7Tax1", "#tm-s7Tax2",
   ".tm-o-amount", ".tm-o-rate", "#tm-ordRate", "#tm-ordTotal", ".tm-s7-run",
   "#mcb-amount", "#mcb-base", "#mcb-max", ".mcb-reg", ".mcb-add",
   "#nh-iAmount", "#nh-sAmount",
@@ -1774,56 +1930,22 @@ calcBase();
 document.getElementById("pg-freq").addEventListener("change", calcPayg);
 document.getElementById("pg-scale").addEventListener("change", calcPayg);
 
-function calcPayg(){
-  const freq = document.getElementById("pg-freq").value;
-  const scale = parseInt(document.getElementById("pg-scale").value, 10);
+// ATO Schedule 5 Method B(ii) — shared by the PAYG page and Termination
+function methodB2({freq, scale, ytdNormalBefore, curNormal, periodsToDate, ytdAdditionalPrior, ytdAdditionalTaxPrior, currentAdditional}){
   const periodsPerYear = PERIODS_PER_YEAR[freq];
-
-  const ytdNormalBefore = num("pg-ytdNormal");
-  const curNormal = num("pg-curNormal");
-  const periodsToDate = Math.max(1, num("pg-periodsToDate"));
-  const ytdAdditionalPrior = num("pg-ytdAdditional");
-  const ytdAdditionalTaxPrior = num("pg-ytdAdditionalTax");
-  const currentAdditional = num("pg-currentAdditional");
-
-  // Step 1: average total earnings
-  const totalNormalYtd = ytdNormalBefore + curNormal;
-  const avgTotalEarnings = Math.floor(totalNormalYtd / periodsToDate);
-
-  // Step 2: tax on average total earnings
-  const tax1 = periodWithholding(avgTotalEarnings, scale, freq);
-
-  // Step 3: additional payments averaged over pay periods in the year
-  const totalAdditionalYtd = ytdAdditionalPrior + currentAdditional;
-  const addPerPeriod = Math.floor(totalAdditionalYtd / periodsPerYear);
-
-  // Step 4: combined
-  const combined = avgTotalEarnings + addPerPeriod;
-
-  // Step 5: tax on combined
-  const tax2 = periodWithholding(combined, scale, freq);
-
-  // Step 6: difference
-  const diff = tax2 - tax1;
-
-  // Step 7: total withholding on additional payments YTD
-  const totalWithholdingOnAdditional = diff * periodsPerYear;
-
-  // Step 8: subtract prior withheld on additional payments (B(ii)) this FY
-  const netWithholding = totalWithholdingOnAdditional - ytdAdditionalTaxPrior;
-
-  // Step 9: 47% cap
-  const cap = currentAdditional * 0.47;
-
-  // Step 10: lesser of step 8 / step 9, floored, not negative
-  const finalAdditional = Math.max(0, Math.floor(Math.min(netWithholding, cap)));
-
-  // Step 11: tax on normal earnings this period
-  const normalTax = periodWithholding(curNormal, scale, freq);
-
-  // Step 12: total
-  const total = finalAdditional + normalTax;
-
+  periodsToDate = Math.max(1, periodsToDate || 0);
+  const avgTotalEarnings = Math.floor((ytdNormalBefore + curNormal) / periodsToDate);       // step 1
+  const tax1 = periodWithholding(avgTotalEarnings, scale, freq);                           // step 2
+  const addPerPeriod = Math.floor((ytdAdditionalPrior + currentAdditional) / periodsPerYear); // step 3
+  const combined = avgTotalEarnings + addPerPeriod;                                        // step 4
+  const tax2 = periodWithholding(combined, scale, freq);                                   // step 5
+  const diff = tax2 - tax1;                                                                // step 6
+  const totalWithholdingOnAdditional = diff * periodsPerYear;                              // step 7
+  const netWithholding = totalWithholdingOnAdditional - ytdAdditionalTaxPrior;             // step 8
+  const cap = currentAdditional * 0.47;                                                    // step 9
+  const finalAdditional = Math.max(0, Math.floor(Math.min(netWithholding, cap)));          // step 10
+  const normalTax = periodWithholding(curNormal, scale, freq);                             // step 11
+  const total = finalAdditional + normalTax;                                               // step 12
   const rows = [
     [1, "Average total earnings YTD (incl. this pay), ÷ pay periods to date", avgTotalEarnings],
     [2, "Withholding on average total earnings (step 1)", tax1],
@@ -1835,17 +1957,27 @@ function calcPayg(){
     [8, "Step 7 − PAYG already withheld on additional payments this FY", netWithholding],
     [9, "This period's additional payment × 47% (cap)", cap],
   ];
-
   let html = "<tr><th>#</th><th>Step</th><th>Result</th></tr>";
-  rows.forEach(r=>{
-    html += `<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="val">${fmt(r[2])}</td></tr>`;
-  });
+  rows.forEach(r=>{ html += `<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="val">${fmt(r[2])}</td></tr>`; });
   html += `<tr class="final"><td class="n">10</td><td>Lesser of step 8 &amp; step 9 — withholding on the additional payment</td><td class="val">${fmt(finalAdditional)}</td></tr>`;
   html += `<tr><td class="n">11</td><td>Withholding on normal earnings this period (excl. additional payment)</td><td class="val">${fmt(normalTax)}</td></tr>`;
   html += `<tr class="final"><td class="n">12</td><td>Total PAYG withholding this pay period (step 10 + step 11)</td><td class="val">${fmt(total)}</td></tr>`;
+  return {finalAdditional, normalTax, total, html};
+}
 
-  document.getElementById("pg-steps").innerHTML = html;
-  document.getElementById("pg-total").textContent = fmt(total);
+function calcPayg(){
+  const r = methodB2({
+    freq: document.getElementById("pg-freq").value,
+    scale: parseInt(document.getElementById("pg-scale").value, 10),
+    ytdNormalBefore: num("pg-ytdNormal"),
+    curNormal: num("pg-curNormal"),
+    periodsToDate: num("pg-periodsToDate"),
+    ytdAdditionalPrior: num("pg-ytdAdditional"),
+    ytdAdditionalTaxPrior: num("pg-ytdAdditionalTax"),
+    currentAdditional: num("pg-currentAdditional"),
+  });
+  document.getElementById("pg-steps").innerHTML = r.html;
+  document.getElementById("pg-total").textContent = fmt(r.total);
 }
 calcPayg();
 
@@ -2282,8 +2414,8 @@ function nesRedundancy(hired, last, smallBiz, casual){
 
 const TERM_INPUTS = ["tm-name","tm-dob","tm-hired","tm-last","tm-reason","tm-casual","tm-noticeDate","tm-noticeExtra",
  "tm-genuine","tm-smallBiz","tm-redWks","tm-certified","tm-retireDate","tm-deathTo",
- "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-ordRate","tm-ordSuper","tm-stsl",
- "tm-alBal","tm-alAccrue","tm-lslHrs","tm-normalGross","tm-s7Hours","tm-s7Tax1","tm-s7Tax2",
+ "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-ordRate","tm-ordSuper","tm-manualPayg","tm-bonusTax",
+ "tm-alBal","tm-alRate","tm-alAccrue","tm-normalGross","tm-s7Hours","tm-s7Tax1","tm-s7Tax2",
  "tm-noticeWks","tm-exGratia","tm-etpRate"];
 TERM_INPUTS.forEach(id=>{
   const el = document.getElementById(id);
@@ -2329,10 +2461,11 @@ const TM_SAMPLE = {
   "tm-ordHrs": "38",
   "tm-ordRate": "",
   "tm-ordSuper": "yes",
-  "tm-stsl": "0",
+  "tm-bonusTax": "",
+  "tm-manualPayg": "",
   "tm-alBal": "60.3073",
   "tm-alAccrue": "no",
-  "tm-lslHrs": "0",
+  "tm-alRate": "",
   "tm-noticeWks": "",
   "tm-exGratia": "0",
   "tm-noticeExtra": "0",
@@ -2341,6 +2474,7 @@ const TM_SAMPLE = {
 document.getElementById("tm-loadSample").addEventListener("click", ()=>{
   setTermType("normal");
   document.getElementById("tm-otherRows").innerHTML = "";
+  document.getElementById("tm-leaveRows").innerHTML = "";
   Object.entries(TM_SAMPLE).forEach(([id, v])=>{ document.getElementById(id).value = v; });
   calcTermination();
 });
@@ -2378,6 +2512,44 @@ function addOtherPay(type, hours, amount){
   document.getElementById("tm-otherRows").appendChild(row);
 }
 document.getElementById("tm-addOther").addEventListener("click", ()=>{ addOtherPay(); calcTermination(); });
+// Other leave paid out — same layout as the pay lines
+const TM_LEAVE_TYPES = {
+  lsl:     {label:"Long service leave", mult:1},
+  loading: {label:"Annual leave loading (17.5%)", mult:0.175},
+  other:   {label:"Other leave", mult:1},
+};
+function addLeave(type, hours){
+  const row = document.createElement("div");
+  row.className = "tm-other-row";
+  row.innerHTML = `
+    <select class="tm-l-type">${Object.entries(TM_LEAVE_TYPES).map(([k, t])=>`<option value="${k}">${t.label}</option>`).join("")}</select>
+    <input type="number" class="tm-l-hours" step="any" placeholder="hrs">
+    <input type="number" class="tm-l-rate" step="any">
+    <input type="number" class="tm-l-amount" step="0.01">
+    <span></span>
+    <button type="button" class="rm" title="Remove">×</button>`;
+  row.querySelector(".tm-l-type").value = type || "lsl";
+  if(hours !== undefined) row.querySelector(".tm-l-hours").value = hours;
+  row.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input", calcTermination); el.addEventListener("change", calcTermination); });
+  row.querySelector(".rm").addEventListener("click", ()=>{ row.remove(); calcTermination(); });
+  document.getElementById("tm-leaveRows").appendChild(row);
+}
+document.getElementById("tm-addLeave").addEventListener("click", ()=>{ addLeave(); calcTermination(); });
+function readLeave(hourlyRate){
+  return [...document.querySelectorAll("#tm-leaveRows .tm-other-row")].map(row=>{
+    const t = TM_LEAVE_TYPES[row.querySelector(".tm-l-type").value];
+    const hrsEl = row.querySelector(".tm-l-hours"), rateEl = row.querySelector(".tm-l-rate"), amtEl = row.querySelector(".tm-l-amount");
+    const defRate = hourlyRate * t.mult;
+    rateEl.placeholder = defRate ? defRate.toFixed(6) : "";
+    const hours = parseFloat(hrsEl.value) || 0;
+    const rate = rateEl.value !== "" ? parseFloat(rateEl.value) || 0 : defRate;
+    const calc = round2(hours * rate);
+    amtEl.placeholder = hours ? calc.toFixed(2) : "0.00";
+    const amount = amtEl.value !== "" ? parseFloat(amtEl.value) || 0 : calc;
+    return {type: row.querySelector(".tm-l-type").value, label:t.label, hours, rate, amount};
+  }).filter(l => l.amount);
+}
+
 // Hours × rate = total. The rate defaults to the hourly rate (× 1.5 for overtime); typing a total overrides it.
 function readOtherPay(hourlyRate){
   return [...document.querySelectorAll("#tm-otherRows .tm-other-row")].map(row=>{
@@ -2391,7 +2563,7 @@ function readOtherPay(hourlyRate){
     const calc = round2(hours * rate);
     amtEl.placeholder = hours ? calc.toFixed(2) : "0.00";
     const amount = amtEl.value !== "" ? parseFloat(amtEl.value) || 0 : (t.hours ? calc : 0);
-    return {label:t.label, hours, rate, amount, super: row.querySelector(".tm-o-super").value === "yes"};
+    return {type: row.querySelector(".tm-o-type").value, label:t.label, hours, rate, amount, super: row.querySelector(".tm-o-super").value === "yes"};
   }).filter(o => o.amount);
 }
 
@@ -2417,7 +2589,9 @@ function calcTermination(){
   const reason = document.getElementById("tm-reason").value;
   const casual = document.getElementById("tm-casual").value === "yes";
   const freq = document.getElementById("tm-freq").value;
-  const scale = parseInt(document.getElementById("tm-scale").value, 10);
+  const scaleSel = document.getElementById("tm-scale").value;
+  const manualPayg = scaleSel === "stsl";                 // PAYG on final wages entered from Xero (includes STSL)
+  const scale = scaleSel === "1" ? 1 : 2;                  // tax table for everything else (leave, Schedule 7)
   const periodsPerYear = PERIODS_PER_YEAR[freq];
   const stdHrs = num("tm-stdHrs");
   const sgRate = (document.getElementById("tm-sgRate").value === "" ? 12 : num("tm-sgRate"))/100;
@@ -2468,18 +2642,31 @@ function calcTermination(){
   const otherPay = readOtherPay(hourlyRate);
   const otherGross = round2(otherPay.reduce((a, o)=>a + o.amount, 0));
   const otherOte = otherPay.filter(o=>o.super).reduce((a, o)=>a + o.amount, 0);
-  const ordGross = round2(ordPay + otherGross);  // everything taxed with the tax table in the final pay
-  const ordPayg = isDeath ? 0 : periodWithholding(ordGross, scale, freq);
-  const stsl = isDeath ? 0 : num("tm-stsl");
-  const ordNet = ordGross - ordPayg - stsl;
+  const ordGross = round2(ordPay + otherGross);  // everything paid in the final pay
+  // Bonus / commission: PAYG entered from Xero; the rest of the final pay uses the tax table
+  const bonusGross = round2(otherPay.filter(o=>o.type === "bonus").reduce((a, o)=>a + o.amount, 0));
+  const hasBonus = bonusGross > 0 && !isDeath && !manualPayg;
+  document.getElementById("tm-s5").style.display = hasBonus ? "block" : "none";
+  const taxTableBase = hasBonus ? round2(ordGross - bonusGross) : ordGross;   // earnings taxed with the tax table
+  const tablePayg = isDeath ? 0 : periodWithholding(taxTableBase, scale, freq);
+  const bonusTaxRaw = document.getElementById("tm-bonusTax").value;
+  const bonusTax = hasBonus ? num("tm-bonusTax") : 0;
+  document.getElementById("tm-manualPaygRow").style.display = manualPayg && !isDeath ? "" : "none";
+  const manualPaygRaw = document.getElementById("tm-manualPayg").value;
+  const ordPayg = isDeath ? 0 : manualPayg ? num("tm-manualPayg") : tablePayg + bonusTax;
+  const ordNet = ordGross - ordPayg;
 
   // ---- Unused leave (AL accrual helper: ordinary hours ÷ 13 = 4 weeks per 52)
   const alAccrual = document.getElementById("tm-alAccrue").value === "yes" ? ordHrs / 13 : 0;
   const alHrs = num("tm-alBal") + alAccrual;
-  const alGross = round2(alHrs * hourlyRate);
-  const lslHrs = num("tm-lslHrs");
-  const lslGross = round2(lslHrs * hourlyRate);
-  const leaveGross = alGross + lslGross;
+  const alRateEl = document.getElementById("tm-alRate");
+  alRateEl.placeholder = hourlyRate ? hourlyRate.toFixed(6) : "";
+  const alRate = alRateEl.value !== "" ? num("tm-alRate") : hourlyRate;
+  const alGross = round2(alHrs * alRate);
+  const otherLeave = readLeave(hourlyRate);
+  const extraLeaveGross = round2(otherLeave.reduce((a, l)=>a + l.amount, 0));
+  document.getElementById("tm-alTotal").value = alHrs ? alGross.toFixed(2) : "";
+  const leaveGross = round2(alGross + extraLeaveGross);
 
   // Schedule 7 marginal-rate inputs
   const s7Mode = segVal("tm-s7mode");
@@ -2523,7 +2710,7 @@ function calcTermination(){
     leaveStp = "Lump Sum A · type R";
   } else if(smallLeave){
     // Under $300: add to the final pay and withhold with the tax table
-    leaveTax = Math.max(0, periodWithholding(ordGross + leaveGross, scale, freq) - ordPayg);
+    leaveTax = Math.max(0, periodWithholding(taxTableBase + leaveGross, scale, freq) - tablePayg);
     leaveMethod = `Under ${fmt(TERM.smallLeave)} — added to the final pay`;
     leaveStp = "Paid leave · type U";
   } else {
@@ -2531,9 +2718,8 @@ function calcTermination(){
     leaveMethod = "Marginal rates — Schedule 7";
     leaveStp = "Paid leave · type U";
   }
-  // Split leave tax between AL and LSL pro rata for display
+  // Split leave tax between the leave lines pro rata for display
   const alTax = leaveGross > 0 ? Math.round(leaveTax * alGross / leaveGross) : 0;
-  const lslTax = leaveTax - alTax;
   const leaveNet = leaveGross - leaveTax;
 
   // ---- Notice in lieu, redundancy pay, ex-gratia
@@ -2611,7 +2797,7 @@ function calcTermination(){
   const totalGross = round2(ordGross + leaveGross + taxFree + etpGross);
   const totalTax = ordPayg + leaveTax + etpTax;
   const totalSuper = ordSuper + noticeSuper;
-  const totalNet = round2(totalGross - totalTax - stsl);
+  const totalNet = round2(totalGross - totalTax);
 
   /* ---------- render: summary ---------- */
   const esc = s => s.replace(/[<>&"]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
@@ -2685,15 +2871,19 @@ function calcTermination(){
     line("Ordinary hours", fmt(ordPay), "", `${ordHrs.toFixed(4)} hrs × $${ordRate.toFixed(6)}`) +
     otherPay.map(o => line(o.label, fmt(o.amount), "", `${o.hours ? o.hours.toFixed(4) + " hrs × $" + o.rate.toFixed(6) + " · " : ""}${o.super ? "super applies" : "no super"}`)).join("") +
     (otherPay.length ? line("Gross final wages", fmt(ordGross)) : "") +
-    line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : "") +
-    (stsl ? line("STSL withheld", minus(stsl), "deduct") : "") +
+    (hasBonus
+      ? line("PAYG — tax table", minus(tablePayg), "deduct", `On ${fmt(taxTableBase)} normal earnings (bonus excluded)`) +
+        line("PAYG — bonus / commission", bonusTaxRaw === "" ? "Enter Xero's figure" : minus(bonusTax), "deduct", "Entered from Xero's calculation")
+      : manualPayg && !isDeath
+        ? line("PAYG withheld (incl. STSL)", manualPaygRaw === "" ? "Enter Xero's figure" : minus(ordPayg), "deduct", "Entered manually from Xero — includes the STSL component")
+        : line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : "")) +
     line("Net", fmt(ordNet), "net") +
     line(`Super (${(sgRate*100).toFixed(1)}%)`, fmt(ordSuper), "super", superNote),
     isDeath ? "Paid to estate" : "Gross (salary & wages)");
 
   const leaveBody = leaveGross > 0
-    ? line("Annual leave", fmt(alGross), "", `${alHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}${alAccrual ? ` · incl. ${alAccrual.toFixed(2)} hrs accrued` : ""}`) +
-      (lslGross ? line("Long service leave", fmt(lslGross), "", `${lslHrs.toFixed(2)} hrs × ${fmt(hourlyRate)}`) : "") +
+    ? line("Annual leave", fmt(alGross), "", `${alHrs.toFixed(4)} hrs × $${alRate.toFixed(6)}${alAccrual ? ` · incl. ${alAccrual.toFixed(4)} hrs accrued` : ""}`) +
+      otherLeave.map(l => line(l.label, fmt(l.amount), "", l.hours ? `${l.hours.toFixed(4)} hrs × $${l.rate.toFixed(6)}` : "")).join("") +
       line("PAYG withheld", minus(leaveTax), "deduct", leaveMode === "marginal" && !smallLeave ? "Schedule 7 — see working below" : leaveMethod) +
       line("Net", fmt(leaveNet), "net") +
       line("Super", fmt(0), "super", "Unused leave paid on termination isn't OTE")
