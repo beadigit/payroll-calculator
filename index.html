@@ -7,6 +7,7 @@
 <script>
   // Apply saved theme before first paint to avoid a flash
   try{ const t = localStorage.getItem("theme"); if(t==="light"||t==="dark") document.documentElement.dataset.theme = t; }catch(e){}
+  try{ if(localStorage.getItem("navCollapsed") === "1") document.documentElement.classList.add("nav-collapsed"); }catch(e){}
 </script>
 <style>
   :root{
@@ -24,6 +25,9 @@
     --rule:#132335;        /* heavy divider lines above totals */
     --divider:#c3ced8;     /* column group dividers in tables */
     --bubble:#f1f6f9;      /* column panels (mid-period old/new rate) */
+    --paid-hd:#f8d7d4; --paid-bg:#fdf1f0; --paid-ink:#9b2c2c;      /* over/underpayment panels */
+    --should-hd:#cdebd9; --should-bg:#eff9f3; --should-ink:#256c45;
+    --var-hd:#fbe2b4; --var-bg:#fff7e8; --var-ink:#8a5414;
     --bubble-line:#dde6ec;
     --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23132335' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     --line:#dde3e9;
@@ -46,6 +50,9 @@
       --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
       --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
       --rule:#4b5563; --divider:#4b5563; --bubble:#273444; --bubble-line:#374151;
+      --paid-hd:rgba(249,128,128,0.24); --paid-bg:rgba(249,128,128,0.07); --paid-ink:#fca5a5;
+      --should-hd:rgba(110,231,160,0.20); --should-bg:rgba(110,231,160,0.06); --should-ink:#86efac;
+      --var-hd:rgba(245,184,91,0.24); --var-bg:rgba(245,184,91,0.07); --var-ink:#fcd34d;
       --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     }
   }
@@ -56,6 +63,9 @@
     --teal:#38bdd8; --teal-dim:rgba(56,189,216,0.12); --amber:#f5b85b; --amber-dim:rgba(245,184,91,0.10);
     --red:#f98080; --red-dim:rgba(249,128,128,0.12); --green:#6ee7a0; --green-dim:rgba(110,231,160,0.10);
     --rule:#4b5563; --divider:#4b5563; --bubble:#273444; --bubble-line:#374151;
+      --paid-hd:rgba(249,128,128,0.24); --paid-bg:rgba(249,128,128,0.07); --paid-ink:#fca5a5;
+      --should-hd:rgba(110,231,160,0.20); --should-bg:rgba(110,231,160,0.06); --should-ink:#86efac;
+      --var-hd:rgba(245,184,91,0.24); --var-bg:rgba(245,184,91,0.07); --var-ink:#fcd34d;
       --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f9fafb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
   *{box-sizing:border-box;}
@@ -64,58 +74,82 @@
     font-family:var(--sans); font-size:15px; line-height:1.5;
   }
   .wrap{max-width:1360px; margin:0 auto; padding:28px 20px 80px;}
-  header.top{
-    display:flex; justify-content:space-between; align-items:flex-end;
-    gap:16px; margin-bottom:22px; flex-wrap:wrap;
-    background:var(--header); color:#fff; border-radius:8px; padding:22px 24px; border:1px solid var(--line);
-    border-top:3px solid var(--brand);
-  }
-  header.top h1{
-    font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; font-weight:700;
-  }
-  header.top p{margin:0; color:#fff; opacity:0.7; font-size:13px;}
   .fy-badge{
-    font-family:var(--mono); font-size:12px; background:rgba(48,176,203,0.16); color:var(--brand);
-    padding:5px 10px; border-radius:3px; white-space:nowrap;
+    font-family:var(--mono); font-size:11px; line-height:1.5; background:var(--teal-dim); color:var(--teal);
+    padding:7px 10px; border-radius:4px;
   }
-  .top-right{display:flex; gap:8px; align-items:center; align-self:flex-start; flex-wrap:wrap;}
-  .theme-toggle{
-    font-family:var(--sans); font-size:12px; font-weight:600; color:#fff;
-    background:transparent; border:1px solid rgba(255,255,255,0.3); border-radius:3px;
-    padding:4px 10px; cursor:pointer; white-space:nowrap;
-  }
-  .theme-toggle:hover{border-color:var(--brand); color:var(--brand);}
 
-  .layout{display:grid; grid-template-columns:230px minmax(0, 1fr); gap:28px; align-items:start;}
+  /* Left nav bar: full height; collapses to an icon rail */
+  :root{--nav-w:248px; --rail-w:68px;}
+  body{padding-left:var(--nav-w); transition:padding-left .25s ease;}
+  .nav-collapsed body{padding-left:var(--rail-w);}
+  .layout{display:block;}
   .sidenav{
-    position:sticky; top:20px; background:var(--panel); border:1px solid var(--line); border-radius:8px;
-    padding:8px 10px 12px;
+    position:fixed; top:0; left:0; bottom:0; width:var(--nav-w); z-index:40; overflow-x:hidden; overflow-y:auto;
+    display:flex; flex-direction:column; background:#132335; color:#e6edf3; padding:18px 12px 0;
+    transition:width .25s ease, transform .25s ease, box-shadow .25s ease;
   }
-  .nav-group + .nav-group{border-top:1px solid var(--line); margin-top:6px; padding-top:4px;}
-  .nav-cat{
-    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal);
-    padding:10px 10px 4px;
+  :root[data-theme="dark"] .sidenav{background:#0b1220; border-right:1px solid #1f2937;}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .sidenav{background:#0b1220; border-right:1px solid #1f2937;} }
+  .nav-collapsed .sidenav{width:var(--rail-w);}
+  .sidenav .lbl{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .nav-brand{display:flex; align-items:center; gap:10px; padding:0 6px 16px; margin-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.08);}
+  .nav-brand .mark{flex:0 0 32px; height:32px; border-radius:8px; background:var(--brand); color:#132335; display:flex; align-items:center; justify-content:center; font:800 12px/1 var(--sans); letter-spacing:0.02em;}
+  .nav-brand strong{font-size:15px; letter-spacing:-0.01em; color:#fff;}
+  .nav-brand strong span{color:var(--brand);}
+  .nav-group + .nav-group{border-top:1px solid rgba(255,255,255,0.08); margin-top:6px; padding-top:4px;}
+  .nav-cat{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.45); padding:10px 10px 4px; white-space:nowrap;}
+  .sidenav button.tab-btn{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:var(--sans); font-size:13.5px; font-weight:600;
+    color:rgba(255,255,255,0.72); background:none; border:none; border-left:3px solid transparent;
+    border-radius:0 6px 6px 0; padding:9px 10px; margin:1px 0; cursor:pointer;
   }
-  .sidenav button{
-    display:block; width:100%; text-align:left; font-family:var(--sans); font-size:13.5px; font-weight:600;
-    color:var(--ink); opacity:0.75; background:none; border:none; border-left:3px solid transparent;
-    border-radius:0 6px 6px 0; padding:8px 10px; margin:1px 0; cursor:pointer;
+  .sidenav .ico{flex:0 0 20px; width:20px; height:20px;}
+  .sidenav button.tab-btn:hover{color:#fff; background:rgba(255,255,255,0.06);}
+  .sidenav button.tab-btn.active{color:var(--brand); background:rgba(48,176,203,0.14); border-left-color:var(--brand);}
+  .nav-foot{margin-top:auto; padding:14px 0; border-top:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:10px;}
+  .nav-foot .fy-badge{background:rgba(48,176,203,0.12); color:var(--brand); white-space:normal;}
+  .theme-toggle{
+    display:flex; align-items:center; gap:12px; width:100%; font-family:var(--sans); font-size:13px; font-weight:600;
+    color:rgba(255,255,255,0.8); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px;
+    padding:9px 12px; cursor:pointer; text-align:left;
   }
-  .sidenav button:hover{opacity:1; background:var(--paper);}
-  .sidenav button.active{opacity:1; color:var(--teal); background:var(--teal-dim); border-left-color:var(--brand);}
-  .page-head{margin-bottom:18px;}
+  .theme-toggle:hover{color:#fff; border-color:var(--brand);}
+  .theme-toggle .ico-txt{flex:0 0 18px; text-align:center; font-size:14px;}
+  .nav-collapse{
+    margin:0 -12px; height:46px; flex:0 0 46px; border:none; border-top:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.05); color:#fff; font-size:22px; line-height:1; cursor:pointer;
+  }
+  .nav-collapse:hover{background:rgba(48,176,203,0.18); color:var(--brand);}
+  /* Collapsed rail: icons only (names show on hover) */
+  .nav-collapsed .sidenav .lbl, .nav-collapsed .sidenav .nav-cat{display:none;}
+  .nav-collapsed .sidenav button.tab-btn{justify-content:center; padding:10px 0; border-left-width:3px; border-radius:0 6px 6px 0;}
+  .nav-collapsed .nav-brand{justify-content:center; padding-left:0; padding-right:0;}
+  .nav-collapsed .theme-toggle{justify-content:center; padding:9px 0;}
+  .nav-collapsed .nav-group + .nav-group{margin-top:4px; padding-top:4px;}
+  .nav-toggle{
+    display:none; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--ink);
+    width:38px; height:38px; font-size:18px; line-height:1; cursor:pointer; flex:0 0 auto; margin-top:2px;
+  }
+  .nav-backdrop{display:none;}
+  /* Narrow screens: no rail — the full bar slides over the page from ☰ */
+  @media (max-width:900px){
+    body, .nav-collapsed body{padding-left:0;}
+    .nav-toggle{display:block;}
+    .sidenav, .nav-collapsed .sidenav{width:var(--nav-w); transform:translateX(-100%);}
+    .nav-collapsed .sidenav .lbl{display:inline;} .nav-collapsed .sidenav .nav-cat{display:block;}
+    .nav-collapsed .sidenav button.tab-btn{justify-content:flex-start; padding:9px 10px;}
+    .nav-collapsed .nav-brand{justify-content:flex-start; padding:0 6px 16px;}
+    .nav-collapsed .theme-toggle{justify-content:flex-start; padding:9px 12px;}
+    .nav-collapse{display:none;}
+    .nav-open .sidenav{transform:none; box-shadow:0 0 40px rgba(0,0,0,0.3);}
+    .nav-open .nav-backdrop{display:block; position:fixed; inset:0; z-index:35; background:rgba(17,24,39,0.45);}
+  }
+  .page-head{margin-bottom:18px; display:flex; gap:14px; align-items:flex-start;}
   .page-head .eyebrow{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal);}
   .page-head h2{font-size:22px; margin:2px 0 4px; letter-spacing:-0.01em;}
-  .page-head p{margin:0; font-size:13.5px; opacity:0.7; max-width:720px;}
-  @media (max-width:900px){
-    .layout{grid-template-columns:1fr; gap:16px;}
-    .sidenav{position:static; display:flex; gap:4px; overflow-x:auto; padding:6px;}
-    .nav-group{display:flex; align-items:center; flex-shrink:0;}
-    .nav-group + .nav-group{border-top:none; margin-top:0; padding-top:0; border-left:1px solid var(--line); padding-left:4px;}
-    .nav-cat{padding:0 6px; font-size:10px;}
-    .sidenav button{white-space:nowrap; border-left:none; border-radius:6px; border-bottom:2px solid transparent;}
-    .sidenav button.active{border-bottom-color:var(--brand);}
-  }
+  .page-head p{margin:0; font-size:13.5px; opacity:0.7;}
+  .page-head > div{flex:1 1 auto; min-width:0;}
 
   .panel{display:none;}
   .panel.active{display:block;}
@@ -248,14 +282,21 @@
   .btn.ghost{background:none; border:1px solid var(--line); color:var(--ink);}
   .btn.small{padding:6px 10px; font-size:12px;}
 
-  .mp-controls{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;}
-  .mp-controls .seg{min-width:260px;}
-  .mp-stack{display:flex; flex-direction:column; gap:20px;}
+  .mp-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 14px 12px 20px; margin-bottom:12px;}
+  .mp-bar-label{font-size:13.5px; font-weight:600;}
+  .mp-bar-right{display:flex; align-items:center; gap:10px;}
+  .seg.pill{border:none; background:var(--paper); padding:4px; border-radius:8px; gap:2px; min-height:0;}
+  .seg.pill button{border:none !important; border-radius:6px; padding:8px 16px; flex:0 0 auto; background:transparent; opacity:0.7;}
+  .seg.pill button.active{background:var(--brand); color:var(--brand-ink); opacity:1;}
+  .mp-card-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px;}
+  .mp-card-head h2{font-size:17px; margin:0;}
+  .mp-cols{font-size:12px; opacity:0.6;}
+  .mp-stack{display:flex; flex-direction:column; gap:12px;}
   .mp-stack .card + .card{margin-top:0;}
   .mp-card{min-width:0; overflow-x:auto;}
   .mp-table{
     width:calc(100% + 24px); margin:0 -12px; font-size:13px; min-width:560px;
-    border-collapse:separate; border-spacing:12px 0;   /* 12px gap between the description, old and new columns */
+    border-collapse:separate; border-spacing:12px 0; table-layout:fixed;   /* 12px gaps; fixed widths so the footer lines up with the panels */
   }
   .mp-table th:first-child, .mp-table td:first-child{width:28%;}
   .mp-table.single th:first-child, .mp-table.single td:first-child{width:40%;}
@@ -276,8 +317,14 @@
   .mp-table tr.pro td.col-old, .mp-table tr.pro td.col-new{background:var(--green-dim);}
   .mp-table tr.pro td:first-child{opacity:1;}
   .mp-table tr.gap td{padding:5px; border-bottom:none;}
-  .mp-foot{display:flex; gap:16px; align-items:flex-end; margin-top:16px; flex-wrap:wrap;}
-  .mp-foot .field{margin:0; flex:0 1 280px;}
+  /* Footer uses the same columns as the table above, so TOTAL spans exactly the old + new rate panels */
+  .mp-table.mp-foot{margin-top:12px;}
+  .mp-table.mp-foot td{border:none !important; background:none !important; padding:0 10px; vertical-align:bottom; opacity:1;}   /* same side padding as the rows above */
+  .mp-table.mp-foot td:first-child{padding-left:0;}
+  .mp-table.mp-foot td.span{padding:0;}
+  .mp-table.mp-foot tr.sizer td{height:0; padding-top:0; padding-bottom:0; line-height:0;}   /* same 3 columns as the panels, so widths match */
+  .mp-table.mp-foot td.span .mp-total{margin:0;}
+  .mp-table.mp-foot label{margin-bottom:4px;}
   .mp-total{
     flex:1 1 260px; display:flex; justify-content:space-between; align-items:center;
     height:calc(1.4 * 14px + 18px);   /* same height as a text box: line + padding + border */
@@ -304,27 +351,48 @@
   .ov-run-actions{display:flex; gap:6px; align-items:center; margin-left:auto;}
   .ov-rmrun{background:none; border:1px solid var(--line); border-radius:4px; color:var(--red); cursor:pointer; font-size:16px; line-height:1; width:32px; height:32px; padding:0;}
   .ov-rmrun:disabled{opacity:0.35; cursor:not-allowed;}
-  .ov-table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:860px;}
-  .ov-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; padding:5px 6px; text-align:center;}
-  .ov-table tr.grp th:first-child, .ov-table tr.grp th:nth-child(2){text-align:left; vertical-align:bottom;}
-  .ov-table th.c-paid{background:var(--red-dim); color:var(--red);}
-  .ov-table th.c-should{background:var(--green-dim); color:var(--green);}
-  .ov-table th.c-var{background:var(--teal-dim); color:var(--teal);}
-  .ov-table td{padding:3px 4px; border-bottom:1px dashed var(--line);}
+  /* Paid / Should be / Variance as separate rounded panels (gap columns between them) */
+  .ov-table{width:100%; border-collapse:separate; border-spacing:0; font-size:12.5px; min-width:980px; table-layout:fixed;}
+  .ov-table col.w-item{width:13%;} .ov-table col.w-type{width:18%;}
+  .ov-table col.w-data{width:auto;}              /* the six Hours/Amount columns share the rest equally */
+  .ov-table col.w-gap{width:12px;} .ov-table col.w-act{width:40px;}
+  .ov-table input, .ov-table select{min-width:0 !important; width:100%;}
+  .ov-lab-ctl{display:flex; align-items:center; gap:6px;}
+  .ov-lab-ctl > span:first-child{flex:0 0 46px;}
+  .ov-lab-ctl select{flex:1 1 0; font-weight:600; font-family:var(--sans); font-size:12px;}
+  .ov-pct{display:flex; align-items:center; gap:4px; flex:0 0 96px;}
+  .ov-pct input{text-align:right;} .ov-pct span{font-weight:600; opacity:0.7;}
+  .ov-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.03em; padding:6px 6px; text-align:center;}
+  .ov-table tr.grp th:first-child, .ov-table tr.grp th:nth-child(2){text-align:left; vertical-align:bottom; padding-left:2px;}
+  /* Paid = light red, Should be = light green, Variance = light yellow-orange; all six columns the same width */
+  .ov-table th.c-paid{background:var(--paid-hd); color:var(--paid-ink);}
+  .ov-table th.c-should{background:var(--should-hd); color:var(--should-ink);}
+  .ov-table th.c-var{background:var(--var-hd); color:var(--var-ink);}
+  .ov-table tr.sub th{font-size:10.5px; padding-top:0; opacity:0.85;}
+  .ov-table th.hd{border-radius:8px 8px 0 0; padding-top:9px;}
+  .ov-table td.b-paid, .ov-table tbody.ov-sum td.b-paid{background:var(--paid-bg) !important;}
+  .ov-table td.b-should, .ov-table tbody.ov-sum td.b-should{background:var(--should-bg) !important;}
+  .ov-table td.b-var, .ov-table tbody.ov-sum td.b-var{background:var(--var-bg) !important;}
+  .ov-table .gp{width:12px; min-width:12px; padding:0 !important; border:none !important; background:transparent !important;}
+  .ov-table td{padding:4px 5px; border-bottom:1px dashed var(--line);}
+  .ov-table td.b-paid, .ov-table td.b-should, .ov-table td.b-var{background:var(--bubble); border-bottom-color:var(--bubble-line);}
+  .ov-table td.mid, .ov-table th.mid{border-left:1px dashed var(--bubble-line);}
+  .ov-table td.b-paid input, .ov-table td.b-should input{background-color:var(--panel);}
   .ov-table input, .ov-table select{padding:5px 6px; font-size:12.5px;}
-  .ov-table input[type=number]{text-align:right; min-width:80px;}
+  .ov-table input[type=number], .ov-table input.money{text-align:right; min-width:80px;}
   .ov-table .ov-desc{min-width:140px; font-family:var(--sans);}
   .ov-table .ov-type{min-width:168px; font-family:var(--sans);}
   .ov-table td.num{font-family:var(--mono); text-align:right; white-space:nowrap; padding-right:8px; font-weight:600;}
   .ov-table .neg, .ov-totals .neg{color:var(--red);}
   .ov-table .pos, .ov-totals .pos{color:var(--green);}
-  .ov-table tbody.ov-sum td{background:var(--amber-dim); font-weight:700; border-bottom:1px solid var(--panel);}
+  /* Totals rows: bold, a rule above, variance amount highlighted; panels close with rounded corners */
+  .ov-table tbody.ov-sum td{font-weight:700;}
+  .ov-table tbody.ov-sum td.lab{padding-left:2px;}
   .ov-table tbody.ov-sum tr:first-child td{border-top:2px solid var(--rule);}
-  .ov-table tbody.ov-sum td.v{background:var(--teal-dim);}
-  /* Dividers: solid between Paid / Should be / Variance, dashed between hours and amount */
-  .ov-table .g{border-left:2px solid var(--divider); padding-left:8px;}
-  .ov-table .mid{border-left:1px dashed var(--divider); padding-left:8px;}
-  .ov-table .gend{border-right:2px solid var(--divider);}
+  .ov-table tbody.ov-sum td.b-paid, .ov-table tbody.ov-sum td.b-should, .ov-table tbody.ov-sum td.b-var{background:var(--bubble);}
+  .ov-table tbody.ov-sum tr:last-child td{border-bottom:none;}
+  .ov-table tbody.ov-sum tr:last-child td.b-paid:not(.mid), .ov-table tbody.ov-sum tr:last-child td.b-should:not(.mid), .ov-table tbody.ov-sum tr:last-child td.b-var:not(.mid){border-bottom-left-radius:8px;}
+  .ov-table tbody.ov-sum tr:last-child td.mid{border-bottom-right-radius:8px;}
   .ov-table button.ov-act{background:none; border:1px solid var(--line); border-radius:4px; cursor:pointer; height:28px; width:28px; font-size:15px; line-height:1; padding:0;}
   .ov-table button.ov-act.rm{color:var(--red);}
   .ov-table button.ov-act.add{color:var(--brand-ink); background:var(--brand); border-color:var(--brand); font-weight:700;}
@@ -464,55 +532,57 @@
 <body>
 <div class="wrap">
 
-  <header class="top">
-    <div>
-      <h1>Payroll Calculator</h1>
-      <p>Pay · Tax · Super · Termination · Onboarding</p>
-    </div>
-    <div class="top-right">
-      <div class="fy-badge">FY2026–27 tax tables · resident, Scale 1/2 only</div>
-      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
-    </div>
-  </header>
-
   <div class="layout">
-  <aside class="sidenav" aria-label="Calculators">
+  <div class="nav-backdrop" id="nav-backdrop"></div>
+  <aside class="sidenav" id="sidenav" aria-label="Calculators">
+    <div class="nav-brand">
+      <span class="mark">PC</span>
+      <strong class="lbl">Payroll <span>Calculator</span></strong>
+    </div>
     <div class="nav-group">
       <div class="nav-cat">Pay</div>
-      <button class="tab-btn active" data-tab="base" data-cat="Pay"
-        data-desc="Pay per period from an annual salary or hourly rate — full-time or part-time, super inclusive or exclusive.">Base pay</button>
-      <button class="tab-btn" data-tab="variance" data-cat="Pay"
-        data-desc="Pro-rata salary and allowances for part of a weekly, fortnightly or monthly pay period, split between an old and a new rate by work pattern.">Mid-period rate change</button>
-      <button class="tab-btn" data-tab="overpay" data-cat="Pay"
-        data-desc="Compare what was paid with what should have been paid, pay run by pay run — gross, tax, net and super.">Over/underpayments</button>
+      <button title="Base pay" class="tab-btn active" data-tab="base" data-cat="Pay"
+        data-desc="Pay per period from an annual salary or hourly rate — full-time or part-time, super inclusive or exclusive."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M16.5 14.5h2"/></svg><span class="lbl">Base pay</span></button>
+      <button title="Mid-period rate change" class="tab-btn" data-tab="variance" data-cat="Pay"
+        data-desc="Standard hours per pay period: weekly = hours per week · fortnightly = hours per week × 2 · monthly = hours per week × 52 ÷ 12. Pro-rata hours = standard hours × working days in the date range ÷ working days in the full pay period. Only the ticked work-pattern days count."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M9 15h6M13 13l2 2-2 2"/></svg><span class="lbl">Mid-period rate change</span></button>
+      <button title="Over/underpayments" class="tab-btn" data-tab="overpay" data-cat="Pay"
+        data-desc="For each affected pay run, enter what was paid and what it should have been, line by line. Variance = should be − paid, so &lt;strong&gt;brackets mean the employee was overpaid&lt;/strong&gt;. Tax: enter the amount from the payslip (paid) and from the &lt;a href=&quot;https://www.ato.gov.au/calculators-and-tools/tax-withheld-calculator&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ATO tax withheld calculator ↗&lt;/a&gt; (should be). Super is worked out at the super % unless you type the payslip figure."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M7 4L4 7M7 4l3 3"/><path d="M17 20V4M17 20l-3-3M17 20l3-3"/></svg><span class="lbl">Over/underpayments</span></button>
     </div>
     <div class="nav-group">
       <div class="nav-cat">Tax</div>
-      <button class="tab-btn" data-tab="payg" data-cat="Tax"
-        data-desc="PAYG withholding on back pay, bonuses and commissions using the ATO's Schedule 5 Method B(ii).">PAYG — Method B(ii)</button>
+      <button title="PAYG — Method B(ii)" class="tab-btn" data-tab="payg" data-cat="Tax"
+        data-desc="Implements the ATO&#x27;s Schedule 5 &lt;strong&gt;Method B(ii)&lt;/strong&gt; — for back payments relating to a prior financial year, or any commission/bonus/similar additional payment that doesn&#x27;t relate to a single pay period. Covers resident employees, &lt;strong&gt;Scale 1&lt;/strong&gt; (no tax-free threshold) and &lt;strong&gt;Scale 2&lt;/strong&gt; (tax-free threshold claimed) only — not foreign residents, no-TFN, Medicare levy exemptions, or STSL/HELP. Cross-check against the ATO&#x27;s own calculator before relying on this for a live pay run."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h12v19l-3-2-3 2-3-2-3 2z"/><path d="M9.5 9.5l5 5"/><circle cx="9.5" cy="14.5" r=".9"/><circle cx="14.5" cy="9.5" r=".9"/></svg><span class="lbl">PAYG — Method B(ii)</span></button>
     </div>
     <div class="nav-group">
       <div class="nav-cat">Super</div>
-      <button class="tab-btn" data-tab="mcb" data-cat="Super"
-        data-desc="Super Guarantee for each pay run, reduced once OTE reaches the maximum contribution base.">Max contribution base</button>
+      <button title="Max contribution base" class="tab-btn" data-tab="mcb" data-cat="Super"
+        data-desc="Super Guarantee is paid on each pay run&#x27;s ordinary time earnings (OTE) until the employee&#x27;s OTE for the financial year reaches the &lt;strong&gt;maximum contribution base&lt;/strong&gt;. In the pay run that crosses it, super is only due on the remaining amount; after that, no SG is required for the rest of the year. Only OTE counts — leave out overtime and other non-OTE payments."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span class="lbl">Max contribution base</span></button>
     </div>
     <div class="nav-group">
       <div class="nav-cat">Termination</div>
-      <button class="tab-btn" data-tab="term" data-cat="Termination"
-        data-desc="Final pay — wages, unused leave, redundancy and ETPs — with NES notice and STP reporting labels.">Termination pay</button>
+      <button title="Termination pay" class="tab-btn" data-tab="term" data-cat="Termination"
+        data-desc="Final pay — wages, unused leave, redundancy and ETPs — with NES notice and STP reporting labels."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/></svg><span class="lbl">Termination pay</span></button>
     </div>
     <div class="nav-group">
       <div class="nav-cat">Onboarding</div>
-      <button class="tab-btn" data-tab="nh" data-cat="Onboarding"
-        data-desc="Check a new starter's set-up against the client's instructions, including whether pay is inclusive or exclusive of super.">New hire check</button>
+      <button title="New hire check" class="tab-btn" data-tab="nh" data-cat="Onboarding"
+        data-desc="Upload the client&#x27;s instructions — offer letter, contract or email — and compare them with what&#x27;s been entered in Xero. Files are read &lt;strong&gt;in your browser only&lt;/strong&gt; and never uploaded anywhere. Reading is keyword-based, so always review the values it pulls out before relying on the result."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 11.5l1.8 1.8 3.4-3.6"/></svg><span class="lbl">New hire check</span></button>
     </div>
+    <div class="nav-foot">
+      <div class="fy-badge lbl">FY2026–27 tax tables<br>Resident · Scale 1/2 only</div>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"></button>
+    </div>
+    <button type="button" class="nav-collapse" id="nav-collapse" aria-label="Collapse the menu"></button>
   </aside>
 
   <main class="content">
   <div class="page-head">
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Show or hide the menu" aria-controls="sidenav">☰</button>
+    <div>
     <div class="eyebrow" id="page-cat">Pay</div>
     <h2 id="page-title">Base pay</h2>
     <p id="page-desc">Pay per period from an annual salary or hourly rate — full-time or part-time, super inclusive or exclusive.</p>
+    </div>
   </div>
 
   <!-- ============ BASE PAY ============ -->
@@ -555,7 +625,7 @@
         <div id="bp-annual-fields">
           <div class="field">
             <label>Full-time equivalent annual salary ($)</label>
-            <input type="number" id="bp-annualSalary" value="85000" step="0.01">
+            <input type="number" id="bp-annualSalary" step="0.01">
             <div class="hint">The salary this role would pay at full standard hours.</div>
           </div>
         </div>
@@ -563,18 +633,18 @@
         <div id="bp-hourly-fields" style="display:none;">
           <div class="field">
             <label>Hourly rate ($)</label>
-            <input type="number" id="bp-hourlyRate" value="42.50" step="0.01">
+            <input type="number" id="bp-hourlyRate" step="0.01">
           </div>
         </div>
 
         <div class="field">
           <label>Standard full-time hours / week</label>
-          <input type="number" id="bp-ftHours" value="38" step="0.25">
+          <input type="number" id="bp-ftHours" placeholder="38" step="0.25">
         </div>
 
         <div class="field" id="bp-pt-hours-field">
           <label>Contracted hours / week (this employee)</label>
-          <input type="number" id="bp-ptHours" value="22.8" step="0.25">
+          <input type="number" id="bp-ptHours" step="0.25">
           <div class="hint">Used to pro-rata the FTE salary, and to work out hours this pay period.</div>
         </div>
 
@@ -595,7 +665,7 @@
         </div>
         <div class="field">
           <label>Super Guarantee rate (%)</label>
-          <input type="number" id="bp-sgRate" value="12" step="0.1">
+          <input type="number" id="bp-sgRate" value="12" placeholder="12" step="0.1">
           <div class="hint">12% is the current SG rate from 1 July 2025 onwards.</div>
         </div>
 
@@ -611,9 +681,6 @@
 
   <!-- ============ PAYG METHOD B(ii) ============ -->
   <div class="panel" id="panel-payg">
-    <div class="note">
-      Implements the ATO's Schedule 5 <strong>Method B(ii)</strong> — for back payments relating to a prior financial year, or any commission/bonus/similar additional payment that doesn't relate to a single pay period. Covers resident employees, <strong>Scale 1</strong> (no tax-free threshold) and <strong>Scale 2</strong> (tax-free threshold claimed) only — not foreign residents, no-TFN, Medicare levy exemptions, or STSL/HELP. Cross-check against the ATO's own calculator before relying on this for a live pay run.
-    </div>
     <div class="grid">
       <div class="card">
         <h2>Inputs</h2>
@@ -640,31 +707,31 @@
         <h3>Year-to-date normal earnings</h3>
         <div class="field">
           <label>Normal earnings YTD, before this pay (excl. additional payments) ($)</label>
-          <input type="number" id="pg-ytdNormal" value="24000" step="0.01">
+          <input type="number" id="pg-ytdNormal" step="0.01">
         </div>
         <div class="row2">
           <div class="field">
             <label>This period's normal earnings (excl. additional) ($)</label>
-            <input type="number" id="pg-curNormal" value="3200" step="0.01">
+            <input type="number" id="pg-curNormal" step="0.01">
           </div>
           <div class="field">
             <label>Pay periods to date (incl. this one)</label>
-            <input type="number" id="pg-periodsToDate" value="8" step="1">
+            <input type="number" id="pg-periodsToDate" step="1">
           </div>
         </div>
 
         <h3>Additional payments this financial year</h3>
         <div class="field">
           <label>Prior additional payments this FY calculated under Method B(ii) ($)</label>
-          <input type="number" id="pg-ytdAdditional" value="0" step="0.01">
+          <input type="number" id="pg-ytdAdditional" step="0.01">
         </div>
         <div class="field">
           <label>PAYG already withheld on those prior additional payments ($)</label>
-          <input type="number" id="pg-ytdAdditionalTax" value="0" step="0.01">
+          <input type="number" id="pg-ytdAdditionalTax" step="0.01">
         </div>
         <div class="field">
           <label>Additional payment being made this pay period ($)</label>
-          <input type="number" id="pg-currentAdditional" value="2000" step="0.01">
+          <input type="number" id="pg-currentAdditional" step="0.01">
           <div class="hint">Back payment relating to a prior FY, commission, bonus, or similar — not tied to a single pay period.</div>
         </div>
       </div>
@@ -682,30 +749,25 @@
 
   <!-- ============ VARIANCE & ADJUSTMENTS ============ -->
   <div class="panel" id="panel-variance">
-    <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-        <div class="mp-controls">
-          <div class="field" style="margin:0;">
-            <label>Calculation</label>
-            <div class="seg" id="mp-mode">
-              <button class="active" data-val="change">Old → new rate</button>
-              <button data-val="single">Single rate</button>
-            </div>
-          </div>
-        </div>
+    <div class="card mp-bar">
+      <span class="mp-bar-label">Calculation method</span>
+      <div class="mp-bar-right">
         <button class="btn ghost small" id="mp-loadSample" type="button">Load sample</button>
+        <div class="seg pill" id="mp-mode">
+          <button class="active" data-val="change">Old → new rate</button>
+          <button data-val="single">Single rate</button>
+        </div>
       </div>
-      <div class="hint" id="mp-method" style="font-size:12px; opacity:0.65; margin-top:12px;"></div>
     </div>
     <div class="mp-stack">
       <div class="card mp-card" data-sec="nt">
-        <h2>Normal time</h2>
+        <div class="mp-card-head"><h2>Normal time</h2><span class="mp-cols">Old rate / New rate</span></div>
         <table class="mp-table">
           <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
           <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
           <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
           <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
-          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" value="38" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" value="38" step="0.25"></td></tr>
+          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" step="0.25"></td></tr>
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
           <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
@@ -716,21 +778,24 @@
           <tr class="calc"><td>Base hourly rate</td><td class="col-old num" data-o="rate" data-c="old"></td><td class="col-new num" data-o="rate" data-c="new"></td></tr>
           <tr class="pro"><td>PRO-RATA salary</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
         </table>
-        <div class="mp-foot">
-          <div class="field"><label>Processed for the period</label><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></div>
-          <div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div>
-        </div>
+        <table class="mp-table mp-foot">
+          <tr class="sizer"><td></td><td class="col-old"></td><td class="col-new"></td></tr>
+          <tr>
+            <td></td>
+            <td colspan="2" class="span"><div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div></td>
+          </tr>
+        </table>
         <div class="mp-warn"></div>
       </div>
 
       <div class="card mp-card" data-sec="al">
-        <h2>Allowance</h2>
+        <div class="mp-card-head"><h2>Allowance</h2><span class="mp-cols">Old rate / New rate</span></div>
         <table class="mp-table">
           <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
           <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
           <tr><td>From date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="from" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="from" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
           <tr><td>To date</td><td class="col-old"><input type="text" class="date-au mp-in" data-f="to" data-c="old" placeholder="dd/mm/yyyy"></td><td class="col-new"><input type="text" class="date-au mp-in" data-f="to" data-c="new" placeholder="dd/mm/yyyy"></td></tr>
-          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" value="38" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" value="38" step="0.25"></td></tr>
+          <tr><td>Hours per week</td><td class="col-old"><input type="number" class="mp-in" data-f="hours" data-c="old" step="0.25"></td><td class="col-new"><input type="number" class="mp-in" data-f="hours" data-c="new" step="0.25"></td></tr>
           <tr class="mp-pattern-row"><td>Work pattern</td><td class="col-old"><div class="mp-pattern" data-c="old"></div></td><td class="col-new"><div class="mp-pattern" data-c="new"></div></td></tr>
           <tr class="calc"><td>Standard hours <span class="mp-per">(per pay period)</span></td><td class="col-old num" data-o="std" data-c="old"></td><td class="col-new num" data-o="std" data-c="new"></td></tr>
           <tr class="calc"><td>Working days</td><td class="col-old num" data-o="days" data-c="old"></td><td class="col-new num" data-o="days" data-c="new"></td></tr>
@@ -743,11 +808,14 @@
           <tr class="calc"><td>Leave deduction</td><td class="col-old num neg" data-o="leaveAmt" data-c="old"></td><td class="col-new num neg" data-o="leaveAmt" data-c="new"></td></tr>
           <tr class="pro"><td>PRO-RATA allowance</td><td class="col-old num" data-o="pro" data-c="old"></td><td class="col-new num" data-o="pro" data-c="new"></td></tr>
         </table>
-        <div class="mp-foot">
-          <div class="field"><label>Processed for the period</label><input type="number" class="mp-in" data-f="processed" step="0.01" placeholder="0.00"></div>
-          <div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div>
-        </div>
-        <div class="hint" style="font-size:11.5px; opacity:0.6; margin-top:8px;">TOTAL = pro-rata allowance − leave taken − processed for the period. Leave taken is deducted at the hourly allowance rate.</div>
+        <table class="mp-table mp-foot">
+          <tr class="sizer"><td></td><td class="col-old"></td><td class="col-new"></td></tr>
+          <tr>
+            <td></td>
+            <td colspan="2" class="span"><div class="mp-total"><span>TOTAL</span><span class="amt" data-o="total"></span></div></td>
+          </tr>
+        </table>
+        <div class="hint" style="font-size:11.5px; opacity:0.6; margin-top:8px;">TOTAL = pro-rata allowance (old + new) − leave taken. Leave taken is deducted at the hourly allowance rate.</div>
         <div class="mp-warn"></div>
       </div>
     </div>
@@ -764,16 +832,11 @@
             <button class="btn ghost small" id="ov-loadSample" type="button">Load sample</button>
           </div>
         </div>
-        <div class="hint" style="font-size:12px; opacity:0.65; margin-bottom:14px;">
-          For each affected pay run, enter what was paid and what it should have been, line by line. Variance = should be − paid, so <strong>brackets mean the employee was overpaid</strong>.
-          Tax and super: leave blank to calculate (tax table / super %), or type the payslip figure. Cross-check tax with the
-          <a href="https://www.ato.gov.au/calculators-and-tools/tax-withheld-calculator" target="_blank" rel="noopener">ATO tax withheld calculator ↗</a>.
-        </div>
         <div id="ov-runs"></div>
         <div class="ov-bottom">
           <div>
             <h3>Recovery</h3>
-            <div class="field" style="max-width:260px;"><label>Pay periods to recover over</label><input type="number" id="ov-periods" value="1" step="1" min="1"></div>
+            <div class="field" style="max-width:260px;"><label>Pay periods to recover over</label><input type="number" id="ov-periods" placeholder="1" step="1" min="1"></div>
             <div id="ov-results"></div>
             <div class="note" id="ov-note"></div>
           </div>
@@ -835,11 +898,11 @@
           </div>
         </div>
         <div class="row3">
-          <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" value="38" step="0.25"></div>
-          <div class="field"><label>Annual salary ($)</label><input type="number" id="tm-salary" value="85000" step="0.01"></div>
+          <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" step="0.25"></div>
+          <div class="field"><label>Annual salary ($)</label><input type="number" id="tm-salary" step="0.01"></div>
           <div class="field"><label>Hourly rate ($)</label><input type="number" id="tm-rate" value="" step="0.0001" placeholder="from salary"></div>
         </div>
-        <div class="field"><label>Super Guarantee rate (%)</label><input type="number" id="tm-sgRate" value="12" step="0.1"></div>
+        <div class="field"><label>Super Guarantee rate (%)</label><input type="number" id="tm-sgRate" value="12" placeholder="12" step="0.1"></div>
       </div>
       <div class="card">
         <h2 id="tm-heading">Termination calculation</h2>
@@ -923,8 +986,8 @@
       <div class="card">
         <h2>Final pay period</h2>
         <div class="row2">
-          <div class="field"><label>Ordinary hours worked</label><input type="number" id="tm-ordHrs" value="76" step="0.25"></div>
-          <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" value="0" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
+          <div class="field"><label>Ordinary hours worked</label><input type="number" id="tm-ordHrs" step="0.25"></div>
+          <div class="field"><label>STSL withheld ($)</label><input type="number" id="tm-stsl" step="0.01"><div class="hint">Entered manually — not calculated.</div></div>
         </div>
 
         <h3 id="tm-otherHead">Other pay in this period</h3>
@@ -935,7 +998,7 @@
 
         <h3>Leave</h3>
         <div class="row2">
-          <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" value="64" step="0.01"></div>
+          <div class="field"><label>Annual leave balance (hours)</label><input type="number" id="tm-alBal" step="0.01"></div>
           <div class="field">
             <label>Add AL accrued on final period?</label>
             <select id="tm-alAccrue">
@@ -944,7 +1007,7 @@
             </select>
           </div>
         </div>
-        <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" value="0" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
+        <div class="field"><label>Long service leave (hours)</label><input type="number" id="tm-lslHrs" step="0.01"><div class="hint">Assumed accrued after 15 August 1993.</div></div>
 
         <h3>Employment termination payment (ETP)</h3>
         <div class="row2">
@@ -953,11 +1016,11 @@
             <input type="number" id="tm-noticeWks" value="" step="0.2" placeholder="NES minimum">
             <div class="hint">Blank = NES minimum. Enter the award/contract period if it's longer.</div>
           </div>
-          <div class="field"><label>Ex-gratia ($)</label><input type="number" id="tm-exGratia" value="0" step="0.01"></div>
+          <div class="field"><label>Ex-gratia ($)</label><input type="number" id="tm-exGratia" step="0.01"></div>
         </div>
         <div class="field">
           <label>Other weekly amounts in full rate of pay ($/week)</label>
-          <input type="number" id="tm-noticeExtra" value="0" step="0.01">
+          <input type="number" id="tm-noticeExtra" step="0.01">
           <div class="hint">Allowances, loadings, incentive payments, overtime/penalties the employee would normally have earned. Added to notice in lieu; super is applied to the base portion only.</div>
         </div>
         <div class="field">
@@ -1038,9 +1101,6 @@
 
   <!-- ============ SUPER — MAXIMUM CONTRIBUTION BASE ============ -->
   <div class="panel" id="panel-mcb">
-    <div class="note">
-      Super Guarantee is paid on each pay run's ordinary time earnings (OTE) until the employee's OTE for the financial year reaches the <strong>maximum contribution base</strong>. In the pay run that crosses it, super is only due on the remaining amount; after that, no SG is required for the rest of the year. Only OTE counts — leave out overtime and other non-OTE payments.
-    </div>
     <div class="grid">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -1048,17 +1108,17 @@
           <button class="btn ghost small" id="mcb-loadSample" type="button">Load sample</button>
         </div>
         <div class="row2">
-          <div class="field"><label>Total fixed remuneration ($)</label><input type="number" id="mcb-amount" value="325300" step="0.01"><div class="hint">Including super. Enter this or the base salary — the other is worked out at the SG rate.</div></div>
+          <div class="field"><label>Total fixed remuneration ($)</label><input type="number" id="mcb-amount" step="0.01"><div class="hint">Including super. Enter this or the base salary — the other is worked out at the SG rate.</div></div>
           <div class="field"><label>Base salary ($)</label><input type="number" id="mcb-base" step="0.01"><div class="hint">Excluding super. Enter this or the total fixed remuneration — the other is worked out at the SG rate.</div></div>
         </div>
         <div class="row2">
-          <div class="field"><label>SG rate (%)</label><input type="number" id="mcb-sgRate" value="12" step="0.1"></div>
-          <div class="field"><label>Standard hours / week</label><input type="number" id="mcb-hours" value="38" step="0.25"></div>
+          <div class="field"><label>SG rate (%)</label><input type="number" id="mcb-sgRate" value="12" placeholder="12" step="0.1"></div>
+          <div class="field"><label>Standard hours / week</label><input type="number" id="mcb-hours" step="0.25"></div>
         </div>
         <div class="row2">
           <div class="field">
             <label>Maximum contribution base ($)</label>
-            <input type="number" id="mcb-max" value="270830" step="1">
+            <input type="number" id="mcb-max" value="270830" placeholder="270830" step="1">
             <div class="hint">FY2026–27 annual limit.</div>
           </div>
           <div class="field">
@@ -1100,9 +1160,6 @@
 
   <!-- ============ NEW HIRE CHECK ============ -->
   <div class="panel" id="panel-nh">
-    <div class="note">
-      Upload the client's instructions — offer letter, contract or email — and compare them with what's been entered in Xero. Files are read <strong>in your browser only</strong> and never uploaded anywhere. Reading is keyword-based, so always review the values it pulls out before relying on the result.
-    </div>
     <div class="grid">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -1153,7 +1210,7 @@
             <tr>
               <td>Super rate (%)</td>
               <td><input type="number" id="nh-iSg" step="0.1" class="nh-i" placeholder="12"></td>
-              <td><input type="number" id="nh-sSg" step="0.1" value="12"></td>
+              <td><input type="number" id="nh-sSg" step="0.1"></td>
               <td id="nh-cSg"></td>
             </tr>
             <tr>
@@ -1376,6 +1433,58 @@ function tipHtml(text){
   return `<button type="button" class="tip" data-tip="${a}" aria-label="Help: ${a}">?</button>`;
 }
 
+/* ---------------- money fields: 1,234,567.89 ---------------- */
+// Dollar inputs show thousands separators. Their .value still returns a plain number string
+// ("85000.5"), so every calculation reads them exactly as before.
+const MONEY_SEL = [
+  "#bp-annualSalary", "#bp-hourlyRate",
+  "#pg-ytdNormal", "#pg-curNormal", "#pg-ytdAdditional", "#pg-ytdAdditionalTax", "#pg-currentAdditional",
+  '#panel-variance .mp-in[data-f="amount"]',
+  ".ov-aP", ".ov-aS", ".ov-taxP", ".ov-taxS", ".ov-supP", ".ov-supS",
+  "#tm-salary", "#tm-rate", "#tm-stsl", "#tm-exGratia", "#tm-noticeExtra", "#tm-normalGross", "#tm-s7Tax1", "#tm-s7Tax2",
+  ".tm-o-amount", ".tm-s7-run",
+  "#mcb-amount", "#mcb-base", "#mcb-max", ".mcb-reg", ".mcb-add",
+  "#nh-iAmount", "#nh-sAmount",
+].join(",");
+const nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+function withCommas(v){
+  let t = String(v ?? "").replace(/,/g, "").trim();
+  if(!/^-?\d*\.?\d*$/.test(t) || t === "" || t === "-" || t === ".") return t;
+  const neg = t.startsWith("-"); if(neg) t = t.slice(1);
+  let [int, dec] = t.split(".");
+  int = (int || "0").replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return (neg ? "-" : "") + int + (dec !== undefined ? "." + dec : "");
+}
+function makeMoney(el){
+  if(el.dataset.money) return;
+  el.dataset.money = "1";
+  const current = nativeValue.get.call(el);
+  el.type = "text"; el.inputMode = "decimal"; el.autocomplete = "off"; el.classList.add("money");
+  Object.defineProperty(el, "value", {
+    configurable: true,
+    get(){ return nativeValue.get.call(this).replace(/,/g, "").trim(); },
+    set(v){ nativeValue.set.call(this, withCommas(v)); },
+  });
+  el.value = current;
+  if(/^-?[\d.]+$/.test(el.placeholder)) el.placeholder = withCommas(el.placeholder);
+  // Only numbers, one point and a leading minus while typing; commas are added when leaving the box
+  el.addEventListener("input", ()=>{
+    const raw = nativeValue.get.call(el);
+    const clean = raw.replace(/[^\d.,-]/g, "").replace(/(?!^)-/g, "").replace(/(\..*)\./g, "$1");
+    if(clean !== raw) nativeValue.set.call(el, clean);
+  });
+  el.addEventListener("blur", ()=>{ el.value = el.value; });
+}
+document.querySelectorAll(MONEY_SEL).forEach(makeMoney);
+// Rows added later (pay runs, pay items, pay run table) get the same treatment
+new MutationObserver(muts=>{
+  muts.forEach(m=>m.addedNodes.forEach(n=>{
+    if(n.nodeType !== 1) return;
+    if(n.matches && n.matches(MONEY_SEL)) makeMoney(n);
+    n.querySelectorAll && n.querySelectorAll(MONEY_SEL).forEach(makeMoney);
+  }));
+}).observe(document.body, {childList:true, subtree:true});
+
 /* ---------------- helpers ---------------- */
 function fmt(v){
   const n = Number(v)||0;
@@ -1453,7 +1562,9 @@ function currentTheme(){
   return document.documentElement.dataset.theme || (darkQuery.matches ? "dark" : "light");
 }
 function renderThemeBtn(){
-  themeBtn.textContent = currentTheme() === "dark" ? "☀ Light" : "☾ Dark";
+  const dark = currentTheme() === "dark";
+  themeBtn.innerHTML = `<span class="ico-txt">${dark ? "☀" : "☾"}</span><span class="lbl">${dark ? "Light mode" : "Dark mode"}</span>`;
+  themeBtn.title = dark ? "Light mode" : "Dark mode";
 }
 themeBtn.addEventListener("click", ()=>{
   const next = currentTheme() === "dark" ? "light" : "dark";
@@ -1471,8 +1582,8 @@ function showTool(btn){
   btn.classList.add("active");
   document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
   document.getElementById("page-cat").textContent = btn.dataset.cat;
-  document.getElementById("page-title").textContent = btn.textContent;
-  document.getElementById("page-desc").textContent = btn.dataset.desc;
+  document.getElementById("page-title").textContent = btn.querySelector(".lbl").textContent;
+  document.getElementById("page-desc").innerHTML = btn.dataset.desc;
 }
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
@@ -1480,6 +1591,34 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     history.replaceState(null, "", "#" + btn.dataset.tab);
   });
 });
+// Nav bar: wide screens collapse/expand (remembered); narrow screens slide it over the page
+const narrowNav = () => window.matchMedia("(max-width:900px)").matches;
+function setNav(open){
+  const root = document.documentElement;
+  if(narrowNav()){
+    root.classList.toggle("nav-open", open);
+  } else {
+    root.classList.toggle("nav-collapsed", !open);
+    try{ localStorage.setItem("navCollapsed", open ? "0" : "1"); }catch(e){}
+  }
+}
+const navIsOpen = () => narrowNav() ? document.documentElement.classList.contains("nav-open") : !document.documentElement.classList.contains("nav-collapsed");
+document.getElementById("nav-toggle").addEventListener("click", ()=>{ setNav(!navIsOpen()); renderCollapseBtn(); });
+const collapseBtn = document.getElementById("nav-collapse");
+function renderCollapseBtn(){
+  const open = navIsOpen();
+  collapseBtn.innerHTML = open ? "‹" : "›";
+  collapseBtn.setAttribute("aria-label", open ? "Collapse the menu" : "Expand the menu");
+  collapseBtn.title = open ? "Collapse" : "Expand";
+}
+collapseBtn.addEventListener("click", ()=>{ setNav(!navIsOpen()); renderCollapseBtn(); });
+window.addEventListener("resize", renderCollapseBtn);
+document.getElementById("nav-backdrop").addEventListener("click", ()=>setNav(false));
+document.addEventListener("keydown", e=>{ if(e.key === "Escape" && narrowNav() && navIsOpen()) setNav(false); });
+document.querySelectorAll(".sidenav .tab-btn").forEach(b=>b.addEventListener("click", ()=>{ if(narrowNav()) setNav(false); }));
+
+renderCollapseBtn();
+
 // Open the tool named in the address (e.g. index.html#term) so a link goes straight to it
 const startTool = document.querySelector(`.tab-btn[data-tab="${location.hash.slice(1)}"]`);
 if(startTool) showTool(startTool);
@@ -1519,7 +1658,7 @@ function calcBase(){
   const superMode = segVal("bp-superMode");
   const ftHours = num("bp-ftHours") || 38;
   const ptHours = num("bp-ptHours") || ftHours;
-  const sgRate = (num("bp-sgRate")||12)/100;
+  const sgRate = (document.getElementById("bp-sgRate").value === "" ? 12 : num("bp-sgRate"))/100;
 
   document.getElementById("bp-pt-hours-field").style.display = empType==="pt" ? "block":"none";
   const contractedHours = empType === "pt" ? ptHours : ftHours;
@@ -1751,13 +1890,10 @@ function mpColumn(card, c){
   res.pro = round2(res.proHrs * rate);  // leave taken is deducted in the TOTAL
   return res;
 }
-const MP_METHOD = "Standard hours per pay period: weekly = hours per week · fortnightly = hours per week × 2 · monthly = hours per week × 52 ÷ 12. " +
-  "Pro-rata hours = standard hours × working days in the date range ÷ working days in the full pay period (the week, the fortnight, or that calendar month). Only the ticked work-pattern days count.";
 function calcProrata(){
   const single = segVal("mp-mode") === "single";
-  document.getElementById("mp-method").textContent = MP_METHOD + " " +
-    (single ? "TOTAL = pro-rata amount − the amount already processed for the period." : "TOTAL = old + new − the amount already processed for the period.");
   document.querySelectorAll("#panel-variance .mp-table").forEach(t=>t.classList.toggle("single", single));
+  document.querySelectorAll("#panel-variance .mp-cols").forEach(el=>{ el.textContent = single ? "Single rate" : "Old rate / New rate"; });
   document.querySelectorAll("#panel-variance .col-new").forEach(el=>{ el.style.display = single ? "none" : ""; });
   document.querySelectorAll("#panel-variance td.span").forEach(el=>{ el.colSpan = single ? 1 : 2; });
   document.querySelectorAll("#panel-variance th.col-old").forEach(el=>{ el.textContent = single ? "Rate" : "Old rate"; });
@@ -1791,8 +1927,7 @@ function calcProrata(){
       const shown = [oldFrom, oldTo].filter(Boolean).map(fmtDateAU).join(" – ");
       warns.unshift(`New rate dates must be after the old rate dates. The old rate runs ${shown}, so the new rate should start on ${fmtDateAU(new Date(oldEnd.getFullYear(), oldEnd.getMonth(), oldEnd.getDate() + 1))} or later.`);
     }
-    const processed = parseFloat(card.querySelector('.mp-in[data-f="processed"]').value) || 0;
-    total = round2(total - processed);
+    total = round2(total);
     card.querySelector('[data-o="total"]').textContent = badFrom || badTo ? "Check dates" : fmt(total);
     card.querySelector(".mp-warn").innerHTML = warns.map(w=>`<div class="warn">${w}</div>`).join("");
   });
@@ -1805,15 +1940,14 @@ function mpFill(sec, c, v){
   const card = document.querySelector(`#panel-variance .mp-card[data-sec="${sec}"]`);
   Object.entries(v).forEach(([k, val])=>{
     if(k === "pattern") card.querySelectorAll(`.mp-pattern[data-c="${c}"] input`).forEach(i=>{ i.checked = val.includes(+i.dataset.d); });
-    else if(k === "processed") card.querySelector('.mp-in[data-f="processed"]').value = val;
     else if(k !== "rate") card.querySelector(`.mp-in[data-f="${k}"][data-c="${c}"]`).value = val;
   });
 }
 function mpLoadSample(){
   document.querySelectorAll("#mp-mode button").forEach(b=>b.classList.toggle("active", b.dataset.val === "change"));
-  mpFill("nt", "old", {freq:"monthly", from:"19/08/2024", to:"31/08/2024", hours:32, pattern:[1,2,4,5], amount:56936.94, processed:4744.75});
+  mpFill("nt", "old", {freq:"monthly", from:"19/08/2024", to:"31/08/2024", hours:32, pattern:[1,2,4,5], amount:56936.94});
   mpFill("nt", "new", {freq:"monthly", from:"01/09/2024", to:"30/09/2024", hours:40, pattern:[1,2,3,4,5], amount:62155.86});
-  mpFill("al", "old", {freq:"monthly", from:"01/03/2024", to:"15/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1126.13, leave:"", processed:1126.13});
+  mpFill("al", "old", {freq:"monthly", from:"01/03/2024", to:"15/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1126.13, leave:""});
   mpFill("al", "new", {freq:"monthly", from:"18/03/2024", to:"31/03/2024", hours:40, pattern:[1,2,3,4,5], amount:1885.37, leave:8});
   calcProrata();
 }
@@ -1842,10 +1976,6 @@ function addOvRun(data = {}, after = null){
   run.innerHTML = `
     <div class="ov-run-head">
       <input type="text" class="ov-label" placeholder="Pay run, e.g. APR24 PAY" value="${ovEsc(data.label || "Pay run " + ovRunCount)}">
-      <label>Frequency <select class="ov-freq">
-        <option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></label>
-      <label>Tax scale <select class="ov-scale"><option value="2">2 — TFT claimed</option><option value="1">1 — no TFT</option></select></label>
-      <label>Super % <input type="number" class="ov-sg" step="0.1" value="${data.sg ?? 12}"></label>
       <div class="ov-run-actions">
         <button type="button" class="btn small ov-addrun">+ Add pay run</button>
         <button type="button" class="ov-rmrun" title="Remove this pay run" aria-label="Remove this pay run">×</button>
@@ -1853,25 +1983,31 @@ function addOvRun(data = {}, after = null){
     </div>
     <div style="overflow-x:auto;">
     <table class="ov-table">
+      <colgroup>
+        <col class="w-item"><col class="w-type"><col class="w-gap">
+        <col class="w-data"><col class="w-data"><col class="w-gap">
+        <col class="w-data"><col class="w-data"><col class="w-gap">
+        <col class="w-data"><col class="w-data"><col class="w-gap"><col class="w-act">
+      </colgroup>
       <thead>
-        <tr class="grp"><th rowspan="2">Pay item</th><th rowspan="2">Type</th>
-          <th colspan="2" class="c-paid g">Paid</th><th colspan="2" class="c-should g">Should be</th><th colspan="2" class="c-var g gend">Variance</th><th rowspan="2"></th></tr>
-        <tr class="sub"><th class="c-paid g">Hours</th><th class="c-paid mid">Amount</th><th class="c-should g">Hours</th><th class="c-should mid">Amount</th><th class="c-var g">Hours</th><th class="c-var mid gend">Amount</th></tr>
+        <tr class="grp"><th rowspan="2">Pay item</th><th rowspan="2">Type</th><th class="gp" rowspan="2"></th>
+          <th colspan="2" class="c-paid hd">Paid</th><th class="gp" rowspan="2"></th><th colspan="2" class="c-should hd">Should be</th><th class="gp" rowspan="2"></th><th colspan="2" class="c-var hd">Variance</th><th class="gp" rowspan="2"></th><th rowspan="2"></th></tr>
+        <tr class="sub"><th class="c-paid">Hours</th><th class="c-paid mid">Amount</th><th class="c-should">Hours</th><th class="c-should mid">Amount</th><th class="c-var">Hours</th><th class="c-var mid">Amount</th></tr>
       </thead>
       <tbody class="ov-lines"></tbody>
       <tbody class="ov-sum">
-        <tr data-k="gross"><td colspan="2">Gross</td><td class="g"></td><td class="num p mid"></td><td class="g"></td><td class="num s mid"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
-        <tr data-k="tax"><td colspan="2">Tax</td><td class="g"></td><td class="mid"><input type="number" class="ov-taxP" step="1"></td><td class="g"></td><td class="mid"><input type="number" class="ov-taxS" step="1"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
-        <tr data-k="net"><td colspan="2">Net</td><td class="g"></td><td class="num p mid"></td><td class="g"></td><td class="num s mid"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
-        <tr data-k="super"><td colspan="2">Super</td><td class="g"></td><td class="mid"><input type="number" class="ov-supP" step="0.01"></td><td class="g"></td><td class="mid"><input type="number" class="ov-supS" step="0.01"></td><td class="g"></td><td class="num v mid gend"></td><td></td></tr>
+        <tr data-k="gross"><td colspan="2" class="lab">Gross</td><td class="gp"></td><td class="b-paid"></td><td class="num p b-paid mid"></td><td class="gp"></td><td class="b-should"></td><td class="num s b-should mid"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
+        <tr data-k="tax"><td colspan="2" class="lab"><div class="ov-lab-ctl"><span>Tax</span>
+          <select class="ov-scale" title="Tax scale — use the same scale in the ATO tax withheld calculator"><option value="2" title="Tax-free threshold claimed">Scale 2 (TFT claimed)</option><option value="1" title="No tax-free threshold">Scale 1 (no TFT)</option></select></div></td><td class="gp"></td><td class="b-paid"></td><td class="b-paid mid"><input type="number" class="ov-taxP" step="1" placeholder="from payslip"></td><td class="gp"></td><td class="b-should"></td><td class="b-should mid"><input type="number" class="ov-taxS" step="1" placeholder="from ATO calc"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
+        <tr data-k="net"><td colspan="2" class="lab">Net</td><td class="gp"></td><td class="b-paid"></td><td class="num p b-paid mid"></td><td class="gp"></td><td class="b-should"></td><td class="num s b-should mid"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
+        <tr data-k="super"><td colspan="2" class="lab"><div class="ov-lab-ctl"><span>Super</span>
+          <span class="ov-pct"><input type="number" class="ov-sg" step="0.1" placeholder="12" value="${data.sg ?? 12}" title="Super rate"><span>%</span></span></div></td><td class="gp"></td><td class="b-paid"></td><td class="b-paid mid"><input type="number" class="ov-supP" step="0.01"></td><td class="gp"></td><td class="b-should"></td><td class="b-should mid"><input type="number" class="ov-supS" step="0.01"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
       </tbody>
     </table>
     </div>`;
-  run.querySelector(".ov-freq").value = data.freq || "fortnightly";
-  run.querySelector(".ov-scale").value = data.scale || "2";
   if(data.taxP !== undefined) run.querySelector(".ov-taxP").value = data.taxP;
   if(data.taxS !== undefined) run.querySelector(".ov-taxS").value = data.taxS;
-  run.querySelectorAll(".ov-run-head input, .ov-run-head select, .ov-sum input").forEach(el=>{
+  run.querySelectorAll(".ov-run-head input, .ov-sum input, .ov-sum select").forEach(el=>{
     el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder);
   });
   run.querySelector(".ov-rmrun").addEventListener("click", ()=>{
@@ -1882,7 +2018,8 @@ function addOvRun(data = {}, after = null){
   run.querySelector(".ov-addrun").addEventListener("click", ()=>{ addOvRun({}, run); calcOverUnder(); });
   if(after) after.after(run); else document.getElementById("ov-runs").appendChild(run);
   ovRunButtons();
-  (data.lines || [{desc:"Ordinary hours", type:"ote"}]).forEach(l => addOvLine(run, l));
+  run.querySelector(".ov-scale").value = data.scale || "2";
+  (data.lines || [{type:"ote"}]).forEach(l => addOvLine(run, l));
   return run;
 }
 function ovRunButtons(){
@@ -1902,11 +2039,15 @@ function addOvLine(run, l){
   tr.innerHTML = `
     <td><input type="text" class="ov-desc" placeholder="e.g. Annual leave" value="${ovEsc(v(l.desc))}"></td>
     <td><select class="ov-type">${Object.entries(OV_TYPES).map(([k, t])=>`<option value="${k}">${t}</option>`).join("")}</select></td>
-    <td class="g"><input type="number" class="ov-hP" step="0.01" value="${v(l.hP)}"></td>
-    <td class="mid"><input type="number" class="ov-aP" step="0.01" value="${v(l.aP)}"></td>
-    <td class="g"><input type="number" class="ov-hS" step="0.01" value="${v(l.hS)}"></td>
-    <td class="mid"><input type="number" class="ov-aS" step="0.01" value="${v(l.aS)}"></td>
-    <td class="num vh g"></td><td class="num va mid gend"></td>
+    <td class="gp"></td>
+    <td class="b-paid"><input type="number" class="ov-hP" step="0.01" value="${v(l.hP)}"></td>
+    <td class="b-paid mid"><input type="number" class="ov-aP" step="0.01" value="${v(l.aP)}"></td>
+    <td class="gp"></td>
+    <td class="b-should"><input type="number" class="ov-hS" step="0.01" value="${v(l.hS)}"></td>
+    <td class="b-should mid"><input type="number" class="ov-aS" step="0.01" value="${v(l.aS)}"></td>
+    <td class="gp"></td>
+    <td class="num vh b-var"></td><td class="num va b-var mid"></td>
+    <td class="gp"></td>
     <td><button type="button" class="ov-act"></button></td>`;
   tr.querySelector(".ov-type").value = l.type || "ote";
   tr.querySelectorAll("input,select").forEach(el=>{ el.addEventListener("input", calcOverUnder); el.addEventListener("change", calcOverUnder); });
@@ -1935,9 +2076,8 @@ function calcOverUnder(){
   const val = el => parseFloat(el.value) || 0;
   const tot = {gross:[0,0], tax:[0,0], net:[0,0], super:[0,0]};
   document.querySelectorAll("#ov-runs .ov-run").forEach(run=>{
-    const freq = run.querySelector(".ov-freq").value;
-    const scale = parseInt(run.querySelector(".ov-scale").value, 10);
-    const sg = val(run.querySelector(".ov-sg")) / 100;
+    const sgEl = run.querySelector(".ov-sg");
+    const sg = (sgEl.value === "" ? 12 : val(sgEl)) / 100;
     const side = {p:{gross:0, ote:0, adj:0}, s:{gross:0, ote:0, adj:0}};
     run.querySelectorAll(".ov-lines tr").forEach(tr=>{
       const type = tr.querySelector(".ov-type").value;
@@ -1951,17 +2091,16 @@ function calcOverUnder(){
       });
       tr.querySelector(".vh").textContent = fmtAcc(hS - hP);
       tr.querySelector(".va").textContent = fmtAcc(aS - aP);
-      tr.querySelector(".va").className = "num va mid gend" + (aS - aP < -0.005 ? " neg" : aS - aP > 0.005 ? " pos" : "");
+      tr.querySelector(".va").className = "num va b-var mid" + (aS - aP < -0.005 ? " neg" : aS - aP > 0.005 ? " pos" : "");
     });
     const out = {};
     ["p", "s"].forEach(k=>{
       const g = round2(side[k].gross);
       const taxEl = run.querySelector(k === "p" ? ".ov-taxP" : ".ov-taxS");
       const supEl = run.querySelector(k === "p" ? ".ov-supP" : ".ov-supS");
-      const taxCalc = g > 0 ? periodWithholding(g, scale, freq) : 0;
       const supCalc = round2(Math.max(0, side[k].ote) * sg);
-      taxEl.placeholder = taxCalc.toFixed(0); supEl.placeholder = supCalc.toFixed(2);
-      const tax = taxEl.value !== "" ? val(taxEl) : taxCalc;
+      supEl.placeholder = supCalc.toFixed(2);
+      const tax = val(taxEl);   // entered from the payslip / ATO tax withheld calculator
       const sup = supEl.value !== "" ? val(supEl) : supCalc;
       out[k] = {gross:g, tax, net:round2(g - tax + side[k].adj), super:sup};
     });
@@ -1971,7 +2110,7 @@ function calcOverUnder(){
       if(row.querySelector(".s")) row.querySelector(".s").textContent = fmtAcc(out.s[key]);
       const d = round2(out.s[key] - out.p[key]);
       row.querySelector(".v").textContent = fmtAcc(d);
-      row.querySelector(".v").className = "num v mid gend" + (d < -0.005 ? " neg" : d > 0.005 ? " pos" : "");
+      row.querySelector(".v").className = "num v b-var mid" + (d < -0.005 ? " neg" : d > 0.005 ? " pos" : "");
       tot[key][0] += out.p[key]; tot[key][1] += out.s[key];
     });
   });
@@ -2005,7 +2144,7 @@ function calcOverUnder(){
 document.getElementById("ov-periods").addEventListener("input", calcOverUnder);
 document.getElementById("ov-loadSample").addEventListener("click", ()=>{
   document.getElementById("ov-runs").innerHTML = ""; ovRunCount = 0;
-  addOvRun({label:"APR24 PAY", freq:"monthly", sg:11.5, taxP:3367, taxS:0, lines:[
+  addOvRun({label:"APR24 PAY", sg:11.5, taxP:3367, taxS:0, lines:[
     {desc:"Ordinary hours", type:"ote", hP:173.33, aP:16891.88, hS:173.33, aS:16891.88},
     {desc:"Annual leave", type:"ote", hS:-122, aS:-11889.33},
     {desc:"Sick leave", type:"earn", aP:-974.53, aS:-974.53},
@@ -2013,7 +2152,7 @@ document.getElementById("ov-loadSample").addEventListener("click", ()=>{
     {desc:"Adjustment", type:"earn", aP:-100, aS:-100},
     {desc:"Deduction", type:"ded", aP:10, aS:10},
   ]});
-  addOvRun({label:"MAY24 PAY", freq:"monthly", sg:11.5, taxP:1712, taxS:230, lines:[
+  addOvRun({label:"MAY24 PAY", sg:11.5, taxP:1712, taxS:230, lines:[
     {desc:"Gross pay", type:"ote", aP:6501.50, aS:2500.58},
   ]});
   calcOverUnder();
@@ -2260,7 +2399,7 @@ function calcTermination(){
   const scale = parseInt(document.getElementById("tm-scale").value, 10);
   const periodsPerYear = PERIODS_PER_YEAR[freq];
   const stdHrs = num("tm-stdHrs");
-  const sgRate = num("tm-sgRate")/100;
+  const sgRate = (document.getElementById("tm-sgRate").value === "" ? 12 : num("tm-sgRate"))/100;
   const rateRaw = document.getElementById("tm-rate").value;
   const hourlyRate = rateRaw !== "" ? num("tm-rate")
     : (stdHrs > 0 ? num("tm-salary") / (stdHrs * WEEKS_PER_YEAR) : 0);
@@ -2665,7 +2804,7 @@ function buildMcbRows(){
 }
 
 function calcMcb(){
-  const sgRate = num("mcb-sgRate")/100;
+  const sgRate = (document.getElementById("mcb-sgRate").value === "" ? 12 : num("mcb-sgRate"))/100;
   // Whichever of TFR / base salary was typed last drives the other
   const tfrEl = document.getElementById("mcb-amount"), baseEl = document.getElementById("mcb-base");
   let amount, base;
@@ -2679,7 +2818,7 @@ function calcMcb(){
     if(document.activeElement !== baseEl) baseEl.value = tfrEl.value === "" ? "" : base.toFixed(2);
   }
   const hours = num("mcb-hours");
-  const maxBase = num("mcb-max");
+  const maxBase = document.getElementById("mcb-max").value === "" ? 270830 : num("mcb-max");
   const freq = document.getElementById("mcb-freq").value;
   const regDefault = round2(base / PERIODS_PER_YEAR[freq]);
   document.getElementById("mcb-breakdown").innerHTML =
@@ -2695,7 +2834,7 @@ function calcMcb(){
   const regInputs = document.querySelectorAll("#mcb-table .mcb-reg");
   regInputs.forEach((regEl, i)=>{
     regEl.placeholder = regDefault.toFixed(2);
-    if(regEl.dataset.edited !== "1" && document.activeElement !== regEl) regEl.value = regDefault.toFixed(2);
+    if(regEl.dataset.edited !== "1" && document.activeElement !== regEl) regEl.value = regDefault ? regDefault.toFixed(2) : "";
     const reg = regEl.dataset.edited === "1" ? parseFloat(regEl.value) || 0 : regDefault;
     const add = parseFloat(document.querySelector(`#mcb-table .mcb-add[data-i="${i}"]`).value) || 0;
     const ote = reg + add;
