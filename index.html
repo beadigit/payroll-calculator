@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payroll Calculator — PAYG, Base Pay &amp; Adjustments</title>
+<title>Payroll Calculator</title>
 <script>
   // Apply saved theme before first paint to avoid a flash
   try{ const t = localStorage.getItem("theme"); if(t==="light"||t==="dark") document.documentElement.dataset.theme = t; }catch(e){}
@@ -86,11 +86,9 @@
   .layout{display:block;}
   .sidenav{
     position:fixed; top:0; left:0; bottom:0; width:var(--nav-w); z-index:40; overflow-x:hidden; overflow-y:auto;
-    display:flex; flex-direction:column; background:#132335; color:#e6edf3; padding:18px 12px 0;
+    display:flex; flex-direction:column; background:#0b1220; border-right:1px solid #1f2937; color:#e6edf3; padding:18px 12px 0;   /* same dark bar in light and dark mode */
     transition:width .25s ease, transform .25s ease, box-shadow .25s ease;
   }
-  :root[data-theme="dark"] .sidenav{background:#0b1220; border-right:1px solid #1f2937;}
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .sidenav{background:#0b1220; border-right:1px solid #1f2937;} }
   .nav-collapsed .sidenav{width:var(--rail-w);}
   .sidenav .lbl{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .nav-brand{display:flex; align-items:center; gap:10px; padding:0 6px 16px; margin-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.08);}
@@ -150,6 +148,14 @@
   .page-head h2{font-size:22px; margin:2px 0 4px; letter-spacing:-0.01em;}
   .page-head p{margin:0; font-size:13.5px; opacity:0.7;}
   .page-head > div{flex:1 1 auto; min-width:0;}
+  /* Employee name: a full-width row under the first card's heading of whichever calculator is open */
+  .card-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .card .card-head h2{margin:0;}
+  .mp-card-head:has(> .emp-slot){align-items:center;}
+  *:has(> .emp-slot){flex-wrap:wrap; row-gap:14px;}
+  .emp-slot{order:5; flex:1 1 100%; display:flex;}   /* its own full-width row under the heading */
+  .emp-slot:empty{display:none;}
+  .emp-slot .page-emp{flex:1 1 auto; margin:0;}
 
   .panel{display:none;}
   .panel.active{display:block;}
@@ -229,11 +235,13 @@
   .result-line:last-child{border-bottom:none;}
   .result-line .k{opacity:0.75;}
   .result-line .v{font-family:var(--mono); font-weight:600; white-space:nowrap;}
+  /* totals: navy bar, same as the TOTAL bar on Mid-period rate change */
   .result-line.total{
-    border-top:2px solid var(--rule); border-bottom:none; margin-top:6px; padding-top:12px;
-    font-size:16px; font-weight:700;
+    align-items:center; border:none; margin-top:12px; padding:10px 14px; border-radius:4px;
+    background:var(--navy); color:#fff; font-size:14px; font-weight:700;
   }
-  .result-line.total .v{font-size:17px;}
+  .result-line.total .k{opacity:1;}
+  .result-line.total .v{font-size:15px;}
   .result-line.sub .k{padding-left:14px; opacity:0.6;}
 
   .steps{width:100%; border-collapse:collapse; font-size:12.5px;}
@@ -244,8 +252,9 @@
   .steps td{padding:7px 8px; border-bottom:1px dashed var(--line); vertical-align:top;}
   .steps td.n{font-family:var(--mono); font-weight:700; opacity:0.5; width:24px;}
   .steps td.val{font-family:var(--mono); text-align:right; white-space:nowrap; font-weight:600;}
-  .steps tr.hl td{background:var(--teal-dim);}
-  .steps tr.final td{background:var(--amber-dim); font-weight:700; border-bottom:none;}
+  /* key results: soft green, same as the PRO-RATA rows on Mid-period rate change */
+  .steps tr.hl td{background:var(--green-dim); color:var(--green);}
+  .steps tr.final td{background:var(--green-dim); color:var(--green); font-weight:700; border-bottom:none;}
 
   .sal-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
   .sal-head h2{margin:0;}
@@ -256,8 +265,11 @@
   }
   .sal-wrap{overflow-x:auto;}
   .sal{min-width:520px; font-size:13.5px;}
-  .sal th.r{text-align:right;}
-  .sal td.val.hl{color:var(--teal); font-weight:700;}
+  .sal{border-collapse:separate; border-spacing:0;}
+  .sal th.r{text-align:right; background:var(--navy); color:#fff; padding:9px 10px;}   /* navy column heads, like OLD RATE / NEW RATE */
+  .sal th.r:nth-child(2){border-radius:8px 0 0 0;}
+  .sal th.r:last-child{border-radius:0 8px 0 0;}
+  .sal td.val.hl{color:var(--green); font-weight:700;}
 
   .note{
     background:var(--teal-dim); border-left:3px solid var(--teal); padding:10px 12px;
@@ -588,8 +600,8 @@
     </div>
     <div class="nav-group">
       <div class="nav-cat">Tax</div>
-      <button title="PAYG — Method B(ii)" class="tab-btn" data-tab="payg" data-cat="Tax"
-        data-desc="Implements the ATO&#x27;s Schedule 5 &lt;strong&gt;Method B(ii)&lt;/strong&gt; — for back payments relating to a prior financial year, or any commission/bonus/similar additional payment that doesn&#x27;t relate to a single pay period. Covers resident employees, &lt;strong&gt;Scale 1&lt;/strong&gt; (no tax-free threshold) and &lt;strong&gt;Scale 2&lt;/strong&gt; (tax-free threshold claimed) only — not foreign residents, no-TFN, Medicare levy exemptions, or STSL/HELP. Cross-check against the ATO&#x27;s own calculator before relying on this for a live pay run."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h12v19l-3-2-3 2-3-2-3 2z"/><path d="M9.5 9.5l5 5"/><circle cx="9.5" cy="14.5" r=".9"/><circle cx="14.5" cy="9.5" r=".9"/></svg><span class="lbl">PAYG — Method B(ii)</span></button>
+      <button title="Sched 5 Method B (ii)" class="tab-btn" data-tab="payg" data-cat="Tax"
+        data-desc="Implements the ATO&#x27;s Schedule 5 &lt;strong&gt;Method B(ii)&lt;/strong&gt; — for back payments relating to a prior financial year, or any commission/bonus/similar additional payment that doesn&#x27;t relate to a single pay period. Covers &lt;strong&gt;Scale 1&lt;/strong&gt; (no tax-free threshold), &lt;strong&gt;Scale 2&lt;/strong&gt; (tax-free threshold claimed) and &lt;strong&gt;Scale 3&lt;/strong&gt; (foreign residents); working holiday makers use Schedule 15 instead. Not no-TFN, Medicare levy exemptions, or STSL/HELP. Cross-check against the ATO&#x27;s own calculator before relying on this for a live pay run."><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h12v19l-3-2-3 2-3-2-3 2z"/><path d="M9.5 9.5l5 5"/><circle cx="9.5" cy="14.5" r=".9"/><circle cx="14.5" cy="9.5" r=".9"/></svg><span class="lbl">Sched 5 Method B (ii)</span></button>
     </div>
     <div class="nav-group">
       <div class="nav-cat">Super</div>
@@ -627,12 +639,12 @@
   <div class="panel active" id="panel-base">
     <div class="grid">
       <div class="card">
-        <h2>Employee &amp; pay basis</h2>
+        <div class="card-head"><h2>Employee &amp; pay basis</h2><span class="emp-slot"><div class="field page-emp" id="page-emp-field"><label for="page-emp">Employee</label><input type="text" id="page-emp" placeholder="Employee name" autocomplete="off"></div></span></div>
 
         <div class="field">
           <label>Start date</label>
           <input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="bp-startDate">
-          <div class="hint">Shown in the salary summary heading, e.g. "New Employee - 01 June 2026".</div>
+          <div class="hint">Shown in the salary summary heading with the employee name, e.g. "Jordan Citizen - 01 June 2026".</div>
         </div>
 
         <div class="field">
@@ -721,7 +733,7 @@
   <div class="panel" id="panel-payg">
     <div class="grid">
       <div class="card">
-        <h2>Inputs</h2>
+        <div class="card-head"><h2>Inputs</h2><span class="emp-slot"></span></div>
 
         <h3>Pay cycle &amp; tax scale</h3>
         <div class="row2">
@@ -734,11 +746,14 @@
             </select>
           </div>
           <div class="field">
-            <label>Tax-free threshold claimed?</label>
+            <label>Tax scale</label>
             <select id="pg-scale">
-              <option value="2" selected>Yes — Scale 2</option>
-              <option value="1">No — Scale 1</option>
+              <option value="2" selected>Scale 2 — tax-free threshold claimed</option>
+              <option value="1">Scale 1 — no tax-free threshold</option>
+              <option value="3">Scale 3 — foreign resident</option>
+              <option value="whm">Working holiday maker — Schedule 15</option>
             </select>
+            <div class="hint">Foreign residents use Scale 3: no tax-free threshold and no Medicare levy. Working holiday makers (subclass 417 or 462) use Schedule 15 when the employer is registered as a WHM employer; if it isn't, choose Scale 3.</div>
           </div>
         </div>
 
@@ -775,7 +790,7 @@
       </div>
 
       <div class="card">
-        <h2>Method B(ii) — step by step</h2>
+        <h2 id="pg-stepsTitle">Method B(ii) — step by step</h2>
         <table class="steps" id="pg-steps"></table>
         <div class="result-line total">
           <span class="k">Total PAYG withholding this pay period</span>
@@ -799,7 +814,7 @@
     </div>
     <div class="mp-stack">
       <div class="card mp-card" data-sec="nt">
-        <div class="mp-card-head"><h2>Normal time</h2><span class="mp-cols">Old rate / New rate</span></div>
+        <div class="mp-card-head"><h2>Normal time</h2><span class="emp-slot"></span><span class="mp-cols">Old rate / New rate</span></div>
         <table class="mp-table">
           <tr class="mp-head"><th>Description</th><th class="col-old">Old rate</th><th class="col-new">New rate</th></tr>
           <tr><td>Pay frequency</td><td class="col-old"><select class="mp-in" data-f="freq" data-c="old"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td><td class="col-new"><select class="mp-in" data-f="freq" data-c="new"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly" selected>Monthly</option></select></td></tr>
@@ -863,7 +878,7 @@
       <!-- Over/underpayment -->
       <div class="card" style="grid-column:1/-1;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
-          <h2 style="margin:0;">Over/underpayment reconciliation</h2>
+          <h2 style="margin:0;">Over/underpayment reconciliation</h2><span class="emp-slot"></span>
           <div style="display:flex; gap:8px;">
             <button class="btn ghost small" id="ov-loadSample" type="button">Load sample</button>
           </div>
@@ -891,10 +906,10 @@
     <div class="grid">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h2 style="margin:0;">Employee</h2>
+          <h2 style="margin:0;">Employee</h2><span class="emp-slot"></span>
           <button class="btn ghost small" id="tm-loadSample" type="button">Load sample</button>
         </div>
-        <div class="field"><label>Name</label><input type="text" id="tm-name" placeholder="optional"></div>
+        <input type="hidden" id="tm-name">
         <div class="row3">
           <div class="field"><label>Date of birth</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-dob"></div>
           <div class="field"><label>Hired date</label><input type="text" class="date-au" inputmode="numeric" placeholder="dd/mm/yyyy" autocomplete="off" id="tm-hired"></div>
@@ -930,10 +945,17 @@
             <select id="tm-scale">
               <option value="2" selected>Scale 2 — tax-free threshold claimed</option>
               <option value="1">Scale 1 — no tax-free threshold</option>
+              <option value="3">Scale 3 — foreign resident</option>
+              <option value="whm">Working holiday maker — Schedule 15</option>
               <option value="stsl">STSL — enter PAYG manually</option>
             </select>
-            <div class="hint">Choose STSL when the employee has a study and training support loan (HELP, VSL, SSL, TSL). The calculator doesn't work out STSL, so you enter the final wages PAYG from Xero instead.</div>
+            <div class="hint">Foreign residents use Scale 3: no tax-free threshold, and no Medicare levy in the leave and ETP rates. Working holiday makers (subclass 417 or 462) use Schedule 15 when the employer is registered as a WHM employer; if it isn't, choose Scale 3. Choose STSL when the employee has a study and training support loan (HELP, VSL, SSL, TSL); the calculator doesn't work out STSL, so you enter the final wages PAYG from Xero instead.</div>
           </div>
+        </div>
+        <div class="field" id="tm-whmYtdRow" style="display:none">
+          <label>Earnings paid this financial year, before the final pay ($)</label>
+          <input type="number" id="tm-whmYtd" step="0.01" placeholder="YTD gross from Xero">
+          <div class="hint">Working holiday maker rates apply to everything paid in the income year: 15% on the first $45,000, then 30%, 37% and 45%. Enter the YTD gross before this final pay so the right band is used.</div>
         </div>
         <div class="row3">
           <div class="field"><label>Standard hours / week</label><input type="number" id="tm-stdHrs" step="0.25"></div>
@@ -1091,7 +1113,7 @@
             <option value="0.17">17% — at or over preservation age</option>
             <option value="0.32">32% — under preservation age</option>
           </select>
-          <div class="hint">Anything above the cap is withheld at 47%. Death benefits use their own rates.</div>
+          <div class="hint">Anything above the cap is withheld at 47%. Death benefits use their own rates. For foreign residents and working holiday makers, every ETP and leave rate is 2% lower because the Medicare levy doesn't apply.</div>
         </div>
       </div>
       <div class="card">
@@ -1153,7 +1175,8 @@
         <dt>ETP caps</dt><dd>The employment termination payment cap is $270,000. The whole-of-income cap is $180,000 and isn't indexed (ATO Schedule 11, from 1 July 2026).</dd>
         <dt>ETP tax rates</dt><dd>32% for an employee under preservation age, 17% once they have reached preservation age (60) by 30 June of the year the payment is made, and 47% on anything above the caps.</dd>
         <dt>Unused leave</dt><dd>Withheld at a flat 32%, or with the marginal method where ATO Schedule 7 (from 1 July 2026) calls for it, including the special rule for payments under $300.</dd>
-        <dt>Final wages</dt><dd>Ordinary earnings are taxed with the ATO's Schedule 1 formulas for scales 1 and 2 (from 1 July 2026), the same table a normal pay run uses.</dd>
+        <dt>Final wages</dt><dd>Ordinary earnings are taxed with the ATO's Schedule 1 formulas for scales 1, 2 and 3 (from 1 July 2026), the same table a normal pay run uses. Working holiday makers use Schedule 15 instead: 15% on the first $45,000 paid in the income year, then 30%, 37% and 45%.</dd>
+        <dt>Foreign residents and working holiday makers</dt><dd>No Medicare levy, so the flat leave rate is 30% and the ETP rates are 15%, 30% and 45%.</dd>
         <dt>Super guarantee</dt><dd>12%, with an annual maximum contribution base of $270,830 under Payday Super (FY 2026–27).</dd>
         <dt>What we take as given</dt><dd>The employee has provided a TFN and no withholding variation is in place. If an ETP has already been paid for the same termination, the caps and codes change, and this tool doesn't model that.</dd>
       </dl>
@@ -1165,7 +1188,7 @@
     <div class="grid">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h2 style="margin:0;">Remuneration</h2>
+          <h2 style="margin:0;">Remuneration</h2><span class="emp-slot"></span>
           <button class="btn ghost small" id="mcb-loadSample" type="button">Load sample</button>
         </div>
         <div class="row2">
@@ -1224,7 +1247,7 @@
     <div class="grid">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h2 style="margin:0;">1. Client instructions</h2>
+          <h2 style="margin:0;">1. Client instructions</h2><span class="emp-slot"></span>
           <button class="btn ghost small" id="nh-loadSample" type="button">Load sample</button>
         </div>
         <label class="dropzone" id="nh-drop">
@@ -1608,7 +1631,7 @@ function tipHtml(text){
 // ("85000.5"), so every calculation reads them exactly as before.
 const MONEY_SEL = [
   "#bp-annualSalary", "#bp-hourlyRate",
-  "#pg-ytdNormal", "#pg-curNormal", "#pg-ytdAdditional", "#pg-ytdAdditionalTax", "#pg-currentAdditional",
+  "#pg-ytdNormal", "#pg-curNormal", "#pg-ytdAdditional", "#pg-ytdAdditionalTax", "#pg-currentAdditional", "#tm-whmYtd",
   '#panel-variance .mp-in[data-f="amount"]',
   ".ov-aP", ".ov-aS", ".ov-taxP", ".ov-taxS", ".ov-supP", ".ov-supS",
   "#tm-salary", "#tm-rate", "#tm-alRate", "#tm-alTotal", ".tm-l-rate", ".tm-l-amount", "#tm-bonusTax", "#tm-manualPayg", "#tm-exGratia", "#tm-noticeExtra", "#tm-normalGross", "#tm-s7Tax1", "#tm-s7Tax2",
@@ -1686,8 +1709,14 @@ const SCALE2 = [ // tax-free threshold claimed
   {lt:Infinity, a:0.4700, b:655.7704},
 ];
 
+const SCALE3 = [ // foreign residents — no tax-free threshold, no Medicare levy
+  {lt:2596, a:0.3000, b:0.3000},
+  {lt:3653, a:0.3700, b:181.7308},
+  {lt:Infinity, a:0.4500, b:474.0385},
+];
+
 function withholdFromX(x, scale){
-  const table = scale === 1 ? SCALE1 : SCALE2;
+  const table = scale === 1 ? SCALE1 : scale === 3 ? SCALE3 : SCALE2;
   for(const row of table){
     if(x < row.lt){
       if(row.a === null) return 0;
@@ -1722,6 +1751,20 @@ function periodWithholding(periodEarnings, scale, frequency){
   return 0;
 }
 
+// Working holiday makers (Schedule 15): the bands apply to everything paid in the income year,
+// so withholding on a payment = tax on (earnings so far + this payment) − tax on earnings so far.
+const WHM_BANDS = [{upTo:45000, rate:0.15}, {upTo:135000, rate:0.30}, {upTo:190000, rate:0.37}, {upTo:Infinity, rate:0.45}];
+function whmTaxOn(income){
+  let tax = 0, from = 0;
+  for(const b of WHM_BANDS){ if(income > from) tax += (Math.min(income, b.upTo) - from) * b.rate; from = b.upTo; }
+  return tax;
+}
+function whmWithholding(payment, earnedBefore){
+  if(payment <= 0) return 0;
+  const before = Math.max(0, earnedBefore || 0);
+  return Math.max(0, Math.round(whmTaxOn(before + payment) - whmTaxOn(before)));
+}
+
 const PERIODS_PER_YEAR = {weekly:52, fortnightly:26, monthly:12};
 const WEEKS_PER_YEAR = 52;
 
@@ -1754,7 +1797,22 @@ function showTool(btn){
   document.getElementById("page-cat").textContent = btn.dataset.cat;
   document.getElementById("page-title").textContent = btn.querySelector(".lbl").textContent;
   document.getElementById("page-desc").innerHTML = btn.dataset.desc;
+  syncPageEmp();
 }
+/* ---- employee name, kept per calculator (Termination keeps it in tm-name) ---- */
+const empByTool = {};
+const currentTab = () => (document.querySelector(".tab-btn.active") || {}).dataset?.tab;
+function empFor(tab){ return tab === "term" ? document.getElementById("tm-name").value : (empByTool[tab] || ""); }
+function syncPageEmp(){
+  const tab = currentTab(), slot = document.querySelector("#panel-" + tab + " .emp-slot");
+  if(slot) slot.append(document.getElementById("page-emp-field"));   // one field, moved to the open calculator
+  document.getElementById("page-emp").value = empFor(tab);
+}
+document.getElementById("page-emp").addEventListener("input", () => {
+  const tab = currentTab(), v = document.getElementById("page-emp").value;
+  if(tab === "term"){ document.getElementById("tm-name").value = v; calcTermination(); } else empByTool[tab] = v;
+  if(tab === "base") calcBase();
+});
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     showTool(btn);
@@ -1892,10 +1950,12 @@ function calcBase(){
   const startLabel = startDate
     ? " - " + new Date(startDate + "T00:00:00").toLocaleDateString("en-AU",{day:"2-digit", month:"long", year:"numeric"})
     : "";
+  // employee name from the page header; "New Employee" until one is entered
+  const empLabel = (empByTool.base || "").trim().replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]) || "New Employee";
   document.getElementById("bp-summary").innerHTML = `
     <div class="sal-head">
       <div>
-        <h2>Salary summary — New Employee${startLabel}</h2>
+        <h2>Salary summary — ${empLabel}${startLabel}</h2>
         <div class="basis">${empType==="pt" ? "Part-time" : "Full-time"} ${fmtH(contractedHours)} hrs/week (${fmtH(standardHoursThisPeriod)} hrs/${periodUnit})</div>
       </div>
       <span class="fte">${fmtH(fteFraction*100)}% FTE</span>
@@ -1942,7 +2002,8 @@ function methodB2({freq, scale, ytdNormalBefore, curNormal, periodsToDate, ytdAd
   const diff = tax2 - tax1;                                                                // step 6
   const totalWithholdingOnAdditional = diff * periodsPerYear;                              // step 7
   const netWithholding = totalWithholdingOnAdditional - ytdAdditionalTaxPrior;             // step 8
-  const cap = currentAdditional * 0.47;                                                    // step 9
+  const topRate = scale === 3 ? 0.45 : 0.47;
+  const cap = currentAdditional * topRate;                                                 // step 9
   const finalAdditional = Math.max(0, Math.floor(Math.min(netWithholding, cap)));          // step 10
   const normalTax = periodWithholding(curNormal, scale, freq);                             // step 11
   const total = finalAdditional + normalTax;                                               // step 12
@@ -1955,7 +2016,7 @@ function methodB2({freq, scale, ytdNormalBefore, curNormal, periodsToDate, ytdAd
     [6, "Step 5 − step 2", diff],
     [7, "Step 6 × pay periods in the year", totalWithholdingOnAdditional],
     [8, "Step 7 − PAYG already withheld on additional payments this FY", netWithholding],
-    [9, "This period's additional payment × 47% (cap)", cap],
+    [9, `This period's additional payment × ${topRate * 100}% (cap)`, cap],
   ];
   let html = "<tr><th>#</th><th>Step</th><th>Result</th></tr>";
   rows.forEach(r=>{ html += `<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="val">${fmt(r[2])}</td></tr>`; });
@@ -1966,9 +2027,30 @@ function methodB2({freq, scale, ytdNormalBefore, curNormal, periodsToDate, ytdAd
 }
 
 function calcPayg(){
+  const scaleSel = document.getElementById("pg-scale").value;
+  if(scaleSel === "whm"){
+    // Schedule 15: Method B(ii) doesn't apply; the whole payment is taxed on the year's cumulative earnings
+    const before = num("pg-ytdNormal") + num("pg-ytdAdditional");
+    const pay = num("pg-curNormal") + num("pg-currentAdditional");
+    const total = whmWithholding(pay, before);
+    const rows = [
+      [1, "Earnings already paid this financial year (normal + additional, before this pay)", before],
+      [2, "This pay (normal + additional)", pay],
+      [3, "Tax at WHM rates on step 1 + step 2", whmTaxOn(before + pay)],
+      [4, "Less tax at WHM rates on step 1", whmTaxOn(before)],
+    ];
+    let html = "<tr><th>#</th><th>Step</th><th>Result</th></tr>";
+    rows.forEach(r=>{ html += `<tr><td class="n">${r[0]}</td><td>${r[1]}</td><td class="val">${fmt(r[2])}</td></tr>`; });
+    html += `<tr class="final"><td class="n">5</td><td>Total PAYG withholding this pay period (step 3 − step 4, nearest dollar)</td><td class="val">${fmt(total)}</td></tr>`;
+    document.getElementById("pg-stepsTitle").textContent = "Schedule 15 — working holiday maker";
+    document.getElementById("pg-steps").innerHTML = html;
+    document.getElementById("pg-total").textContent = fmt(total);
+    return;
+  }
+  document.getElementById("pg-stepsTitle").textContent = "Method B(ii) — step by step";
   const r = methodB2({
     freq: document.getElementById("pg-freq").value,
-    scale: parseInt(document.getElementById("pg-scale").value, 10),
+    scale: parseInt(scaleSel, 10),
     ytdNormalBefore: num("pg-ytdNormal"),
     curNormal: num("pg-curNormal"),
     periodsToDate: num("pg-periodsToDate"),
@@ -2144,7 +2226,7 @@ function addOvRun(data = {}, after = null){
       <tbody class="ov-sum">
         <tr data-k="gross"><td colspan="2" class="lab">Gross</td><td class="gp"></td><td class="b-paid"></td><td class="num p b-paid mid"></td><td class="gp"></td><td class="b-should"></td><td class="num s b-should mid"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
         <tr data-k="tax"><td colspan="2" class="lab"><div class="ov-lab-ctl"><span>Tax</span>
-          <select class="ov-scale" title="Tax scale — use the same scale in the ATO tax withheld calculator"><option value="2" title="Tax-free threshold claimed">Scale 2 (TFT claimed)</option><option value="1" title="No tax-free threshold">Scale 1 (no TFT)</option></select></div></td><td class="gp"></td><td class="b-paid"></td><td class="b-paid mid"><input type="number" class="ov-taxP" step="1" placeholder="from payslip"></td><td class="gp"></td><td class="b-should"></td><td class="b-should mid"><input type="number" class="ov-taxS" step="1" placeholder="from ATO calc"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
+          <select class="ov-scale" title="Tax scale — use the same scale in the ATO tax withheld calculator"><option value="2" title="Tax-free threshold claimed">Scale 2 (TFT claimed)</option><option value="1" title="No tax-free threshold">Scale 1 (no TFT)</option><option value="3" title="Foreign resident">Scale 3 (foreign resident)</option><option value="whm" title="Working holiday maker — Schedule 15">WHM (Schedule 15)</option></select></div></td><td class="gp"></td><td class="b-paid"></td><td class="b-paid mid"><input type="number" class="ov-taxP" step="1" placeholder="from payslip"></td><td class="gp"></td><td class="b-should"></td><td class="b-should mid"><input type="number" class="ov-taxS" step="1" placeholder="from ATO calc"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
         <tr data-k="net"><td colspan="2" class="lab">Net</td><td class="gp"></td><td class="b-paid"></td><td class="num p b-paid mid"></td><td class="gp"></td><td class="b-should"></td><td class="num s b-should mid"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
         <tr data-k="super"><td colspan="2" class="lab"><div class="ov-lab-ctl"><span>Super</span>
           <span class="ov-pct"><input type="number" class="ov-sg" step="0.1" placeholder="12" value="${data.sg ?? 12}" title="Super rate"><span>%</span></span></div></td><td class="gp"></td><td class="b-paid"></td><td class="b-paid mid"><input type="number" class="ov-supP" step="0.01"></td><td class="gp"></td><td class="b-should"></td><td class="b-should mid"><input type="number" class="ov-supS" step="0.01"></td><td class="gp"></td><td class="b-var"></td><td class="num v b-var mid"></td><td class="gp"></td><td></td></tr>
@@ -2416,7 +2498,7 @@ const TERM_INPUTS = ["tm-name","tm-dob","tm-hired","tm-last","tm-reason","tm-cas
  "tm-genuine","tm-smallBiz","tm-redWks","tm-certified","tm-retireDate","tm-deathTo",
  "tm-freq","tm-scale","tm-stdHrs","tm-salary","tm-rate","tm-sgRate","tm-ordHrs","tm-ordRate","tm-ordSuper","tm-manualPayg","tm-bonusTax",
  "tm-alBal","tm-alRate","tm-alAccrue","tm-normalGross","tm-s7Hours","tm-s7Tax1","tm-s7Tax2",
- "tm-noticeWks","tm-exGratia","tm-etpRate"];
+ "tm-noticeWks","tm-exGratia","tm-etpRate","tm-whmYtd"];
 TERM_INPUTS.forEach(id=>{
   const el = document.getElementById(id);
   el.addEventListener("input", calcTermination);
@@ -2472,6 +2554,7 @@ const TM_SAMPLE = {
   "tm-etpRate": "auto",
 };
 document.getElementById("tm-loadSample").addEventListener("click", ()=>{
+  setTimeout(syncPageEmp);
   setTermType("normal");
   document.getElementById("tm-otherRows").innerHTML = "";
   document.getElementById("tm-leaveRows").innerHTML = "";
@@ -2591,7 +2674,13 @@ function calcTermination(){
   const freq = document.getElementById("tm-freq").value;
   const scaleSel = document.getElementById("tm-scale").value;
   const manualPayg = scaleSel === "stsl";                 // PAYG on final wages entered from Xero (includes STSL)
-  const scale = scaleSel === "1" ? 1 : 2;                  // tax table for everything else (leave, Schedule 7)
+  const scale = scaleSel === "1" ? 1 : scaleSel === "3" ? 3 : 2;   // tax table for everything else (leave, Schedule 7)
+  const whm = scaleSel === "whm";                          // working holiday maker — Schedule 15, cumulative for the year
+  const noMedicare = whm || scaleSel === "3";              // foreign residents & WHMs: leave and ETP rates exclude the 2% Medicare levy
+  const whmYtd = num("tm-whmYtd");
+  document.getElementById("tm-whmYtdRow").style.display = whm ? "" : "none";
+  const lumpSumARate = noMedicare ? Math.round((TERM.lumpSumARate - 0.02) * 100) / 100 : TERM.lumpSumARate;
+  const topRate = noMedicare ? Math.round((TERM.topRate - 0.02) * 100) / 100 : TERM.topRate;
   const periodsPerYear = PERIODS_PER_YEAR[freq];
   const stdHrs = num("tm-stdHrs");
   const sgRate = (document.getElementById("tm-sgRate").value === "" ? 12 : num("tm-sgRate"))/100;
@@ -2645,10 +2734,10 @@ function calcTermination(){
   const ordGross = round2(ordPay + otherGross);  // everything paid in the final pay
   // Bonus / commission: PAYG entered from Xero; the rest of the final pay uses the tax table
   const bonusGross = round2(otherPay.filter(o=>o.type === "bonus").reduce((a, o)=>a + o.amount, 0));
-  const hasBonus = bonusGross > 0 && !isDeath && !manualPayg;
+  const hasBonus = bonusGross > 0 && !isDeath && !manualPayg && !whm;   // WHM bonuses just join the year's cumulative earnings
   document.getElementById("tm-s5").style.display = hasBonus ? "block" : "none";
   const taxTableBase = hasBonus ? round2(ordGross - bonusGross) : ordGross;   // earnings taxed with the tax table
-  const tablePayg = isDeath ? 0 : periodWithholding(taxTableBase, scale, freq);
+  const tablePayg = isDeath ? 0 : whm ? whmWithholding(taxTableBase, whmYtd) : periodWithholding(taxTableBase, scale, freq);
   const bonusTaxRaw = document.getElementById("tm-bonusTax").value;
   const bonusTax = hasBonus ? num("tm-bonusTax") : 0;
   document.getElementById("tm-manualPaygRow").style.display = manualPayg && !isDeath ? "" : "none";
@@ -2700,14 +2789,19 @@ function calcTermination(){
   const s7Diff = s7Tax2 - s7Tax1;
 
   let leaveTax = 0, leaveMethod, leaveStp;
-  const smallLeave = leaveMode === "marginal" && leaveGross > 0 && leaveGross < TERM.smallLeave;
+  const smallLeave = !whm && leaveMode === "marginal" && leaveGross > 0 && leaveGross < TERM.smallLeave;
   if(leaveMode === "estate"){
     leaveMethod = "Paid to the estate — no withholding";
     leaveStp = "Paid to estate";
   } else if(leaveMode === "lumpA"){
-    leaveTax = Math.round(leaveGross * TERM.lumpSumARate);
-    leaveMethod = `Flat ${pct(TERM.lumpSumARate)} — ${genuine ? "genuine redundancy" : "invalidity"}`;
+    leaveTax = Math.round(leaveGross * lumpSumARate);
+    leaveMethod = `Flat ${pct(lumpSumARate)} — ${genuine ? "genuine redundancy" : "invalidity"}`;
     leaveStp = "Lump Sum A · type R";
+  } else if(whm){
+    // WHM: the leave is taxed at WHM rates on top of everything already paid this year, including the final pay
+    leaveTax = whmWithholding(leaveGross, whmYtd + taxTableBase);
+    leaveMethod = "Working holiday maker rates — Schedule 15";
+    leaveStp = "Paid leave · type U";
   } else if(smallLeave){
     // Under $300: add to the final pay and withhold with the tax table
     leaveTax = Math.max(0, periodWithholding(taxTableBase + leaveGross, scale, freq) - tablePayg);
@@ -2768,9 +2862,10 @@ function calcTermination(){
     etpCode = excluded ? "R" : "O";
     const etpSel = document.getElementById("tm-etpRate").value;
     rateUnder = etpSel === "auto" ? (ageAtFyEnd >= TERM.preservationAge ? 0.17 : 0.32) : parseFloat(etpSel);
-    rateNote = etpSel === "auto"
+    if(noMedicare) rateUnder = Math.round((rateUnder - 0.02) * 100) / 100;
+    rateNote = (etpSel === "auto"
       ? `Age ${ageAtFyEnd} at 30/06/2027 — ${ageAtFyEnd >= TERM.preservationAge ? "at or over" : "under"} preservation age (${TERM.preservationAge})`
-      : "Rate chosen manually";
+      : "Rate chosen manually") + (noMedicare ? " · no Medicare levy (" + (whm ? "working holiday maker" : "foreign resident") + ")" : "");
     if(excluded){
       cap = TERM.etpCap; capNote = `Excluded ETP — ETP cap ${fmt(TERM.etpCap)}`;
     } else {
@@ -2782,7 +2877,7 @@ function calcTermination(){
   }
   const underCap = Math.min(etpTaxable, cap);
   const overCap = Math.max(0, etpTaxable - cap);
-  const overRate = isDeath && deathTo === "trustee" ? 0 : TERM.topRate;
+  const overRate = isDeath && deathTo === "trustee" ? 0 : topRate;
   const etpTax = Math.round(underCap * rateUnder + overCap * overRate);
   const etpNet = etpGross - etpTax;
 
@@ -2867,7 +2962,7 @@ function calcTermination(){
     </div>`;
 
   const superNote = superCapped ? `Limited by the maximum contribution base (${fmt(mcbLeft)})` : `On ${fmt(finalOte)} OTE · paid to fund, not to employee`;
-  const finalPay = block(`${++n}. Final wages`, isDeath ? "Paid to the estate" : "Schedule 1 tax table",
+  const finalPay = block(`${++n}. Final wages`, isDeath ? "Paid to the estate" : manualPayg ? "Entered from Xero" : whm ? "Schedule 15 — working holiday maker" : "Schedule 1 tax table",
     line("Ordinary hours", fmt(ordPay), "", `${ordHrs.toFixed(4)} hrs × $${ordRate.toFixed(6)}`) +
     otherPay.map(o => line(o.label, fmt(o.amount), "", `${o.hours ? o.hours.toFixed(4) + " hrs × $" + o.rate.toFixed(6) + " · " : ""}${o.super ? "super applies" : "no super"}`)).join("") +
     (otherPay.length ? line("Gross final wages", fmt(ordGross)) : "") +
@@ -2876,10 +2971,10 @@ function calcTermination(){
         line("PAYG — bonus / commission", bonusTaxRaw === "" ? "Enter Xero's figure" : minus(bonusTax), "deduct", "Entered from Xero's calculation")
       : manualPayg && !isDeath
         ? line("PAYG withheld (incl. STSL)", manualPaygRaw === "" ? "Enter Xero's figure" : minus(ordPayg), "deduct", "Entered manually from Xero — includes the STSL component")
-        : line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : "")) +
+        : line("PAYG withheld", minus(ordPayg), "deduct", isDeath ? "No withholding on amounts paid to the estate" : whm ? `WHM rates on top of ${fmt(whmYtd)} already paid this financial year` : "")) +
     line("Net", fmt(ordNet), "net") +
     line(`Super (${(sgRate*100).toFixed(1)}%)`, fmt(ordSuper), "super", superNote),
-    isDeath ? "Paid to estate" : "Gross (salary & wages)");
+    isDeath ? "Paid to estate" : whm ? "Income type: working holiday maker" : "Gross (salary & wages)");
 
   const leaveBody = leaveGross > 0
     ? line("Annual leave", fmt(alGross), "", `${alHrs.toFixed(4)} hrs × $${alRate.toFixed(6)}${alAccrual ? ` · incl. ${alAccrual.toFixed(4)} hrs accrued` : ""}`) +
@@ -2940,7 +3035,14 @@ function calcTermination(){
     s7note.innerHTML = `<div class="note">Unused leave owed at death is paid to the estate — no withholding.</div>`;
   } else if(leaveMode === "lumpA"){
     s7title.textContent = "Tax on unused leave — Lump Sum A";
-    s7note.innerHTML = `<div class="note">On a ${genuine ? "genuine redundancy" : "certified invalidity"}, unused annual and long service leave is withheld at a flat ${pct(TERM.lumpSumARate)}: ${fmt(leaveGross)} × ${pct(TERM.lumpSumARate)} = <strong>${fmt(leaveTax)}</strong>. The Schedule 7 marginal method isn't used.</div>`;
+    s7note.innerHTML = `<div class="note">On a ${genuine ? "genuine redundancy" : "certified invalidity"}, unused annual and long service leave is withheld at a flat ${pct(lumpSumARate)}: ${fmt(leaveGross)} × ${pct(lumpSumARate)} = <strong>${fmt(leaveTax)}</strong>. The Schedule 7 marginal method isn't used.</div>`;
+  } else if(whm){
+    s7title.textContent = "Tax on unused leave — working holiday maker";
+    s7table.innerHTML = `<tr><th>#</th><th>Step</th><th style="text-align:right">Result</th></tr>
+      <tr><td class="n">1</td><td>Earnings this financial year before the leave (${fmt(whmYtd)} YTD + ${fmt(taxTableBase)} final pay)</td><td class="val">${fmt(whmYtd + taxTableBase)}</td></tr>
+      <tr><td class="n">2</td><td>Tax at WHM rates on step 1 + unused leave (${fmt(leaveGross)})</td><td class="val">${fmt(whmTaxOn(whmYtd + taxTableBase + leaveGross))}</td></tr>
+      <tr><td class="n">3</td><td>Less tax at WHM rates on step 1</td><td class="val">${fmt(whmTaxOn(whmYtd + taxTableBase))}</td></tr>
+      <tr class="final"><td class="n">4</td><td>Tax on unused leave (step 2 − step 3, nearest dollar)</td><td class="val">${fmt(leaveTax)}</td></tr>`;
   } else if(smallLeave){
     s7title.textContent = `Schedule 7 — unused leave under ${fmt(TERM.smallLeave)}`;
     s7table.innerHTML = `<tr><th>#</th><th>Step</th><th style="text-align:right">Result</th></tr>
